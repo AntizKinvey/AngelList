@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
 @interface ContainerViewController : UIViewController <UITabBarControllerDelegate>
 {
-    
+    DBManager *_dbmanager;
 }
 
 @property (strong, nonatomic) UITabBarController *tabBarController;

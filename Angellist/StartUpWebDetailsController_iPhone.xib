@@ -37,12 +37,13 @@
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
-					<object class="IBUIWebView" id="256713445">
+					<object class="IBUIWebView" id="985789264">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">274</int>
 						<string key="NSFrameSize">{320, 480}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="539138053"/>
 						<string key="NSReuseIdentifierKey">_NS:693</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
@@ -52,15 +53,15 @@
 						<int key="IBUIDataDetectorTypes">1</int>
 						<bool key="IBUIDetectsPhoneNumbers">YES</bool>
 					</object>
-					<object class="IBUIView" id="623626257">
+					<object class="IBUIView" id="539138053">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">-2147483356</int>
 						<array class="NSMutableArray" key="NSSubviews">
-							<object class="IBUIActivityIndicatorView" id="636501087">
-								<reference key="NSNextResponder" ref="623626257"/>
+							<object class="IBUIActivityIndicatorView" id="1008136459">
+								<reference key="NSNextResponder" ref="539138053"/>
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{90, 41}, {20, 20}}</string>
-								<reference key="NSSuperview" ref="623626257"/>
+								<reference key="NSSuperview" ref="539138053"/>
 								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:1030</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -72,13 +73,13 @@
 									<bytes key="NSRGB">MC4xMjI2NzQ2NjY0IDAuNzk3NjIwMTIwMiAxAA</bytes>
 								</object>
 							</object>
-							<object class="IBUILabel" id="652051025">
-								<reference key="NSNextResponder" ref="623626257"/>
+							<object class="IBUILabel" id="699729221">
+								<reference key="NSNextResponder" ref="539138053"/>
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{35, 8}, {128, 21}}</string>
-								<reference key="NSSuperview" ref="623626257"/>
+								<reference key="NSSuperview" ref="539138053"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="636501087"/>
+								<reference key="NSNextKeyView" ref="1008136459"/>
 								<string key="NSReuseIdentifierKey">_NS:328</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -110,7 +111,7 @@
 						<string key="NSFrame">{{61, 164}, {199, 81}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="652051025"/>
+						<reference key="NSNextKeyView" ref="699729221"/>
 						<string key="NSReuseIdentifierKey">_NS:196</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
@@ -122,6 +123,7 @@
 				<string key="NSFrameSize">{320, 480}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">3</int>
 					<bytes key="NSWhite">MQA</bytes>
@@ -146,7 +148,7 @@
 					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">loading</string>
 						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="623626257"/>
+						<reference key="destination" ref="539138053"/>
 					</object>
 					<int key="connectionID">8</int>
 				</object>
@@ -154,7 +156,7 @@
 					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">webView</string>
 						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="256713445"/>
+						<reference key="destination" ref="985789264"/>
 					</object>
 					<int key="connectionID">9</int>
 				</object>
@@ -171,8 +173,8 @@
 						<int key="objectID">1</int>
 						<reference key="object" ref="191373211"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="256713445"/>
-							<reference ref="623626257"/>
+							<reference ref="539138053"/>
+							<reference ref="985789264"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -189,32 +191,32 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">4</int>
-						<reference key="object" ref="256713445"/>
-						<reference key="parent" ref="191373211"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">5</int>
-						<reference key="object" ref="623626257"/>
+						<reference key="object" ref="539138053"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="636501087"/>
-							<reference ref="652051025"/>
+							<reference ref="1008136459"/>
+							<reference ref="699729221"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
+						<int key="objectID">5</int>
+						<reference key="object" ref="985789264"/>
+						<reference key="parent" ref="191373211"/>
+					</object>
+					<object class="IBObjectRecord">
 						<int key="objectID">6</int>
-						<reference key="object" ref="636501087"/>
-						<reference key="parent" ref="623626257"/>
+						<reference key="object" ref="1008136459"/>
+						<reference key="parent" ref="539138053"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">7</int>
-						<reference key="object" ref="652051025"/>
-						<reference key="parent" ref="623626257"/>
+						<reference key="object" ref="699729221"/>
+						<reference key="parent" ref="539138053"/>
 					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
-				<string key="-1.CustomClassName">WebDetailsController</string>
+				<string key="-1.CustomClassName">StartUpWebDetailsController</string>
 				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="-2.CustomClassName">UIResponder</string>
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -233,7 +235,7 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">WebDetailsController</string>
+					<string key="className">StartUpWebDetailsController</string>
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="loading">UIView</string>
@@ -251,7 +253,7 @@
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/WebDetailsController.h</string>
+						<string key="minorKey">./Classes/StartUpWebDetailsController.h</string>
 					</object>
 				</object>
 			</array>

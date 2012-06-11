@@ -7,9 +7,11 @@
 //
 
 #import "ContainerViewController.h"
+#import "HomeViewController.h"
 #import "ActivityViewController.h"
 #import "StartUpViewController.h"
 #import "InboxViewController.h"
+#import "CustomTabBar.h"
 
 @implementation ContainerViewController
 
@@ -17,11 +19,19 @@
 
 extern NSString *_angelUserId;
 extern NSString *_angelUserName;
+extern NSString *access_token;
+
+extern NSString *_angelUserIdFromDB;
+extern NSString *_angelUserNameFromDB;
+extern NSString *access_tokenFromDB;
 
 BOOL _transitFromActivity = FALSE;
 BOOL _transitFromStartUps = FALSE;
 
+extern int _totalNoOfRowsInUserTable;
+
 NSString *_currUserId;
+NSString *_currAccessToken;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -44,37 +54,52 @@ NSString *_currUserId;
 
 - (void)viewDidLoad
 {
-    self.tabBarController.delegate = self;
-    _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserId];
-    UIViewController *viewController1, *viewController2, *viewController3;
-    UINavigationController *navigationcontroller1,*navigationcontroller2;
+    _dbmanager = [[[DBManager alloc] init] autorelease];
+    [_dbmanager openDB];
+    if(_totalNoOfRowsInUserTable == 0)
+    {
+        _totalNoOfRowsInUserTable++;
+        [_dbmanager insertRecordIntoUserTable:@"User" withField1:@"UID" field1Value:[NSString stringWithFormat:@"%d",_totalNoOfRowsInUserTable] andField2:@"username" field2Value:[NSString stringWithFormat:@"%@",_angelUserName] andField3:@"angelUserId" field3Value:[NSString stringWithFormat:@"%@",_angelUserId] andField4:@"access_token" field4Value:[NSString stringWithFormat:@"%@",access_token]];
+    }
+    
+    [_dbmanager retrieveUserDetails];
+    
+    self.tabBarController.delegate=self;
+    
+    _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserIdFromDB];
+    _currAccessToken = [[NSString alloc] initWithFormat:@"%@",access_tokenFromDB];
+
+    UIViewController *viewController1, *viewController2, *viewController3, *viewController4;
+    UINavigationController *navigationcontroller2,*navigationcontroller3;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        viewController1 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPhone" bundle:nil] autorelease];
-        navigationcontroller1 = [[[UINavigationController alloc] initWithRootViewController:viewController1] autorelease];
+        viewController1 = [[[InboxViewController alloc] initWithNibName:@"HomeViewController_iPhone" bundle:nil] autorelease];
         
-        viewController2 = [[[StartUpViewController alloc] initWithNibName:@"StartUpViewController_iPhone" bundle:nil] autorelease];
+        viewController2 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPhone" bundle:nil] autorelease];
         navigationcontroller2 = [[[UINavigationController alloc] initWithRootViewController:viewController2] autorelease];
         
-        viewController3 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPhone" bundle:nil] autorelease];
+        viewController3 = [[[StartUpViewController alloc] initWithNibName:@"StartUpViewController_iPhone" bundle:nil] autorelease];
+        navigationcontroller3 = [[[UINavigationController alloc] initWithRootViewController:viewController3] autorelease];
+        
+        viewController4 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPhone" bundle:nil] autorelease];
     }
     else
     {
-        viewController1 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPad" bundle:nil] autorelease];
-        navigationcontroller1 = [[[UINavigationController alloc] initWithRootViewController:viewController1] autorelease];
+        viewController1 = [[[InboxViewController alloc] initWithNibName:@"HomeViewController_iPad" bundle:nil] autorelease];
         
-        viewController2 = [[[StartUpViewController alloc] initWithNibName:@"StartUpViewController_iPad" bundle:nil] autorelease];
+        viewController2 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPad" bundle:nil] autorelease];
         navigationcontroller2 = [[[UINavigationController alloc] initWithRootViewController:viewController2] autorelease];
         
-        viewController3 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPad" bundle:nil] autorelease];
+        viewController3 = [[[StartUpViewController alloc] initWithNibName:@"StartUpViewController_iPad" bundle:nil] autorelease];
+        navigationcontroller3 = [[[UINavigationController alloc] initWithRootViewController:viewController3] autorelease];
+        
+        viewController4 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPad" bundle:nil] autorelease];
     }
     
     
-    self.tabBarController = [[[UITabBarController alloc] init] autorelease];
-    self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller1, navigationcontroller2, viewController3, nil];
+    self.tabBarController = [[[CustomTabBar alloc] init] autorelease];
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:viewController1, navigationcontroller2, navigationcontroller3, viewController4, nil];
     [self.view addSubview:self.tabBarController.view];
-    
-    [[[[[self tabBarController] viewControllers] objectAtIndex:2] tabBarItem] setEnabled:false]; 
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -89,9 +114,8 @@ NSString *_currUserId;
 
 -(void) dealloc
 {
-
+//    [_currUserId release];
 }
-
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {

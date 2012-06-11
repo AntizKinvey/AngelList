@@ -7,13 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
-@interface StartUpViewController : UIViewController <UITableViewDataSource, UITableViewDataSource>
+@interface StartUpViewController : UIViewController <UITableViewDataSource>
 {
      IBOutlet UITableView *table;
+     IBOutlet UIView *loadingView;
+     DBManager *_dbmanager;
 }
 
 -(void) getDetailsOfFollowing;
+-(void) getDetailsOfPortfolio;
 -(void) getDetailsOfAll;
+
+-(void)startLoadingImagesConcurrently;
+-(void) saveImagesOfStartUps;
+-(void) saveStartUpsDetailsToDB;
 
 @end

@@ -105,7 +105,6 @@ NSString *_angelUserName;
                                   error:&error];
             
             access_token = [json objectForKey:@"access_token"];
-            
             access_token_received = TRUE;
         }
         
@@ -127,6 +126,7 @@ NSString *_angelUserName;
             
             _angelUserId = [json objectForKey:@"id"];
             _angelUserName = [json objectForKey:@"name"];
+            
             
             access_token_received = FALSE;
             _loggedIn = TRUE;

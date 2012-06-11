@@ -7,11 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
-@interface ActivityViewController : UIViewController <UITableViewDataSource, UITableViewDataSource>
+@interface ActivityViewController : UIViewController <UITableViewDataSource>
 {
     IBOutlet UITableView *table;
-    IBOutlet UIView *boundsView;
+    IBOutlet UIView *loadingView;
+    
+    DBManager *_dbmanager;
 }
+
+-(void) saveImagesOfFeeds;
+-(void) saveFeedsDataToDB;
 
 @end

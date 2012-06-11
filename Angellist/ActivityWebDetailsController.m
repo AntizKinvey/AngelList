@@ -1,24 +1,20 @@
 //
-//  ThirdViewController.m
-//  SampleTabbar
+//  ActivityWebDetailsVontroller.m
+//  Angellist
 //
-//  Created by Ram Charan on 5/16/12.
+//  Created by Ram Charan on 6/4/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
-#import "WebDetailsController.h"
+#import "ActivityWebDetailsController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@implementation WebDetailsController
+@implementation ActivityWebDetailsController
 
 extern NSMutableArray *actorUrlArray;
-extern NSMutableArray *displayStartUpAngelUrlArray;
-
 extern int _rowNumberInActivity;
-extern int _rowNumberInStartUps;
 
-extern BOOL _transitFromActivity;
-extern BOOL _transitFromStartUps;
+UIButton* backButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -48,7 +44,7 @@ extern BOOL _transitFromStartUps;
     
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    UIButton* backButton = [[UIButton alloc] initWithFrame:frame];
+    backButton = [[UIButton alloc] initWithFrame:frame];
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
@@ -57,18 +53,9 @@ extern BOOL _transitFromStartUps;
     [backButtonItem release];
     [backButton release];
     
-    if(_transitFromActivity)
-    {
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
-        NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        [webView loadRequest:request];
-    }
-    else if(_transitFromStartUps)
-    {
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:_rowNumberInStartUps]]];
-        NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        [webView loadRequest:request];
-    }
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [webView loadRequest:request];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -76,8 +63,14 @@ extern BOOL _transitFromStartUps;
 
 -(void) backAction:(id)sender
 {
-    [webView stopLoading];
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [webView setDelegate:nil];
+   // [webView stopLoading];
+   // loading.hidden = YES;
 }
 
 - (void)viewDidUnload

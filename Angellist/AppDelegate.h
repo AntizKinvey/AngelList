@@ -7,14 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
-@class ViewController;
+@class ViewController,ContainerViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
+{
+    DBManager *_dbmanager;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 
 @property (strong, nonatomic) ViewController *viewController;
+
+@property (strong, nonatomic) ContainerViewController *containerViewController;
 
 
 @end

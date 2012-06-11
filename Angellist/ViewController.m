@@ -9,6 +9,8 @@
 #import "ViewController.h"
 #import "LoginViewController.h"
 #import "ContainerViewController.h"
+#import "Reachability.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation ViewController
 
@@ -79,18 +81,31 @@ ContainerViewController *_containerViewController;
 
 -(IBAction) loginFromAngellist:(id) sender
 {
-    loginFromAL = TRUE;
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
-        [self presentModalViewController:_loginView animated:YES];
+        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        [myAlert show];
     }
     else
     {
-        _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
-        [self presentModalViewController:_loginView animated:YES];
-
+        loginFromAL = TRUE;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+        {
+            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
+            [self presentModalViewController:_loginView animated:YES];
+        }
+        else
+        {
+            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
+            [self presentModalViewController:_loginView animated:YES];
+            
+        }
     }
+    
 }
 
 -(IBAction) loginWithTwitter:(id) sender
