@@ -67,8 +67,7 @@ extern int _rowNumberInStartUps;
 -(void)viewWillDisappear:(BOOL)animated
 {
     [webView setDelegate:nil];
-    //[webView stopLoading];
-    //loading.hidden = YES;
+    
 }
 
 - (void)viewDidUnload

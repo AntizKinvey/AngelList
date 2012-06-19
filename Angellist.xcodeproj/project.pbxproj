@@ -7,6 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07CE68D315908689009B89D4 /* LoginViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC29156F9D9100679076 /* LoginViewController_iPhone.xib */; };
+		07CE68D415908689009B89D4 /* LoginViewController_iPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC2C156F9E0600679076 /* LoginViewController_iPad.xib */; };
+		07CE68D515908689009B89D4 /* ContainerViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC3F156FA24600679076 /* ContainerViewController_iPhone.xib */; };
+		07CE68D615908689009B89D4 /* ContainerViewController_iPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC42156FA2DF00679076 /* ContainerViewController_iPad.xib */; };
+		07CE68D715908689009B89D4 /* ActivityViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC46156FAA5400679076 /* ActivityViewController_iPhone.xib */; };
+		07CE68D815908689009B89D4 /* ActivityViewController_iPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC53156FAAA300679076 /* ActivityViewController_iPad.xib */; };
+		07CE68D915908689009B89D4 /* ActivityDetailsViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 78CB45AF157CD9860043661F /* ActivityDetailsViewController_iPhone.xib */; };
+		07CE68DA15908689009B89D4 /* ActivityWebDetailsController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 78CB45BA157CDB6F0043661F /* ActivityWebDetailsController_iPhone.xib */; };
+		07CE68DB15908689009B89D4 /* StartUpViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC4B156FAA6A00679076 /* StartUpViewController_iPhone.xib */; };
+		07CE68DC15908689009B89D4 /* StartUpViewController_iPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC55156FAAD000679076 /* StartUpViewController_iPad.xib */; };
+		07CE68DD15908689009B89D4 /* StartUpDetailsViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 78CB45B5157CD9B90043661F /* StartUpDetailsViewController_iPhone.xib */; };
+		07CE68DE15908689009B89D4 /* StartUpWebDetailsController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 78CB45BF157CEDF20043661F /* StartUpWebDetailsController_iPhone.xib */; };
+		07CE68DF15908689009B89D4 /* InboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68CC1590866B009B89D4 /* InboxViewController.m */; };
+		07CE68E015908689009B89D4 /* InboxViewController_iPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68CD1590866B009B89D4 /* InboxViewController_iPhone.xib */; };
+		07CE68E115908689009B89D4 /* InboxViewController_iPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68CE1590866B009B89D4 /* InboxViewController_iPad.xib */; };
+		07CE68E215908689009B89D4 /* InboxDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68D01590866B009B89D4 /* InboxDetailsViewController.m */; };
+		07CE68E315908689009B89D4 /* InboxDetailsViewController_IPhone.xib in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68D11590866B009B89D4 /* InboxDetailsViewController_IPhone.xib */; };
+		07CE68E415908689009B89D4 /* InboxDetailsViewController_IPad.xib in Sources */ = {isa = PBXBuildFile; fileRef = 07CE68D21590866B009B89D4 /* InboxDetailsViewController_IPad.xib */; };
+		787C39E015908FAB000AD034 /* send.png in Resources */ = {isa = PBXBuildFile; fileRef = 787C39DF15908FAB000AD034 /* send.png */; };
 		787D23C0158462E70077FF07 /* placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = 787D23BF158462E70077FF07 /* placeholder.png */; };
 		787E2FBF1573319C00E3D6AE /* icon_57.png in Resources */ = {isa = PBXBuildFile; fileRef = 787E2FBD1573319C00E3D6AE /* icon_57.png */; };
 		787E2FC01573319C00E3D6AE /* icon_72.png in Resources */ = {isa = PBXBuildFile; fileRef = 787E2FBE1573319C00E3D6AE /* icon_72.png */; };
@@ -51,11 +70,8 @@
 		7884DC48156FAA5400679076 /* ActivityViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC46156FAA5400679076 /* ActivityViewController_iPhone.xib */; };
 		7884DC4C156FAA6A00679076 /* StartUpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC4A156FAA6A00679076 /* StartUpViewController.m */; };
 		7884DC4D156FAA6A00679076 /* StartUpViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC4B156FAA6A00679076 /* StartUpViewController_iPhone.xib */; };
-		7884DC51156FAA8000679076 /* InboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC4F156FAA7F00679076 /* InboxViewController.m */; };
-		7884DC52156FAA8000679076 /* InboxViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC50156FAA7F00679076 /* InboxViewController_iPhone.xib */; };
 		7884DC54156FAAA400679076 /* ActivityViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC53156FAAA300679076 /* ActivityViewController_iPad.xib */; };
 		7884DC56156FAAD000679076 /* StartUpViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC55156FAAD000679076 /* StartUpViewController_iPad.xib */; };
-		7884DC58156FAAE900679076 /* InboxViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7884DC57156FAAE900679076 /* InboxViewController_iPad.xib */; };
 		7884DC5B156FADD100679076 /* AsyncImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7884DC5A156FADD100679076 /* AsyncImageView.m */; };
 		788C4025157DE13E00A61CBF /* activity.png in Resources */ = {isa = PBXBuildFile; fileRef = 788C4024157DE13E00A61CBF /* activity.png */; };
 		788C4027157DE70500A61CBF /* startup.png in Resources */ = {isa = PBXBuildFile; fileRef = 788C4026157DE70500A61CBF /* startup.png */; };
@@ -78,6 +94,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		07CE68CB1590866B009B89D4 /* InboxViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InboxViewController.h; sourceTree = "<group>"; };
+		07CE68CC1590866B009B89D4 /* InboxViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InboxViewController.m; sourceTree = "<group>"; };
+		07CE68CD1590866B009B89D4 /* InboxViewController_iPhone.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InboxViewController_iPhone.xib; sourceTree = "<group>"; };
+		07CE68CE1590866B009B89D4 /* InboxViewController_iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InboxViewController_iPad.xib; sourceTree = "<group>"; };
+		07CE68CF1590866B009B89D4 /* InboxDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InboxDetailsViewController.h; sourceTree = "<group>"; };
+		07CE68D01590866B009B89D4 /* InboxDetailsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InboxDetailsViewController.m; sourceTree = "<group>"; };
+		07CE68D11590866B009B89D4 /* InboxDetailsViewController_IPhone.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InboxDetailsViewController_IPhone.xib; sourceTree = "<group>"; };
+		07CE68D21590866B009B89D4 /* InboxDetailsViewController_IPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InboxDetailsViewController_IPad.xib; sourceTree = "<group>"; };
+		787C39DF15908FAB000AD034 /* send.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = send.png; path = IPhone/send.png; sourceTree = "<group>"; };
 		787D23BF158462E70077FF07 /* placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = placeholder.png; path = IPhone/placeholder.png; sourceTree = "<group>"; };
 		787E2FBD1573319C00E3D6AE /* icon_57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_57.png; path = Resources/icon_57.png; sourceTree = "<group>"; };
 		787E2FBE1573319C00E3D6AE /* icon_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_72.png; path = Resources/icon_72.png; sourceTree = "<group>"; };
@@ -133,12 +158,8 @@
 		7884DC49156FAA6A00679076 /* StartUpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StartUpViewController.h; sourceTree = "<group>"; };
 		7884DC4A156FAA6A00679076 /* StartUpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StartUpViewController.m; sourceTree = "<group>"; };
 		7884DC4B156FAA6A00679076 /* StartUpViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StartUpViewController_iPhone.xib; sourceTree = "<group>"; };
-		7884DC4E156FAA7F00679076 /* InboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InboxViewController.h; sourceTree = "<group>"; };
-		7884DC4F156FAA7F00679076 /* InboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InboxViewController.m; sourceTree = "<group>"; };
-		7884DC50156FAA7F00679076 /* InboxViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InboxViewController_iPhone.xib; sourceTree = "<group>"; };
 		7884DC53156FAAA300679076 /* ActivityViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActivityViewController_iPad.xib; sourceTree = "<group>"; };
 		7884DC55156FAAD000679076 /* StartUpViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StartUpViewController_iPad.xib; sourceTree = "<group>"; };
-		7884DC57156FAAE900679076 /* InboxViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InboxViewController_iPad.xib; sourceTree = "<group>"; };
 		7884DC59156FADD000679076 /* AsyncImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncImageView.h; sourceTree = "<group>"; };
 		7884DC5A156FADD100679076 /* AsyncImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncImageView.m; sourceTree = "<group>"; };
 		788C4024157DE13E00A61CBF /* activity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = activity.png; path = IPhone/activity.png; sourceTree = "<group>"; };
@@ -281,10 +302,14 @@
 				78CB45BD157CEDF20043661F /* StartUpWebDetailsController.h */,
 				78CB45BE157CEDF20043661F /* StartUpWebDetailsController.m */,
 				78CB45BF157CEDF20043661F /* StartUpWebDetailsController_iPhone.xib */,
-				7884DC4E156FAA7F00679076 /* InboxViewController.h */,
-				7884DC4F156FAA7F00679076 /* InboxViewController.m */,
-				7884DC50156FAA7F00679076 /* InboxViewController_iPhone.xib */,
-				7884DC57156FAAE900679076 /* InboxViewController_iPad.xib */,
+				07CE68CB1590866B009B89D4 /* InboxViewController.h */,
+				07CE68CC1590866B009B89D4 /* InboxViewController.m */,
+				07CE68CD1590866B009B89D4 /* InboxViewController_iPhone.xib */,
+				07CE68CE1590866B009B89D4 /* InboxViewController_iPad.xib */,
+				07CE68CF1590866B009B89D4 /* InboxDetailsViewController.h */,
+				07CE68D01590866B009B89D4 /* InboxDetailsViewController.m */,
+				07CE68D11590866B009B89D4 /* InboxDetailsViewController_IPhone.xib */,
+				07CE68D21590866B009B89D4 /* InboxDetailsViewController_IPad.xib */,
 				787ECD231583276300330768 /* HomeViewController.h */,
 				787ECD241583276300330768 /* HomeViewController.m */,
 				787ECD251583276300330768 /* HomeViewController_iPhone.xib */,
@@ -306,6 +331,7 @@
 		7884DC2E156F9FEE00679076 /* IPhone */ = {
 			isa = PBXGroup;
 			children = (
+				787C39DF15908FAB000AD034 /* send.png */,
 				789FFC7115858B3D00E45F6E /* pendingapi.png */,
 				787D23BF158462E70077FF07 /* placeholder.png */,
 				78832D971585D19900C995D6 /* closebutton.png */,
@@ -399,10 +425,8 @@
 				7884DC43156FA2E000679076 /* ContainerViewController_iPad.xib in Resources */,
 				7884DC48156FAA5400679076 /* ActivityViewController_iPhone.xib in Resources */,
 				7884DC4D156FAA6A00679076 /* StartUpViewController_iPhone.xib in Resources */,
-				7884DC52156FAA8000679076 /* InboxViewController_iPhone.xib in Resources */,
 				7884DC54156FAAA400679076 /* ActivityViewController_iPad.xib in Resources */,
 				7884DC56156FAAD000679076 /* StartUpViewController_iPad.xib in Resources */,
-				7884DC58156FAAE900679076 /* InboxViewController_iPad.xib in Resources */,
 				787E2FBF1573319C00E3D6AE /* icon_57.png in Resources */,
 				787E2FC01573319C00E3D6AE /* icon_72.png in Resources */,
 				787E2FD815734E0900E3D6AE /* background_iPad.png in Resources */,
@@ -429,6 +453,7 @@
 				787D23C0158462E70077FF07 /* placeholder.png in Resources */,
 				789FFC7215858B3D00E45F6E /* pendingapi.png in Resources */,
 				78832D981585D19900C995D6 /* closebutton.png in Resources */,
+				787C39E015908FAB000AD034 /* send.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +464,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07CE68D315908689009B89D4 /* LoginViewController_iPhone.xib in Sources */,
+				07CE68D415908689009B89D4 /* LoginViewController_iPad.xib in Sources */,
+				07CE68D515908689009B89D4 /* ContainerViewController_iPhone.xib in Sources */,
+				07CE68D615908689009B89D4 /* ContainerViewController_iPad.xib in Sources */,
+				07CE68D715908689009B89D4 /* ActivityViewController_iPhone.xib in Sources */,
+				07CE68D815908689009B89D4 /* ActivityViewController_iPad.xib in Sources */,
+				07CE68D915908689009B89D4 /* ActivityDetailsViewController_iPhone.xib in Sources */,
+				07CE68DA15908689009B89D4 /* ActivityWebDetailsController_iPhone.xib in Sources */,
+				07CE68DB15908689009B89D4 /* StartUpViewController_iPhone.xib in Sources */,
+				07CE68DC15908689009B89D4 /* StartUpViewController_iPad.xib in Sources */,
+				07CE68DD15908689009B89D4 /* StartUpDetailsViewController_iPhone.xib in Sources */,
+				07CE68DE15908689009B89D4 /* StartUpWebDetailsController_iPhone.xib in Sources */,
+				07CE68DF15908689009B89D4 /* InboxViewController.m in Sources */,
+				07CE68E015908689009B89D4 /* InboxViewController_iPhone.xib in Sources */,
+				07CE68E115908689009B89D4 /* InboxViewController_iPad.xib in Sources */,
+				07CE68E215908689009B89D4 /* InboxDetailsViewController.m in Sources */,
+				07CE68E315908689009B89D4 /* InboxDetailsViewController_IPhone.xib in Sources */,
+				07CE68E415908689009B89D4 /* InboxDetailsViewController_IPad.xib in Sources */,
 				7884DBFB156F8C3000679076 /* main.m in Sources */,
 				7884DBFF156F8C3000679076 /* AppDelegate.m in Sources */,
 				7884DC02156F8C3000679076 /* ViewController.m in Sources */,
@@ -446,7 +489,6 @@
 				7884DC40156FA24600679076 /* ContainerViewController.m in Sources */,
 				7884DC47156FAA5400679076 /* ActivityViewController.m in Sources */,
 				7884DC4C156FAA6A00679076 /* StartUpViewController.m in Sources */,
-				7884DC51156FAA8000679076 /* InboxViewController.m in Sources */,
 				7884DC5B156FADD100679076 /* AsyncImageView.m in Sources */,
 				78BB083F157BC3A800822FD9 /* Reachability.m in Sources */,
 				78BB0853157BCBF700822FD9 /* DBManager.m in Sources */,
@@ -494,8 +536,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -510,8 +552,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				PROVISIONING_PROFILE = "D5E0F130-69B1-4C2F-806C-97219CA7628D";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D5E0F130-69B1-4C2F-806C-97219CA7628D";
+				PROVISIONING_PROFILE = "D9C7C932-BA3F-4D28-A6A7-D003AC04B308";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D9C7C932-BA3F-4D28-A6A7-D003AC04B308";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -522,8 +564,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -532,8 +574,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "D5E0F130-69B1-4C2F-806C-97219CA7628D";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D5E0F130-69B1-4C2F-806C-97219CA7628D";
+				PROVISIONING_PROFILE = "D9C7C932-BA3F-4D28-A6A7-D003AC04B308";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D9C7C932-BA3F-4D28-A6A7-D003AC04B308";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

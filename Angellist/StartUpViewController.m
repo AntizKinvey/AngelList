@@ -108,7 +108,7 @@ NSTimer *timer;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 8, 240, 20)] autorelease];
+        UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 8, 210, 20)] autorelease];
         cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellNameLabel.text = cellNameValue;
         cellNameLabel.backgroundColor = [UIColor clearColor];
@@ -116,7 +116,7 @@ NSTimer *timer;
         cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
         [cell.contentView addSubview:cellNameLabel];
         
-        UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 26, 240, 30)] autorelease];
+        UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 26, 210, 30)] autorelease];
         cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellHighConceptLabel.numberOfLines = 5;
         cellHighConceptLabel.text = cellHighConceptValue;
@@ -124,7 +124,7 @@ NSTimer *timer;
         cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:13];
         [cell.contentView addSubview:cellHighConceptLabel];
         
-        UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(82, 61, 240, 30)] autorelease];
+        UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(82, 61, 210, 30)] autorelease];
         cellLocationLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellLocationLabel.text = cellLocationValue;
         cellLocationLabel.backgroundColor = [UIColor clearColor];
@@ -132,21 +132,13 @@ NSTimer *timer;
         cellLocationLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:10];
         [cell.contentView addSubview:cellLocationLabel];
         
-        if((_filterFollow == TRUE) || (_filterPortfolio == TRUE))
-        {
-            UIImageView *imageViewNew = [[[UIImageView alloc] initWithFrame:CGRectMake(7, 8, 44, 44)]autorelease];
-            UIImage *image = [displayStartUpLogoUrlArray objectAtIndex:indexPath.row];
-            imageViewNew.image = image;
-            [cell.contentView addSubview:imageViewNew];
-        }
-        else
-        {
+
             UIImage *image = [UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:indexPath.row]];
-            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 8, 44, 44)];
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 8, 50, 50)];
             cellImageView.image = image;
             [cell.contentView addSubview:cellImageView];
             [cellImageView release];
-        }
+
     }
     else
     {
@@ -189,7 +181,7 @@ NSTimer *timer;
     if(([displayStartUpNameArray count] == 0) && (_filterFollow == TRUE))
     {
         loadingView.hidden = YES;
-        filterButton.enabled = YES;
+//        filterButton.enabled = YES;
     }
     return [displayStartUpNameArray count];
 }
@@ -311,7 +303,7 @@ NSTimer *timer;
     filterButton = [[UIButton alloc] initWithFrame:frame];
     [filterButton setBackgroundImage:image forState:UIControlStateNormal];
     [filterButton addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
-    filterButton.enabled = NO;
+
     
     UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterButton];
     self.navigationItem.rightBarButtonItem = filterButtonItem;
@@ -358,6 +350,8 @@ NSTimer *timer;
     }
     else
     {
+        filterButton.enabled = NO;
+        
         NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/startups/batch?ids=6702,445,87,97,117,127,147,166,167,179,193,203,223,227,289,292,303,304,312,319,321,323"];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
@@ -526,133 +520,107 @@ NSTimer *timer;
 }
 
 
--(void) fadeView
-{
-    if(countDown < 35)
-    {
-        countDown++;
-        notReachableView.alpha = alphaValueInStartUp;
-        alphaValueInStartUp = alphaValueInStartUp - 0.03;
-    }
-    else
-    {
-        [timer invalidate];
-        [filterButton setUserInteractionEnabled:YES];
-    }
-}
 
 - (void)filterButtonSelected:(id)sender 
 {
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+
     
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    UIView *filtersList;
+    
+    if(_showFilterMenuInStartUps == FALSE)
     {
-        [filterButton setUserInteractionEnabled:NO];
-        timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(fadeView) userInfo:nil repeats:YES];
-        alphaValueInStartUp = 1.0;
-        countDown = 0;
-    }
-    else
-    {
-        UIView *filtersList;
-        
-        if(_showFilterMenuInStartUps == FALSE)
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
-            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+            [filterView  setBackgroundColor: [UIColor blackColor]];
+            [filterView setAlpha:0.6f];
+            filterView.tag = 1000;
+            [self.view addSubview:filterView];
+            
+            filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 120)];
+            [filtersList  setBackgroundColor: [UIColor blackColor]];
+            [filtersList.layer setCornerRadius:18.0f];
+            [filtersList setAlpha:1.0f];
+            filtersList.tag = 1001;
+            [self.view addSubview:filtersList];
+            
+            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            
+            int _yPos = 5;
+            
+            for (int i=1; i<=4; i++) 
             {
-                UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-                [filterView  setBackgroundColor: [UIColor blackColor]];
-                [filterView setAlpha:0.6f];
-                filterView.tag = 1000;
-                [self.view addSubview:filterView];
+                UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+                [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+                [filterButtons setTitle:[NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
+                [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+                filterButtons.frame = CGRectMake(14, _yPos, 120, 25);
+                filterButtons.tag = i;
+                [filtersList addSubview:filterButtons];
                 
-                filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 120)];
-                [filtersList  setBackgroundColor: [UIColor blackColor]];
-                [filtersList.layer setCornerRadius:18.0f];
-                [filtersList setAlpha:1.0f];
-                filtersList.tag = 1001;
-                [self.view addSubview:filtersList];
-                
-                UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-                
-                int _yPos = 5;
-                
-                for (int i=1; i<=4; i++) 
+                if(i==3)
                 {
-                    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
-                    [filterButtons setTitle:[NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                    filterButtons.frame = CGRectMake(14, _yPos, 120, 25);
-                    filterButtons.tag = i;
-                    [filtersList addSubview:filterButtons];
-                    
-                    if(i==3)
-                    {
-                        filterButtons.enabled = NO;
-                    }
-                    
-                    _yPos = _yPos + 27;
+                    filterButtons.enabled = NO;
                 }
                 
-                [filtersList release];
-                [filterView release];
-                
-                _showFilterMenuInStartUps = TRUE;
+                _yPos = _yPos + 27;
             }
-            else
-            {
-                UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
-                [filterView  setBackgroundColor: [UIColor blackColor]];
-                [filterView setAlpha:0.6f];
-                filterView.tag = 1000;
-                [self.view addSubview:filterView];
-                
-                filtersList = [[UIView alloc] initWithFrame:CGRectMake(((768*165)/320), 0, ((768*150)/320), ((1024*120)/480))];
-                [filtersList  setBackgroundColor: [UIColor blackColor]];
-                [filtersList.layer setCornerRadius:18.0f];
-                [filtersList setAlpha:1.0f];
-                filtersList.tag = 1001;
-                [self.view addSubview:filtersList];
-                
-                UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-                
-                int _yPos = ((1024*5)/480);
-                
-                for (int i=1; i<=4; i++) 
-                {
-                    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-                    [filterButton setTitle:[NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                    filterButton.frame = CGRectMake(((768*14)/320), _yPos, ((768*120)/320), ((1024*25)/480));
-                    filterButton.tag = i;
-                    [filtersList addSubview:filterButton];
-                    
-                    if(i==2 || i==3)
-                    {
-                        filterButton.enabled = NO;
-                    }
-                    
-                    _yPos = _yPos + ((1024*27)/480);
-                }
-                
-                [filtersList release];
-                [filterView release];
-                
-                _showFilterMenuInStartUps = TRUE;
-            }    
+            
+            [filtersList release];
+            [filterView release];
+            
+            _showFilterMenuInStartUps = TRUE;
         }
         else
         {
-            [[self.view viewWithTag:1000] removeFromSuperview];
-            [[self.view viewWithTag:1001] removeFromSuperview];
-            _showFilterMenuInStartUps = FALSE;
-        }
+            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
+            [filterView  setBackgroundColor: [UIColor blackColor]];
+            [filterView setAlpha:0.6f];
+            filterView.tag = 1000;
+            [self.view addSubview:filterView];
+            
+            filtersList = [[UIView alloc] initWithFrame:CGRectMake(((768*165)/320), 0, ((768*150)/320), ((1024*120)/480))];
+            [filtersList  setBackgroundColor: [UIColor blackColor]];
+            [filtersList.layer setCornerRadius:18.0f];
+            [filtersList setAlpha:1.0f];
+            filtersList.tag = 1001;
+            [self.view addSubview:filtersList];
+            
+            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            
+            int _yPos = ((1024*5)/480);
+            
+            for (int i=1; i<=4; i++) 
+            {
+                UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+                [filterButton setTitle:[NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
+                [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+                filterButton.frame = CGRectMake(((768*14)/320), _yPos, ((768*120)/320), ((1024*25)/480));
+                filterButton.tag = i;
+                [filtersList addSubview:filterButton];
+                
+                if(i==2 || i==3)
+                {
+                    filterButton.enabled = NO;
+                }
+                
+                _yPos = _yPos + ((1024*27)/480);
+            }
+            
+            [filtersList release];
+            [filterView release];
+            
+            _showFilterMenuInStartUps = TRUE;
+        }    
+    }
+    else
+    {
+        [[self.view viewWithTag:1000] removeFromSuperview];
+        [[self.view viewWithTag:1001] removeFromSuperview];
+        _showFilterMenuInStartUps = FALSE;
     }
 }
 
@@ -668,6 +636,7 @@ NSTimer *timer;
     [displayStartUpLocationArray removeAllObjects];
     [displayStartUpMarketArray removeAllObjects];
     [displayStartUpLogoImageDataArray removeAllObjects];
+    [displayStartUpLogoImageInDirectory removeAllObjects];
     
     int _tagID = [sender tag];
     
@@ -683,7 +652,7 @@ NSTimer *timer;
                  self.navigationController.title = @"StartUps";
             
                  [self getDetailsOfFollowing];
-                 filterButton.enabled = NO;              
+//                 filterButton.enabled = NO;     
                  break;
             
             //Implement Portfolio    
@@ -696,7 +665,7 @@ NSTimer *timer;
             self.title = @"StartUps - Portfolio";
             self.navigationController.title = @"StartUps";
             [self getDetailsOfPortfolio];
-            filterButton.enabled = NO;   
+//            filterButton.enabled = NO;   
             
             break;
             
@@ -724,247 +693,392 @@ NSTimer *timer;
     }
 }
 
+
 -(void) getDetailsOfFollowing
 {
-    loadingView.hidden = NO;
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/users/%@/following?type=startup",_currUserId]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod: @"GET"];
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        [_dbmanager.startUpIdsArrayFromDB removeAllObjects];
+        [_dbmanager.startUpNameArrayFromDB removeAllObjects];
+        [_dbmanager.startUpAngelUrlArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLogoUrlArrayFromDB removeAllObjects];
+        [_dbmanager.startUpProductDescArrayFromDB removeAllObjects];
+        [_dbmanager.startUpHighConceptArrayFromDB removeAllObjects];
+        [_dbmanager.startUpFollowerCountArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLocationArrayFromDB removeAllObjects];
+        [_dbmanager.startUpMarketArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLogoImageInDirectoryFromDB removeAllObjects];
+        
+        [_dbmanager retrieveStartUpsFollowingDetails];
+        
 
-    [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
-                           completionHandler:^(NSURLResponse *response,
-                                               NSData *data,
-                                               NSError *error) 
-     {
-         if ([data length] >0 && error == nil)
+        [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
+        
+        [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
+        
+
+        [displayStartUpAngelUrlArray addObjectsFromArray:_dbmanager.startUpAngelUrlArrayFromDB];
+        
+
+        [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
+        
+
+        [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
+        
+
+        [displayStartUpHighConceptArray addObjectsFromArray:_dbmanager.startUpHighConceptArrayFromDB];
+        
+
+        [displayStartUpFollowerCountArray addObjectsFromArray:_dbmanager.startUpFollowerCountArrayFromDB];
+        
+
+        [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
+        
+
+        [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
+        
+
+        [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
+        
+        [table reloadData];
+    }
+    else
+    {
+        loadingView.hidden = NO;
+        filterButton.enabled = NO;
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/users/%@/following?type=startup",_currUserId]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod: @"GET"];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
+                               completionHandler:^(NSURLResponse *response,
+                                                   NSData *data,
+                                                   NSError *error) 
          {
-             NSError* error;
-             NSDictionary* json = [NSJSONSerialization 
-                                   JSONObjectWithData:data //1
-                                   options:kNilOptions 
-                                   error:&error];
-             
-             NSArray* startUpFollowing = [json objectForKey:@"startups"]; //2
-             
-             
-             
-             for(int k=0; k<[startUpFollowing count]; k++)
+             if ([data length] >0 && error == nil)
              {
-                 NSDictionary *following = [startUpFollowing objectAtIndex:k];
-                 
-                 NSString* startUpFollowIds = [following valueForKey:@"id"];
-                 [displayStartUpIdsArray addObject:startUpFollowIds];
-                 if(![userFollowingIds containsObject:startUpFollowIds])
-                 {
-                     [userFollowingIds addObject:startUpFollowIds];
-                 }
-                 
-                 NSString* startUpFollowNames = [following valueForKey:@"name"];
-                 [displayStartUpNameArray addObject:startUpFollowNames];
-                 
-                 NSString* startUpFollowAngelUrl = [following valueForKey:@"angellist_url"]; //2
-                 [displayStartUpAngelUrlArray addObject:startUpFollowAngelUrl];
-                 
-                 NSString* startUpFollowLogoUrl = [following valueForKey:@"thumb_url"]; //2
-                 [displayStartUpLogoImageDataArray addObject:startUpFollowLogoUrl];
-                 [displayStartUpLogoUrlArray addObject:[UIImage imageNamed:@"placeholder.png"]];
-                 
-                 NSString* startUpFollowProductDesc = [following valueForKey:@"product_desc"]; //2
-                 [displayStartUpProductDescArray addObject:startUpFollowProductDesc];
-                 
-                 NSString* startUpFollowHighConcept = [following valueForKey:@"high_concept"]; //2
-                 [displayStartUpHighConceptArray addObject:startUpFollowHighConcept];
-                 
-                 NSString* startUpFollowFollowerCount = [following valueForKey:@"follower_count"]; //2
-                 [displayStartUpFollowerCountArray addObject:startUpFollowFollowerCount];
-                 
-             }
-             
-             
-             for(int i=0; i<[displayStartUpIdsArray count]; i++)
-             {
-                 NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startups/%@",[displayStartUpIdsArray objectAtIndex:i]]];
-                 
-                 NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-                 [request setHTTPMethod: @"GET"];
-                 
-                 
-                 NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-                 
                  NSError* error;
                  NSDictionary* json = [NSJSONSerialization 
-                                       JSONObjectWithData:response //1
+                                       JSONObjectWithData:data //1
                                        options:kNilOptions 
                                        error:&error];
                  
-                 NSArray* startUpFollowingLocations = [[json valueForKey:@"locations"] valueForKey:@"display_name"]; //2
-                 NSString* startUpFollowingMarkets = [[json valueForKey:@"markets"] valueForKey:@"display_name"]; //2
+                 NSArray* startUpFollowing = [json objectForKey:@"startups"]; //2
                  
-                 for(int j=0; j<[startUpFollowingLocations count]; j++)
+                 
+                 
+                 for(int k=0; k<[startUpFollowing count]; k++)
                  {
-                     if([startUpFollowingLocations objectAtIndex:j] == (NSString*)[NSNull null])
+                     NSDictionary *following = [startUpFollowing objectAtIndex:k];
+                     
+                     NSString* startUpFollowIds = [following valueForKey:@"id"];
+                     [displayStartUpIdsArray addObject:startUpFollowIds];
+                     if(![userFollowingIds containsObject:startUpFollowIds])
                      {
-                         [displayStartUpLocationArray addObject:@"NA"];
+                         [userFollowingIds addObject:startUpFollowIds];
                      }
-                     else
-                     {
-                         NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpFollowingLocations objectAtIndex:j]]];
-                         
-                         [theMutableString replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                         [theMutableString replaceOccurrencesOfString:@"(" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                         [theMutableString replaceOccurrencesOfString:@")" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                         [theMutableString replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                         
-                         [displayStartUpLocationArray addObject:theMutableString];
-                         [theMutableString release];
-                     } 
+                     
+                     NSString* startUpFollowNames = [following valueForKey:@"name"];
+                     [displayStartUpNameArray addObject:startUpFollowNames];
+                     
+                     NSString* startUpFollowAngelUrl = [following valueForKey:@"angellist_url"]; //2
+                     [displayStartUpAngelUrlArray addObject:startUpFollowAngelUrl];
+                     
+                     NSString* startUpFollowLogoUrl = [following valueForKey:@"thumb_url"]; //2
+
+                     [displayStartUpLogoUrlArray addObject:startUpFollowLogoUrl];
+                      
+                     NSString* startUpFollowProductDesc = [following valueForKey:@"product_desc"]; //2
+                     [displayStartUpProductDescArray addObject:startUpFollowProductDesc];
+                     
+                     NSString* startUpFollowHighConcept = [following valueForKey:@"high_concept"]; //2
+                     [displayStartUpHighConceptArray addObject:startUpFollowHighConcept];
+                     
+                     NSString* startUpFollowFollowerCount = [following valueForKey:@"follower_count"]; //2
+                     [displayStartUpFollowerCountArray addObject:startUpFollowFollowerCount];
+                     
                  }
                  
-                 NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",startUpFollowingMarkets]];
-                 [theMutableString replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                 [theMutableString replaceOccurrencesOfString:@"(" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                 [theMutableString replaceOccurrencesOfString:@")" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                 [theMutableString replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
-                 [displayStartUpMarketArray addObject:theMutableString];
-                 [theMutableString release];
-             }
-             
-             for(int k=0; k<[displayStartUpMarketArray count]; k++)
-             {
-                 NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
-                 if([checkStr rangeOfString:@"("].location != NSNotFound)
+                 
+                 for(int i=0; i<[displayStartUpIdsArray count]; i++)
                  {
-                     [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No data"];
+                     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startups/%@",[displayStartUpIdsArray objectAtIndex:i]]];
+                     
+                     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+                     [request setHTTPMethod: @"GET"];
+                     
+                     
+                     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+                     
+                     NSError* error;
+                     NSDictionary* json = [NSJSONSerialization 
+                                           JSONObjectWithData:response //1
+                                           options:kNilOptions 
+                                           error:&error];
+                     
+                     NSArray* startUpFollowingLocations = [[json valueForKey:@"locations"] valueForKey:@"display_name"]; //2
+                     NSString* startUpFollowingMarkets = [[json valueForKey:@"markets"] valueForKey:@"display_name"]; //2
+                     
+                     for(int j=0; j<[startUpFollowingLocations count]; j++)
+                     {
+                         if([startUpFollowingLocations objectAtIndex:j] == (NSString*)[NSNull null])
+                         {
+                             [displayStartUpLocationArray addObject:@"NA"];
+                         }
+                         else
+                         {
+                             NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpFollowingLocations objectAtIndex:j]]];
+                             
+                             [theMutableString replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             [theMutableString replaceOccurrencesOfString:@"(" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             [theMutableString replaceOccurrencesOfString:@")" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             [theMutableString replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             
+                             [displayStartUpLocationArray addObject:theMutableString];
+                             [theMutableString release];
+                         } 
+                     }
+                     
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",startUpFollowingMarkets]];
+                     [theMutableString replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     [theMutableString replaceOccurrencesOfString:@"(" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     [theMutableString replaceOccurrencesOfString:@")" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     [theMutableString replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     [displayStartUpMarketArray addObject:theMutableString];
+                     [theMutableString release];
                  }
-                 [checkStr release];
+                 
+                 for(int k=0; k<[displayStartUpMarketArray count]; k++)
+                 {
+                     NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
+                     if([checkStr rangeOfString:@"("].location != NSNotFound)
+                     {
+                         [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No data"];
+                     }
+                     [checkStr release];
+                 }
+//                 [self startLoadingImagesConcurrently];
+                 [self saveImagesOfStartUpsFollowing];
+                 [table reloadData];
              }
-             [self startLoadingImagesConcurrently];
-             [table reloadData];
-         }
-         else if ([data length] == 0 && error == nil)
-         {
-             NSLog(@"Nothing was downloaded.");
-         }
-         else if (error != nil)
-         {
-             NSLog(@"Error = %@", error);
-         }         
-     }];
-}
-
-
--(void)startLoadingImagesConcurrently
-{
-    
-    NSOperationQueue *tShopQueue = [NSOperationQueue new];
-    NSInvocationOperation *tPerformOperation = [[NSInvocationOperation alloc] 
-                                                initWithTarget:self
-                                                selector:@selector(loadImage) 
-                                                object:nil];
-    [tShopQueue addOperation:tPerformOperation]; 
-    [tPerformOperation release];
-    [tShopQueue release];
-}
-
-- (void)loadImage 
-{
-    for (int asyncCount = 0; asyncCount < [displayStartUpLogoImageDataArray count] ; asyncCount++) {
-        
-        NSString *picLoad = [NSString stringWithFormat:@"%@",[displayStartUpLogoImageDataArray objectAtIndex:asyncCount]];
-        NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-        
-        UIImage* image = [UIImage imageWithData:imageData];
-        
-        if (image != nil) {
-            
-            [displayStartUpLogoUrlArray replaceObjectAtIndex:asyncCount withObject:image];
-            [self performSelectorOnMainThread:@selector(displayImage:) withObject:[NSNumber numberWithInt:asyncCount] waitUntilDone:NO]; 
-        }
-        [imageData release];
+             else if ([data length] == 0 && error == nil)
+             {
+                 NSLog(@"Nothing was downloaded.");
+             }
+             else if (error != nil)
+             {
+                 NSLog(@"Error = %@", error);
+             }         
+         }];
     }
 }
 
--(void)displayImage:(NSNumber*)presentCount
+-(void) saveImagesOfStartUpsFollowing
 {
-    if([[table indexPathsForVisibleRows]count] > 0)
+    for(int imageNumber=1; imageNumber<=[displayStartUpLogoUrlArray count]; imageNumber++)
     {
-        NSIndexPath *firstRowShown = [[table indexPathsForVisibleRows]objectAtIndex:0];
-        NSIndexPath *lastRowShown = [[table indexPathsForVisibleRows]objectAtIndex:[[table indexPathsForVisibleRows]count]-1];
-        NSInteger count = [presentCount integerValue];
-        if((count > firstRowShown.row)&&(count < lastRowShown.row))
-            [table reloadData];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *savedImagePath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"startupfollowing%d.png",imageNumber]];
+        
+        UIImage *image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[displayStartUpLogoUrlArray objectAtIndex:(imageNumber-1)]]]]];
+        NSData *imageData = UIImagePNGRepresentation(image);
+        [imageData writeToFile:savedImagePath atomically:NO];
+        
+        [image release];
+        
+
+        [displayStartUpLogoImageInDirectory addObject:savedImagePath];
     }
-    else
-        [table reloadData]; 
-    
+    [self saveStartUpsFollowingDetailsToDB];
 }
+
+-(void) saveStartUpsFollowingDetailsToDB
+{
+    for(int k=0; k<[displayStartUpIdsArray count]; k++)
+    {
+        NSString *strtid = [NSString stringWithFormat:@"%d",(k+1)];
+        NSString *startUpId= [NSString stringWithFormat:@"%@",[displayStartUpIdsArray objectAtIndex:k]];
+        NSString *startUpName= [NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:k]];
+        NSString *startUpAngelUrl= [NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:k]];
+        NSString *startUpLogoUrl= [NSString stringWithFormat:@"%@",[displayStartUpLogoUrlArray objectAtIndex:k]];
+        NSString *startUpProductDesc= [NSString stringWithFormat:@"%@",[displayStartUpProductDescArray objectAtIndex:k]];
+        NSString *startUpHighConcept= [NSString stringWithFormat:@"%@",[displayStartUpHighConceptArray objectAtIndex:k]];
+        NSString *startUpFollowerCount= [NSString stringWithFormat:@"%@",[displayStartUpFollowerCountArray objectAtIndex:k]];
+        NSString *startUpLocations= [NSString stringWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
+        NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
+        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
+        
+        [_dbmanager insertRecordIntoStartUpsFollowingTable:@"Following" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
+    }
+}
+
+
 
 -(void) getDetailsOfPortfolio
 {
-    loadingView.hidden = NO;
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",_currUserId]];//
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod: @"GET"];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
-                           completionHandler:^(NSURLResponse *response,
-                                               NSData *data,
-                                               NSError *error) 
-     {
-         if ([data length] >0 && error == nil)
-         {
-             NSError* error;
-             NSDictionary* json = [NSJSONSerialization 
-                                   JSONObjectWithData:data //1
-                                   options:kNilOptions 
-                                   error:&error];
-             
-             NSArray* startUpPortfolio = [[json objectForKey:@"startup_roles"] valueForKey:@"startup"]; //2
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        [_dbmanager.startUpIdsArrayFromDB removeAllObjects];
+        [_dbmanager.startUpNameArrayFromDB removeAllObjects];
+        [_dbmanager.startUpAngelUrlArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLogoUrlArrayFromDB removeAllObjects];
+        [_dbmanager.startUpProductDescArrayFromDB removeAllObjects];
+        [_dbmanager.startUpHighConceptArrayFromDB removeAllObjects];
+        [_dbmanager.startUpFollowerCountArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLocationArrayFromDB removeAllObjects];
+        [_dbmanager.startUpMarketArrayFromDB removeAllObjects];
+        [_dbmanager.startUpLogoImageInDirectoryFromDB removeAllObjects];
+        
+        [_dbmanager retrieveStartUpsPortfolioDetails];
+        
 
-             for(int k=0; k<[startUpPortfolio count]; k++)
+        [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
+        
+
+        [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
+        
+
+        [displayStartUpAngelUrlArray addObjectsFromArray:_dbmanager.startUpAngelUrlArrayFromDB];
+        
+
+        [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
+
+        [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
+        
+
+        [displayStartUpHighConceptArray addObjectsFromArray:_dbmanager.startUpHighConceptArrayFromDB];
+        
+
+        [displayStartUpFollowerCountArray addObjectsFromArray:_dbmanager.startUpFollowerCountArrayFromDB];
+        
+
+        [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
+        
+
+        [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
+        
+
+        [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
+        
+        [table reloadData];
+    }
+    else
+    {
+        loadingView.hidden = NO;
+        filterButton.enabled = NO;
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",_currUserId]];//
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod: @"GET"];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
+                               completionHandler:^(NSURLResponse *response,
+                                                   NSData *data,
+                                                   NSError *error) 
+         {
+             if ([data length] >0 && error == nil)
              {
-                 NSDictionary *portfolio = [startUpPortfolio objectAtIndex:k];
+                 NSError* error;
+                 NSDictionary* json = [NSJSONSerialization 
+                                       JSONObjectWithData:data //1
+                                       options:kNilOptions 
+                                       error:&error];
                  
-                 NSString *startUpPortfolioId = [portfolio valueForKey:@"id"];
-                 [displayStartUpIdsArray addObject:startUpPortfolioId];
+                 NSArray* startUpPortfolio = [[json objectForKey:@"startup_roles"] valueForKey:@"startup"]; //2
                  
-                 NSString *startUpPortfolioName = [portfolio valueForKey:@"name"];
-                  [displayStartUpNameArray addObject:startUpPortfolioName];
-                 
-                 NSString *startUpPortfolioAngelUrl = [portfolio valueForKey:@"angellist_url"];
-                 [displayStartUpAngelUrlArray addObject:startUpPortfolioAngelUrl];
-                 
-                 NSString *startUpPortfolioLogoUrl = [portfolio valueForKey:@"thumb_url"];
-                 [displayStartUpLogoImageDataArray addObject:startUpPortfolioLogoUrl];
-                 [displayStartUpLogoUrlArray addObject:[UIImage imageNamed:@"placeholder.png"]];
-                 
-                 NSString *startUpProdDesc = [portfolio valueForKey:@"product_desc"];
-                [displayStartUpProductDescArray addObject:startUpProdDesc];
-                 
-                 NSString *startUpPortfolioHighConcept = [portfolio valueForKey:@"high_concept"];
-                 [displayStartUpHighConceptArray addObject:startUpPortfolioHighConcept];
-                 
-                 NSString *startUpPortfolioFollowerCount = [portfolio valueForKey:@"follower_count"];
-                 [displayStartUpFollowerCountArray addObject:startUpPortfolioFollowerCount];
-                 
-                 [displayStartUpLocationArray addObject:@""];
-                 [displayStartUpMarketArray addObject:@""];
-                 
+                 for(int k=0; k<[startUpPortfolio count]; k++)
+                 {
+                     NSDictionary *portfolio = [startUpPortfolio objectAtIndex:k];
+                     
+                     NSString *startUpPortfolioId = [portfolio valueForKey:@"id"];
+                     [displayStartUpIdsArray addObject:startUpPortfolioId];
+                     
+                     NSString *startUpPortfolioName = [portfolio valueForKey:@"name"];
+                     [displayStartUpNameArray addObject:startUpPortfolioName];
+                     
+                     NSString *startUpPortfolioAngelUrl = [portfolio valueForKey:@"angellist_url"];
+                     [displayStartUpAngelUrlArray addObject:startUpPortfolioAngelUrl];
+                     
+                     NSString *startUpPortfolioLogoUrl = [portfolio valueForKey:@"thumb_url"];
+//                     [displayStartUpLogoImageDataArray addObject:startUpPortfolioLogoUrl];
+//                     [displayStartUpLogoUrlArray addObject:[UIImage imageNamed:@"placeholder.png"]];
+                     [displayStartUpLogoUrlArray addObject:startUpPortfolioLogoUrl];
+                     
+                     NSString *startUpProdDesc = [portfolio valueForKey:@"product_desc"];
+                     [displayStartUpProductDescArray addObject:startUpProdDesc];
+                     
+                     NSString *startUpPortfolioHighConcept = [portfolio valueForKey:@"high_concept"];
+                     [displayStartUpHighConceptArray addObject:startUpPortfolioHighConcept];
+                     
+                     NSString *startUpPortfolioFollowerCount = [portfolio valueForKey:@"follower_count"];
+                     [displayStartUpFollowerCountArray addObject:startUpPortfolioFollowerCount];
+                     
+                     [displayStartUpLocationArray addObject:@""];
+                     [displayStartUpMarketArray addObject:@""];
+                     
+                 }
+//                 [self startLoadingImagesConcurrently];
+                 [self saveImagesOfStartUpsPortfolio];
+                 [table reloadData];
              }
-             [self startLoadingImagesConcurrently];
-             [table reloadData];
-         }
-         else if ([data length] == 0 && error == nil)
-         {
-             NSLog(@"Nothing was downloaded.");
-         }
-         else if (error != nil)
-         {
-             NSLog(@"Error = %@", error);
-         }         
-     }];
+             else if ([data length] == 0 && error == nil)
+             {
+                 NSLog(@"Nothing was downloaded.");
+             }
+             else if (error != nil)
+             {
+                 NSLog(@"Error = %@", error);
+             }         
+         }];
+    }
+}
+
+-(void) saveImagesOfStartUpsPortfolio
+{
+    for(int imageNumber=1; imageNumber<=[displayStartUpLogoUrlArray count]; imageNumber++)
+    {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *savedImagePath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"startupportfolio%d.png",imageNumber]];
+        
+        UIImage *image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",[displayStartUpLogoUrlArray objectAtIndex:(imageNumber-1)]]]]];
+        NSData *imageData = UIImagePNGRepresentation(image);
+        [imageData writeToFile:savedImagePath atomically:NO];
+        
+        [image release];
+        
+        [startUpLogoImageInDirectory addObject:savedImagePath];
+        [displayStartUpLogoImageInDirectory addObject:savedImagePath];
+    }
+    [self saveStartUpsPortfolioDetailsToDB];
+}
+
+-(void) saveStartUpsPortfolioDetailsToDB
+{
+    for(int k=0; k<[displayStartUpIdsArray count]; k++)
+    {
+        NSString *strtid = [NSString stringWithFormat:@"%d",(k+1)];
+        NSString *startUpId= [NSString stringWithFormat:@"%@",[displayStartUpIdsArray objectAtIndex:k]];
+        NSString *startUpName= [NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:k]];
+        NSString *startUpAngelUrl= [NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:k]];
+        NSString *startUpLogoUrl= [NSString stringWithFormat:@"%@",[displayStartUpLogoUrlArray objectAtIndex:k]];
+        NSString *startUpProductDesc= [NSString stringWithFormat:@"%@",[displayStartUpProductDescArray objectAtIndex:k]];
+        NSString *startUpHighConcept= [NSString stringWithFormat:@"%@",[displayStartUpHighConceptArray objectAtIndex:k]];
+        NSString *startUpFollowerCount= [NSString stringWithFormat:@"%@",[displayStartUpFollowerCountArray objectAtIndex:k]];
+        NSString *startUpLocations= [NSString stringWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
+        NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
+        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
+        
+        [_dbmanager insertRecordIntoStartUpsPortfolioTable:@"Portfolio" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
+    }
 }
 
 -(void) getDetailsOfAll
@@ -1015,6 +1129,8 @@ NSTimer *timer;
     [startUpLogoImageInDirectory release];
     [displayStartUpLogoImageInDirectory release];
     [displayStartUpLogoImageDataArray release];
+    
+    [super dealloc];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

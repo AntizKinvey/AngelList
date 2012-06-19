@@ -8,6 +8,22 @@
 
 #import <UIKit/UIKit.h>
 
-@interface InboxViewController : UIViewController
+@interface InboxViewController : UIViewController<UITableViewDataSource, UITableViewDelegate>
+{
+    IBOutlet UITableView *tableview;
+    UILabel *label;
+    IBOutlet UIView *loading;
+    
+   
+    
+    
+}
+
+@property(nonatomic, retain)IBOutlet UITableView *tableview;
+@property(nonatomic, retain)IBOutlet UIView *loading;
+
+-(void)getTime;
+-(void)startLoadingImagesConcurrently;
+-(void)sendRequestToFetch;
 
 @end

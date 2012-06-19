@@ -92,28 +92,23 @@ BOOL _dataLoaded = FALSE;
     }
     
     loadingView.hidden = YES;
-    
+    filterButton.enabled = YES;
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
-//    else 
-//    {
-//        AsyncImageView* oldImage = (AsyncImageView*)
-//        [cell.contentView viewWithTag:999];
-//        [oldImage removeFromSuperview];
-//    }
     
     //---set the text to display for the cell---
     NSString *cellValue = [feedDescDisplayArray objectAtIndex:indexPath.row]; 
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(80, 7, 240, 75)] autorelease];
+        UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(80, 7, 210, 75)] autorelease];
         cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellTextLabel.numberOfLines = 50;
+        cellTextLabel.backgroundColor = [UIColor clearColor];
         cellTextLabel.text = cellValue;
         cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
         [cell.contentView addSubview:cellTextLabel];
@@ -194,8 +189,7 @@ BOOL _dataLoaded = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-//        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-//        [myAlert show];
+
     }
     else
     {
@@ -223,8 +217,7 @@ BOOL _dataLoaded = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-//        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-//        [myAlert show];
+
     }
     else
     {
@@ -394,6 +387,7 @@ BOOL _dataLoaded = FALSE;
     }
     else
     {
+        filterButton.enabled = NO;
         //Get feeds
         NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/feed"];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -618,129 +612,99 @@ BOOL _dataLoaded = FALSE;
     }
 }
 
--(void) fadeView
-{
-    if(countDownForView < 35)
-    {
-        countDownForView++;
-        notReachable.alpha = alphaValue;
-        alphaValue = alphaValue - 0.03;
-    }
-    else
-    {
-        [timer invalidate];
-        [filterButton setUserInteractionEnabled:YES];
-    }
-}
 
 - (void)filterButtonSelected:(id)sender {
-    // whatever needs to happen when button is tapped
+       UIView *filtersList;
     
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    if(_showFilterMenu == FALSE)
     {
-        [filterButton setUserInteractionEnabled:NO];
-        timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(fadeView) userInfo:nil repeats:YES];
-        alphaValue = 1.0;
-        countDownForView = 0;
-    }
-    else
-    {
-        UIView *filtersList;
-        
-        if(_showFilterMenu == FALSE)
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
-            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+            [filterView  setBackgroundColor: [UIColor blackColor]];
+            [filterView setAlpha:0.6f];
+            filterView.tag = 1000;
+            [self.view addSubview:filterView];
+            
+            filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 145)];
+            [filtersList  setBackgroundColor: [UIColor blackColor]];
+            [filtersList.layer setCornerRadius:18.0f];
+            [filtersList setAlpha:1.0f];
+            filtersList.tag = 1001;
+            [self.view addSubview:filtersList];
+            
+            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            
+            int _yPos = 5;
+            
+            for (int i=1; i<=5; i++) 
             {
-                UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-                [filterView  setBackgroundColor: [UIColor blackColor]];
-                [filterView setAlpha:0.6f];
-                filterView.tag = 1000;
-                [self.view addSubview:filterView];
+                UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+                [filterButton setTitle:[NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
+                [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+                filterButton.frame = CGRectMake(14, _yPos, 120, 25);
+                filterButton.tag = i;
+                [filtersList addSubview:filterButton];
                 
-                filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 145)];
-                [filtersList  setBackgroundColor: [UIColor blackColor]];
-                [filtersList.layer setCornerRadius:18.0f];
-                [filtersList setAlpha:1.0f];
-                filtersList.tag = 1001;
-                [self.view addSubview:filtersList];
-                
-                UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-                
-                int _yPos = 5;
-                
-                for (int i=1; i<=5; i++) 
-                {
-                    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-                    [filterButton setTitle:[NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                    filterButton.frame = CGRectMake(14, _yPos, 120, 25);
-                    filterButton.tag = i;
-                    [filtersList addSubview:filterButton];
-                    
-                    _yPos = _yPos + 27;
-                }
-                
-                
-                [filtersList release];
-                [filterView release];
-                
-                _showFilterMenu = TRUE;
-            }
-            else
-            {
-                UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
-                [filterView  setBackgroundColor: [UIColor blackColor]];
-                [filterView setAlpha:0.6f];
-                filterView.tag = 1000;
-                [self.view addSubview:filterView];
-                
-                filtersList = [[UIView alloc] initWithFrame:CGRectMake(((768*165)/320), 0, ((768*150)/320), ((1024*145)/480))];
-                [filtersList  setBackgroundColor: [UIColor blackColor]];
-                [filtersList.layer setCornerRadius:18.0f];
-                [filtersList setAlpha:1.0f];
-                filtersList.tag = 1001;
-                [self.view addSubview:filtersList];
-                
-                UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-                
-                int _yPos = ((1024*5)/480);
-                
-                for (int i=1; i<=5; i++) 
-                {
-                    UIButton *following = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [following setBackgroundImage:image forState:UIControlStateNormal];
-                    [following setTitle:[NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                    [following setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    [following addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                    following.frame = CGRectMake(((768*14)/320), _yPos, ((768*120)/320), ((1024*25)/480));
-                    following.tag = i;
-                    [filtersList addSubview:following];
-                    
-                    _yPos = _yPos + ((1024*27)/480);
-                }
-                
-                
-                [filtersList release];
-                [filterView release];
-                
-                _showFilterMenu = TRUE;
+                _yPos = _yPos + 27;
             }
             
             
+            [filtersList release];
+            [filterView release];
+            
+            _showFilterMenu = TRUE;
         }
         else
         {
-            [[self.view viewWithTag:1000] removeFromSuperview];
-            [[self.view viewWithTag:1001] removeFromSuperview];
-            _showFilterMenu = FALSE;
+            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
+            [filterView  setBackgroundColor: [UIColor blackColor]];
+            [filterView setAlpha:0.6f];
+            filterView.tag = 1000;
+            [self.view addSubview:filterView];
+            
+            filtersList = [[UIView alloc] initWithFrame:CGRectMake(((768*165)/320), 0, ((768*150)/320), ((1024*145)/480))];
+            [filtersList  setBackgroundColor: [UIColor blackColor]];
+            [filtersList.layer setCornerRadius:18.0f];
+            [filtersList setAlpha:1.0f];
+            filtersList.tag = 1001;
+            [self.view addSubview:filtersList];
+            
+            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            
+            int _yPos = ((1024*5)/480);
+            
+            for (int i=1; i<=5; i++) 
+            {
+                UIButton *following = [UIButton buttonWithType:UIButtonTypeCustom];
+                [following setBackgroundImage:image forState:UIControlStateNormal];
+                [following setTitle:[NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
+                [following setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+                [following addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+                following.frame = CGRectMake(((768*14)/320), _yPos, ((768*120)/320), ((1024*25)/480));
+                following.tag = i;
+                [filtersList addSubview:following];
+                
+                _yPos = _yPos + ((1024*27)/480);
+            }
+            
+            
+            [filtersList release];
+            [filterView release];
+            
+            _showFilterMenu = TRUE;
         }
-    } 
+        
+        
+    }
+    else
+    {
+        [[self.view viewWithTag:1000] removeFromSuperview];
+        [[self.view viewWithTag:1001] removeFromSuperview];
+        _showFilterMenu = FALSE;
+    }
 }
 
 -(void)getFilteredList:(id)sender
@@ -1032,6 +996,7 @@ BOOL _dataLoaded = FALSE;
     [filterTaglineArray release];
     
     [userFollowingIds release];
+    [super dealloc];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

@@ -43,6 +43,8 @@
     [btn1 setTag:0]; // Assign the button a "tag" so when our "click" event is called we know which button was pressed.
     [btn1 setSelected:true]; // Set this button as selected (we will select the others to false as we only want Tab 1 to be selected initially
     
+//    [btn1 setUserInteractionEnabled:NO];
+    
     // Now we repeat the process for the other buttons
     btnImage = [UIImage imageNamed:@"activity.png"];
     btnImageSelected = [UIImage imageNamed:@"activityp.png"];
@@ -67,6 +69,7 @@
     [btn4 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn4 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn4 setTag:3];
+//    [btn4 setUserInteractionEnabled:NO];
     
     // Add my new buttons to the view
     [self.view addSubview:btn1];
@@ -109,12 +112,28 @@
             [btn3 setSelected:false];
             [btn4 setSelected:true];
             break;
-    }  
+    } 
     
-    if (self.selectedIndex == tabID) {
+//    if (self.selectedIndex == 1) {
+//        UINavigationController *navController = (UINavigationController *)[self selectedViewController];
+//        [navController popToRootViewControllerAnimated:YES];
+//    } 
+//    else if (self.selectedIndex == 2) {
+//        UINavigationController *navController = (UINavigationController *)[self selectedViewController];
+//        [navController popToRootViewControllerAnimated:YES];
+//    } 
+//    else 
+//    {
+//        self.selectedIndex = tabID;
+//    }
+    
+    if (self.selectedIndex == tabID) 
+    {
         UINavigationController *navController = (UINavigationController *)[self selectedViewController];
         [navController popToRootViewControllerAnimated:YES];
-    } else {
+    } 
+    else 
+    {
         self.selectedIndex = tabID;
     }
 }

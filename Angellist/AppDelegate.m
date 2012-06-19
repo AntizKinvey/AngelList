@@ -40,6 +40,10 @@ int _totalNoOfRowsInUserTable = 0;
     
     [_dbmanager createTableStartUps:@"StartUps" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
+    [_dbmanager createTableStartUpsFollowing:@"Following" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
+    
+    [_dbmanager createTableStartUpsPortfolio:@"Portfolio" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
+    
     _totalNoOfRowsInUserTable = [_dbmanager retrieveUserFromDB];
     
     if(_totalNoOfRowsInUserTable == 0)
@@ -88,7 +92,7 @@ int _totalNoOfRowsInUserTable = 0;
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    NSLog(@"\n\nAPPLICATION ENTERED FOREGROUND");
+    
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
@@ -96,7 +100,7 @@ int _totalNoOfRowsInUserTable = 0;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    NSLog(@"\n\nAPPLICATION BECAME ACTIVE");
+    
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */

@@ -118,6 +118,7 @@ ContainerViewController *_containerViewController;
 -(void) dealloc
 {
     [_loginView release];
+    [super dealloc];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

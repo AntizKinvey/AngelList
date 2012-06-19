@@ -20,8 +20,14 @@
 -(void) getDetailsOfPortfolio;
 -(void) getDetailsOfAll;
 
--(void)startLoadingImagesConcurrently;
+//-(void) startLoadingImagesConcurrently;
 -(void) saveImagesOfStartUps;
 -(void) saveStartUpsDetailsToDB;
+
+-(void) saveImagesOfStartUpsFollowing;
+-(void) saveStartUpsFollowingDetailsToDB;
+
+-(void) saveImagesOfStartUpsPortfolio;
+-(void) saveStartUpsPortfolioDetailsToDB;
 
 @end

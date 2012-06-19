@@ -15,6 +15,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.title = @"Home";
     }
     return self;
 }
@@ -31,6 +32,9 @@
 
 - (void)viewDidLoad
 {
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }

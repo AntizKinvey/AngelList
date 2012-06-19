@@ -64,23 +64,13 @@ extern NSMutableArray *userFollowingIds;
     [backButton release];
     
 
-    if((_filterFollow == TRUE) || (_filterPortfolio == TRUE))
-    {
-        UIImage *strtUpImage = [displayStartUpLogoUrlArray objectAtIndex:_rowNumberInStartUps];
-        UIImageView *startUpImageView = [[UIImageView alloc] initWithFrame:startUpImage.frame];
-        startUpImageView.image = strtUpImage;
-        [self.view addSubview:startUpImageView];
-        [startUpImageView release];
-    }
-    else
-    {
+
         UIImage *strtUpImage = [UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:_rowNumberInStartUps]];
         UIImageView *startUpImageView = [[UIImageView alloc] initWithFrame:startUpImage.frame];
         startUpImageView.image = strtUpImage;
         [self.view addSubview:startUpImageView];
         [startUpImageView release];
-    }
-    
+
     
     startUpName.text = [displayStartUpNameArray objectAtIndex:_rowNumberInStartUps];
     startUpName.lineBreakMode = UILineBreakModeWordWrap;
