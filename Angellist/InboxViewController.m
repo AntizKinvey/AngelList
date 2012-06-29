@@ -30,6 +30,8 @@ NSMutableArray *_msgbody;
 NSMutableArray *_placeHolder;
 NSMutableArray *_time;
 NSMutableArray *_displayTime;
+NSMutableArray *_totalMsgCount;
+
 
 extern BOOL fromInboxDetails;
 
@@ -57,8 +59,6 @@ UIView *noInternetView;
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc that aren't in use.
-    
-    
 }
 
 
@@ -80,36 +80,70 @@ UIView *noInternetView;
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
-    label = [[UILabel alloc] initWithFrame:CGRectMake(90, 0, 210, 50)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 50)];
     label.text = [_senderName objectAtIndex:indexPath.row];
     label.backgroundColor = [UIColor clearColor];
     
-
+    NSString *strStatus = [NSString stringWithFormat:@"%@",[_dbmanager.inboxViewedFromDB objectAtIndex:indexPath.row]];
+     
+    if ([strStatus isEqual:@"0"]) 
+    {
     label.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
         
-
+    }
+    else 
+    {
+        
+        label.textColor = [UIColor grayColor];
+        
+    }
+    
     label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
     [cell.contentView addSubview:label];
     [label release];
     
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
     msgLabel.text = [_displayTime objectAtIndex:indexPath.row]; 
-    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:8];
+    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
     [cell.contentView addSubview:msgLabel];
     msgLabel.backgroundColor = [UIColor clearColor];
     [msgLabel release];
     
-    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(90, 40, 210, 30)];
+    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 40, 210, 30)];
     timeLabel.text = [_msgbody objectAtIndex:indexPath.row]; 
-    timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+    timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+    timeLabel.lineBreakMode = UILineBreakModeWordWrap;
+    timeLabel.numberOfLines = 0;
     timeLabel.backgroundColor = [UIColor clearColor];
     [cell.contentView addSubview:timeLabel];
     [timeLabel release];
     
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 70, 70)];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
     imageView.image = [_placeHolder objectAtIndex:indexPath.row];
+    imageView.layer.cornerRadius = 3.5f;
+    imageView.layer.masksToBounds = YES;
     [cell.contentView addSubview:imageView];
     [imageView release];
+    
+    NSString *strContent1 = [_msgbody objectAtIndex:[indexPath row]];
+    NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
+     NSString *strContent4 = [_senderName objectAtIndex:indexPath.row];
+    CGSize constrainedSize = CGSizeMake(310, 20000);
+    CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+    if (!timeLabel)
+        timeLabel = (UILabel*)[cell viewWithTag:1];
+    [timeLabel setText:strContent1];
+    [timeLabel setFrame:CGRectMake(70, 30, 210, MAX(exactSize.height, 20.0f))];
+    
+    if (!msgLabel)
+        msgLabel = (UILabel*)[cell viewWithTag:1];
+    [msgLabel setText:strContent3];
+    [msgLabel setFrame:CGRectMake(220, MAX(timeLabel.frame.size.height+35, 80), 210, 30)];
+    
+    if (!label)
+        label = (UILabel*)[cell viewWithTag:1];
+    [label setText:strContent4];
+    [label setFrame:CGRectMake(70, 0, 210, 40)];
     
     loading.hidden = YES;
     return cell;
@@ -119,39 +153,63 @@ UIView *noInternetView;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-
     
-    NSInteger integer = 2;
-    return integer;
+    return [_dbmanager.inboxThreadIdFromDB count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    return 100.0;
+    
+    NSString *text = [_msgbody objectAtIndex:[indexPath row]];
+    
+    CGSize constraint = CGSizeMake(310, 20000.0f);
+    
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    
+    CGFloat height = MAX(size.height, 44.0f);
+    
+   
+    
+    return height + (30 * 2);
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    NSIndexPath *selection = [tableview indexPathForSelectedRow];
-    if (selection){
-        [tableview deselectRowAtIndexPath:selection animated:YES];
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];
+    }
+    else
+    {
+        NSIndexPath *selection = [tableview indexPathForSelectedRow];
+        if (selection){
+            [tableview deselectRowAtIndexPath:selection animated:YES];
+        }
+        
+        if (fromInboxDetails == TRUE) {
+            fromInboxDetails = FALSE;
+            [self sendRequestToFetch];
+            [_dbmanager retrieveInboxDetails];
+            [tableview reloadData];
+            [self startLoadingImagesConcurrently];
+        }
     }
     
-    if (fromInboxDetails == TRUE) {
-        fromInboxDetails = FALSE;
-        [self sendRequestToFetch];
-        [tableview reloadData];
-        [self startLoadingImagesConcurrently];
-    }
     [super viewWillAppear:animated];
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
    
-//    [tableview reloadData];
+
     [super viewDidAppear:animated];
 }
 
@@ -174,6 +232,11 @@ UIView *noInternetView;
 
 - (void)viewDidLoad
 {
+    _dbmanager = [[DBManager alloc] init];
+    [_dbmanager openDB];
+    _dbmanager.inboxThreadIdFromDB = [[[NSMutableArray alloc] init] autorelease];
+    _dbmanager.inboxTotalFromDB = [[[NSMutableArray alloc] init] autorelease];
+    _dbmanager.inboxViewedFromDB = [[[NSMutableArray alloc] init] autorelease];
     
     noInternetView = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
     noInternetView.alpha = 0;
@@ -226,15 +289,14 @@ UIView *noInternetView;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        timerInbox = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(fadeView) userInfo:nil repeats:YES];
-        alphaValueInInbox = 1.0;
-        countDownInbox = 0;
+
 
         [super viewDidLoad];
     }
     else
     {
         [self sendRequestToFetch];
+        
          [super viewDidLoad];
         // Do any additional setup after loading the view from its nib.
         // [self performSelector:@selector(loadImagesToTable) withObject:nil afterDelay:0.5];
@@ -248,73 +310,106 @@ UIView *noInternetView;
 -(void)sendRequestToFetch
 {
    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_currAccessToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
     
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
+   
     
-    NSArray *_messageThreads = [json valueForKey:@"messages"];
-    _senderName = [[NSMutableArray alloc] init];
-    _imageOfSender = [[NSMutableArray alloc] init];
-    _imageOfRecepient = [[NSMutableArray alloc] init];
-    _userids = [[NSMutableArray alloc] init];
-    _sender = [[NSMutableArray alloc] init];
-    _recepient = [[NSMutableArray alloc] init];
-    _recepientName = [[NSMutableArray alloc] init];
-    _read = [[NSMutableArray alloc] init];
-    _threadId = [[NSMutableArray alloc] init];
-    _msgbody = [[NSMutableArray alloc] init];
-    _placeHolder = [[NSMutableArray alloc] init];
-    _time = [[NSMutableArray alloc] init];
-    _displayTime = [[NSMutableArray alloc] init];
+    NSString *stringResponse = [NSString stringWithFormat:@"%@",[json valueForKey:@"success"]];
     
-    for (int _userCount=0; _userCount<[_messageThreads count] ; _userCount++) 
-    {
+    
+    if ([stringResponse isEqual:@"0"]) {
+        UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
+        labelError.text = @"No scope for messages";
+        labelError.textColor = [UIColor grayColor];
+        labelError.textAlignment = UITextAlignmentCenter;
+        [labelError setBackgroundColor:[UIColor clearColor]];
+        [self.view addSubview:labelError];
+        [labelError release];
+    }
+    else {
+        NSArray *_messageThreads = [json valueForKey:@"messages"];
+        _senderName = [[NSMutableArray alloc] init];
+        _imageOfSender = [[NSMutableArray alloc] init];
+        _imageOfRecepient = [[NSMutableArray alloc] init];
+        _userids = [[NSMutableArray alloc] init];
+        _sender = [[NSMutableArray alloc] init];
+        _recepient = [[NSMutableArray alloc] init];
+        _recepientName = [[NSMutableArray alloc] init];
+        _read = [[NSMutableArray alloc] init];
+        _threadId = [[NSMutableArray alloc] init];
+        _msgbody = [[NSMutableArray alloc] init];
+        _placeHolder = [[NSMutableArray alloc] init];
+        _time = [[NSMutableArray alloc] init];
+        _displayTime = [[NSMutableArray alloc] init];
+        _totalMsgCount = [[NSMutableArray alloc] init];
         
-        NSDictionary *diction = [_messageThreads objectAtIndex:_userCount];
-        
-        [_userids addObject:[[diction valueForKey:@"users"] valueForKey:@"id"]];
-        [_sender addObject:[[diction valueForKey:@"last_message"] valueForKey:@"sender_id"]];
-        [_recepient addObject:[[diction valueForKey:@"last_message"] valueForKey:@"recipient_id"]];
-        [_read addObject:[diction valueForKey:@"viewed"]];
-        [_threadId addObject:[diction valueForKey:@"thread_id"]];
-        [_msgbody addObject:[[diction valueForKey:@"last_message"] valueForKey:@"body"]];
-        [_time addObject:[[diction valueForKey:@"last_message"] valueForKey:@"created_at"]];
-        
-        NSDictionary *dictionary = [diction valueForKey:@"users"];
-        NSString *string1 = [NSString stringWithFormat:@"%@",[_sender objectAtIndex:_userCount]];
-        
-        NSEnumerator *enumerator = [dictionary objectEnumerator];
-        NSDictionary *key;
-        
-        while (key = [enumerator nextObject]) {
+        for (int _userCount=0; _userCount<[_messageThreads count] ; _userCount++) 
+        {
+            NSDictionary *diction = [_messageThreads objectAtIndex:_userCount];
             
-            NSString *string2 = [NSString stringWithFormat:@"%@",[key valueForKey:@"id"]];
+            [_userids addObject:[[diction valueForKey:@"users"] valueForKey:@"id"]];
+            [_sender addObject:[[diction valueForKey:@"last_message"] valueForKey:@"sender_id"]];
+            [_recepient addObject:[[diction valueForKey:@"last_message"] valueForKey:@"recipient_id"]];
+            [_read addObject:[NSNumber numberWithBool:[[diction valueForKey:@"viewed"]boolValue]]];
             
-            if ([string1 isEqual:string2]) 
+            [_totalMsgCount addObject:[diction valueForKey:@"total"]];
+            for (int _userCount1=0; _userCount1<[_messageThreads count] ; _userCount1++) 
             {
+                NSDictionary *diction = [_messageThreads objectAtIndex:_userCount1];
+                [_threadId addObject:[diction valueForKey:@"thread_id"]];
+            }
+            [_msgbody addObject:[[diction valueForKey:@"last_message"] valueForKey:@"body"]];
+            [_time addObject:[[diction valueForKey:@"last_message"] valueForKey:@"created_at"]];
+            
+
+                [self readUnread:_userCount];
+                if(_userCount == [_messageThreads count]-1)
+                {
+                    [self readUnread:_userCount];
+                }
+            
+            
+            NSDictionary *dictionary = [diction valueForKey:@"users"];
+            NSString *string1 = [NSString stringWithFormat:@"%@",[_sender objectAtIndex:_userCount]];
+            
+            NSEnumerator *enumerator = [dictionary objectEnumerator];
+            NSDictionary *key;
+            
+            while (key = [enumerator nextObject]) {
                 
-                [_senderName addObject:[key valueForKey:@"name"]];
-                [_imageOfSender addObject:[key valueForKey:@"image"]];
-               
+                NSString *string2 = [NSString stringWithFormat:@"%@",[key valueForKey:@"id"]];
+                
+                if ([string1 isEqual:string2]) 
+                {
+                    
+                    [_senderName addObject:[key valueForKey:@"name"]];
+                    [_imageOfSender addObject:[key valueForKey:@"image"]];
+                   
+                    
+                }
+                else 
+                {
+                    [_recepientName addObject:[key valueForKey:@"name"]];
+                    [_imageOfRecepient addObject:[key valueForKey:@"image"]];
+                }
                 
             }
-            else 
-            {
-                [_recepientName addObject:[key valueForKey:@"name"]];
-                [_imageOfRecepient addObject:[key valueForKey:@"image"]];
-            }
             
+            [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
+           
         }
         
-        [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
         
+        [self getTime]; 
+        
+
     }
-    [self getTime];  
-    
+       
 }
 
 -(void)startLoadingImagesConcurrently
@@ -336,7 +431,7 @@ UIView *noInternetView;
         
         NSString *picLoad = [NSString stringWithFormat:@"%@",[_imageOfSender objectAtIndex:asyncCount]];
         NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-       
+
         
         UIImage* image = [UIImage imageWithData:imageData];
         
@@ -357,11 +452,50 @@ UIView *noInternetView;
         NSIndexPath *lastRowShown = [[tableview indexPathsForVisibleRows]objectAtIndex:[[tableview indexPathsForVisibleRows]count]-1];
         NSInteger count = [presentCount integerValue];
         if((count > firstRowShown.row)&&(count < lastRowShown.row))
+             [_dbmanager retrieveInboxDetails];
             [tableview reloadData];
     }
     else
+         [_dbmanager retrieveInboxDetails];
         [tableview reloadData]; 
     
+}
+
+-(void)readUnread:(int)msgCount
+{
+   
+    [_dbmanager retrieveInboxDetails];
+    
+        if ([_dbmanager.inboxThreadIdFromDB count] != 0) {
+            if ([_dbmanager.inboxThreadIdFromDB count] !=[_threadId count]) {  
+                
+                
+                NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+                NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+                
+                [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
+                
+                
+            }
+            else if (![[NSString stringWithFormat:@"%@",[_totalMsgCount objectAtIndex:msgCount]] isEqual:[NSString stringWithFormat:@"%@",[_dbmanager.inboxTotalFromDB objectAtIndex:msgCount]]]) {
+                
+                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+                NSString *str3 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+                NSString *str4 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+                [_dbmanager updateRecordIntoInboxTable:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str3 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str4];
+            }
+
+        }
+        else {
+            
+                NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+                NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+                
+                [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
+        }
+     
 }
 
 -(void)getTime
@@ -401,13 +535,16 @@ UIView *noInternetView;
                     if (hour == 0){
 
                         if (minute == 0) {
+                            
                             displayTime = [NSString stringWithFormat:@"about %d secs ago",seconds];     
                         }
                         else {
+                            
                             displayTime = [NSString stringWithFormat:@"about %d mins ago",minute];  
                         }
                     }
                     else {
+                        
                         displayTime = [NSString stringWithFormat:@"about %d hours ago",hour];  
                     }
                 }
@@ -416,20 +553,21 @@ UIView *noInternetView;
                     }
             }
             else {
-                    displayTime = [NSString stringWithFormat:@"about %d months ago",month];
+                
+                displayTime = [NSString stringWithFormat:@"about %d months ago",month];
             }
         }
         else {
+            
              displayTime = [NSString stringWithFormat:@"about %d months ago",year];
         }
 
-    [_displayTime addObject:displayTime];
-    [cal release];
+        [_displayTime addObject:displayTime];
+        [cal release];
+        [dateForm release];
 
     }
-    
 
-  
 }
 
 -(void) backAction:(id)sender
@@ -461,6 +599,13 @@ UIView *noInternetView;
     }
     threadIdString = [NSString stringWithFormat:@"%@",[_threadId objectAtIndex:indexPath.row]];
     
+    NSString *readState = [NSString stringWithFormat:@"%@", [_dbmanager.inboxViewedFromDB objectAtIndex:indexPath.row]];
+    
+    
+    if ([readState isEqual:@"0"]) {
+        [_dbmanager updateStatusIntoInboxTable:@"Inbox" withField1:@"viewed" field1Value:@"1" andField2:@"threadId" field2Value:threadIdString];
+    }
+    
     threadValue = [threadIdString intValue];
    
     
@@ -479,6 +624,11 @@ UIView *noInternetView;
     {
         return NO;
     }
+}
+
+-(void) dealloc
+{
+    [super dealloc];
 }
 
 @end

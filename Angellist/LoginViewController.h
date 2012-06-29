@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <KinveyKit/KinveyKit.h>
 
-@interface LoginViewController : UIViewController <UIWebViewDelegate>
+@interface LoginViewController : UIViewController <UIWebViewDelegate, KCSPersistableDelegate>
 {
     IBOutlet UIView *loading;
     IBOutlet UIWebView *webView;

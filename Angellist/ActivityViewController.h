@@ -15,7 +15,10 @@
     IBOutlet UIView *loadingView;
     
     DBManager *_dbmanager;
+    UIView *filterView;
 }
+
+@property(nonatomic, retain)UIView *filterView;
 
 -(void) saveImagesOfFeeds;
 -(void) saveFeedsDataToDB;

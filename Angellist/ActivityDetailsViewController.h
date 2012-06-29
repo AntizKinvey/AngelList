@@ -7,18 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <KinveyKit/KinveyKit.h>
 
-@interface ActivityDetailsViewController : UIViewController
+@interface ActivityDetailsViewController : UIViewController <KCSPersistableDelegate>
 {
-    IBOutlet UIImageView *actorImage;
-    IBOutlet UILabel *actorName;
-    IBOutlet UITextView *actorDesc;
-    IBOutlet UIButton *followButton;
-    IBOutlet UIButton *unfollowButton;
+    IBOutlet UITableView *table;
+    UIButton *followButton;
+    UIButton *unfollowButton;
+    UIButton *moreButton;
 }
-
--(IBAction)actorDetails:(id)sender;
--(IBAction)followActor:(id)sender;
--(IBAction)unfollowActor:(id)sender;
 
 @end

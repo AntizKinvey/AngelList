@@ -22,7 +22,6 @@
     NSMutableArray *feedDescDisplayArrayFromDB;
     NSMutableArray *feedImageArrayFromDB;
     
-    
     NSMutableArray *startUpIdsArrayFromDB;
     NSMutableArray *startUpNameArrayFromDB;
     NSMutableArray *startUpAngelUrlArrayFromDB;
@@ -33,7 +32,16 @@
     NSMutableArray *startUpLocationArrayFromDB;
     NSMutableArray *startUpMarketArrayFromDB;
     NSMutableArray *startUpLogoImageInDirectoryFromDB;
+    
+    NSMutableArray *inboxTotalFromDB;
+    NSMutableArray *inboxThreadIdFromDB;
+    NSMutableArray *inboxViewedFromDB;
+    
 }
+
+@property(nonatomic, retain) NSMutableArray *inboxTotalFromDB;
+@property(nonatomic, retain) NSMutableArray *inboxThreadIdFromDB;
+@property(nonatomic, retain) NSMutableArray *inboxViewedFromDB;
 
 @property (retain) NSMutableArray *feedImagesArrayFromDirectoryFromDB;
 @property (retain) NSMutableArray *actorTypeArrayFromDB;
@@ -43,7 +51,6 @@
 @property (retain) NSMutableArray *actorTaglineArrayFromDB;
 @property (retain) NSMutableArray *feedDescDisplayArrayFromDB;
 @property (retain) NSMutableArray *feedImageArrayFromDB;
-
 
 @property (retain) NSMutableArray *startUpIdsArrayFromDB;
 @property (retain) NSMutableArray *startUpNameArrayFromDB;
@@ -76,6 +83,9 @@
 //Table for Portfolio Following
 -(void) createTableStartUpsPortfolio:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11;
 
+//Table for message status
+-(void) createTableInboxDetails:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3;
+
 //Insert Values to User Table
 -(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value;
 
@@ -90,6 +100,13 @@
 -(void) insertRecordIntoStartUpsFollowingTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
 
 -(void) insertRecordIntoStartUpsPortfolioTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
+
+-(void) insertRecordIntoInbox: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value;
+
+
+-(void) updateRecordIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value;
+
+-(void) updateStatusIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value;
 
 //Retrieve number of rows in User table
 -(int) retrieveUserFromDB;
@@ -106,6 +123,8 @@
 -(void) retrieveStartUpsFollowingDetails;
 
 -(void) retrieveStartUpsPortfolioDetails;
+
+-(void) retrieveInboxDetails;
 
 //Close database
 -(void) closeDB;

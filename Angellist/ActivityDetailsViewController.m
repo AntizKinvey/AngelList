@@ -9,6 +9,8 @@
 #import "ActivityDetailsViewController.h"
 #import "ActivityWebDetailsController.h"
 #import "Reachability.h"
+#import <QuartzCore/QuartzCore.h>
+#import "KCSUserActivity.h"
 
 @implementation ActivityDetailsViewController
 
@@ -25,17 +27,127 @@ extern NSMutableArray *userFollowingIds;
 
 extern int _rowNumberInActivity;
 extern NSString *_currAccessToken;
-
+extern NSString *_globalSessionId;
 UIButton* backButton;
+
+NSMutableArray *displayInCells;
+
+KCSCollection *_detailsCollection;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.title = @"Feed";
     }
     return self;
 }
+
+//---insert individual row into the table view---
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    static NSString *CellIdentifier = @"Cell";
+    
+    //---try to get a reusable cell--- 
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
+    for(UIView *view in cell.contentView.subviews){
+        if ([view isKindOfClass:[UIView class]]) {
+            [view removeFromSuperview];
+        }
+    }
+    
+    //---create new cell if no reusable cell is available---
+    if (cell == nil) 
+    {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+    }
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+    {
+        if(indexPath.row == 0)
+        {
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
+            cellImageView.image = [displayInCells objectAtIndex:0];
+            cellImageView.layer.cornerRadius = 3.5f;
+            cellImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+            
+            UILabel *actorNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
+            actorNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+            actorNamelabel.lineBreakMode = UILineBreakModeWordWrap;
+            actorNamelabel.backgroundColor = [UIColor clearColor];
+            actorNamelabel.text = [displayInCells objectAtIndex:1];
+            actorNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
+            [cell.contentView addSubview:actorNamelabel];
+            [actorNamelabel release];
+            
+             NSString *text = [displayInCells objectAtIndex:2];
+             CGSize constraint = CGSizeMake(270, 20000.0f);
+            CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+            
+            
+            UILabel *actorDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 160, 270, size.height)];
+            actorDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            actorDesclabel.numberOfLines = 10;
+            actorDesclabel.backgroundColor = [UIColor clearColor];
+            actorDesclabel.lineBreakMode = UILineBreakModeWordWrap;
+            actorDesclabel.text = text;
+            [cell.contentView addSubview:actorDesclabel];
+            [actorDesclabel release];
+                
+            
+            if([userFollowingIds containsObject:[actorIdArray objectAtIndex:_rowNumberInActivity]])
+            {
+                unfollowButton.hidden = NO;
+                followButton.hidden = YES;
+                
+                unfollowButton.frame = CGRectMake(170, 180+size.height, 52, 36);
+                [cell.contentView addSubview:unfollowButton];
+            }
+            else
+            {
+                followButton.hidden = NO;
+                unfollowButton.hidden = YES;
+                
+                followButton.frame = CGRectMake(170, 180+size.height, 52, 36);
+                [cell.contentView addSubview:followButton];
+            }
+            
+            moreButton.frame = CGRectMake(230, 180+size.height, 52, 36);
+            [[cell contentView] addSubview:moreButton];
+        }
+    }
+    else
+    {
+        //For IPad
+    }
+    
+    return cell; 
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSString *text = [displayInCells objectAtIndex:2];
+    
+    CGSize constraint = CGSizeMake(270, 20000.0f);
+    
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+
+    return size.height + 230; //160
+    
+}
+
+
+//---set the number of rows in the table view---
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
+{ 
+    return 1;
+}
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -60,19 +172,52 @@ UIButton* backButton;
     [backButtonItem release];
     [backButton release];
     
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    UIImage *feedImage = [UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]];
-    UIImageView *feedImageView = [[UIImageView alloc] initWithFrame:actorImage.frame];
-    feedImageView.image = feedImage;
-    [self.view addSubview:feedImageView];
-    [feedImageView release];
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\nNo Internet Connection");
+    }
+    else
+    {
+        _detailsCollection = [[[KCSClient sharedClient]
+                               collectionFromString:@"UserActivity"
+                               withClass:[KCSUserActivity class]] retain];
+        
+        
+        KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
+        userActivity.sessionId = _globalSessionId;
+        userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]];
+        [userActivity saveToCollection:_detailsCollection withDelegate:self];
+        [userActivity release];
+    }
+   
     
-    actorName.text = [actorNameArray objectAtIndex:_rowNumberInActivity];
-    actorName.lineBreakMode = UILineBreakModeWordWrap;
-    actorName.numberOfLines = 3;
     
-    actorDesc.text = [actorTaglineArray objectAtIndex:_rowNumberInActivity];
-    actorDesc.editable = FALSE;
+    followButton = [[UIButton alloc] init];
+    [followButton setBackgroundImage:[UIImage imageNamed:@"follow.png"] forState:UIControlStateNormal];
+    [followButton addTarget:self action:@selector(followActor) forControlEvents:UIControlStateHighlighted];
+    followButton.hidden = YES;
+
+    unfollowButton = [[UIButton alloc] init];
+    [unfollowButton setBackgroundImage:[UIImage imageNamed:@"unfollow.png"] forState:UIControlStateNormal];
+    [unfollowButton addTarget:self action:@selector(unfollowActor) forControlEvents:UIControlStateHighlighted];
+    unfollowButton.hidden = YES;
+
+    moreButton = [[UIButton alloc] init];
+    [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
+    [moreButton addTarget:self action:@selector(actorDetails) forControlEvents:UIControlStateHighlighted];
+    
+    
+    
+    
+    displayInCells = [[NSMutableArray alloc] init];
+    [displayInCells addObject:[UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]]];
+    
+    [displayInCells addObject:[actorNameArray objectAtIndex:_rowNumberInActivity]];
+    [displayInCells addObject:[actorTaglineArray objectAtIndex:_rowNumberInActivity]];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -83,7 +228,7 @@ UIButton* backButton;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
--(IBAction)actorDetails:(id)sender
+-(void)actorDetails
 {
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -111,7 +256,7 @@ UIButton* backButton;
     
 }
 
--(IBAction)followActor:(id)sender
+-(void)followActor
 {
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -132,11 +277,12 @@ UIButton* backButton;
         [userFollowingIds addObject:[actorIdArray objectAtIndex:_rowNumberInActivity]];
         followButton.hidden = YES;
         unfollowButton.hidden = NO;
+        [table reloadData];
     }
     
 }
 
--(IBAction)unfollowActor:(id)sender
+-(void)unfollowActor
 {
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -157,23 +303,17 @@ UIButton* backButton;
         [userFollowingIds removeObject:[actorIdArray objectAtIndex:_rowNumberInActivity]];
         followButton.hidden = NO;
         unfollowButton.hidden = YES;
+        [table reloadData];
     }
     
 }
 
 -(void) viewWillAppear:(BOOL)animated
 {
-    if([userFollowingIds containsObject:[actorIdArray objectAtIndex:_rowNumberInActivity]])
-    {
-        unfollowButton.hidden = NO;
-        followButton.hidden = YES;
-    }
-    else
-    {
-        followButton.hidden = NO;
-        unfollowButton.hidden = YES;
-    }
+    [displayInCells retain];
+    [super viewWillAppear:animated];
 }
+
 
 - (void)viewDidUnload
 {
@@ -193,6 +333,38 @@ UIButton* backButton;
     {
         return NO;
     }
+}
+
+-(void) dealloc
+{
+    [displayInCells release];
+    [followButton release];
+    [unfollowButton release];
+    [moreButton release];
+    [super dealloc];
+}
+
+/************************************************************************************************************/
+/*                                          Kinvey Delegate Methods                                         */
+/************************************************************************************************************/
+
+//Persistable Delegate Methods
+// Right now just pop-up an alert about what we got back from Kinvey during
+// the save. Normally you would want to implement more code here
+// This is called when the save completes successfully
+- (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
+{
+    NSLog(@"\n\n%@",[result description]);
+}
+
+// Right now just pop-up an alert about the error we got back from Kinvey during
+// the save attempt. Normally you would want to implement more code here
+// This is called when a save fails
+- (void)entity:(id)entity operationDidFailWithError:(NSError *)error
+{
+    NSLog(@"\n%@",[error localizedDescription]);
+    NSLog(@"\n%@",[error localizedFailureReason]);
+    [entity saveToCollection:_detailsCollection withDelegate:self];
 }
 
 @end

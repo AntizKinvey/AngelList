@@ -7,23 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <KinveyKit/KinveyKit.h>
 
-@interface StartUpDetailsViewController : UIViewController
+@interface StartUpDetailsViewController : UIViewController <KCSPersistableDelegate>
 {
-    IBOutlet UIImageView *startUpImage;
-    IBOutlet UITextView *startUpDesc;
-    
-    IBOutlet UILabel *startUpName;
-    IBOutlet UILabel *startUpMarket;
-    IBOutlet UILabel *startUpLocation;
-    IBOutlet UILabel *startUpFollowers;
-    
-    IBOutlet UIButton *followButton;
-    IBOutlet UIButton *unfollowButton;
+    IBOutlet UITableView *table;
+    UIButton *followButton;
+    UIButton *unfollowButton;
+    UIButton *moreButton;
 }
-
--(IBAction)startUpDetails:(id)sender;
--(IBAction)followStartUp:(id)sender;
--(IBAction)unfollowStartUp:(id)sender;
 
 @end

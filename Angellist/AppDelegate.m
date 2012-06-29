@@ -10,13 +10,23 @@
 
 #import "ViewController.h"
 #import "ContainerViewController.h"
-
+#import "KCSLogin.h"
+#import "KCSLogout.h"
+#import "Reachability.h"
 
 @implementation AppDelegate
 
 @synthesize window = _window;
 @synthesize viewController = _viewController;
 @synthesize containerViewController = _containerViewController;
+
+@synthesize loginCollection=_loginCollection;
+@synthesize logoutCollection=_logoutCollection;
+
+
+BOOL _kinveyPingSuccess = FALSE;
+NSString *_globalSessionId;
+NSString *_kinveyUserId; 
 
 int _totalNoOfRowsInUserTable = 0;
 
@@ -43,6 +53,8 @@ int _totalNoOfRowsInUserTable = 0;
     [_dbmanager createTableStartUpsFollowing:@"Following" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
     [_dbmanager createTableStartUpsPortfolio:@"Portfolio" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
+    
+    [_dbmanager createTableInboxDetails:@"Inbox" withField1:@"threadId" withField2:@"total" withField3:@"viewed"];
     
     _totalNoOfRowsInUserTable = [_dbmanager retrieveUserFromDB];
     
@@ -71,6 +83,7 @@ int _totalNoOfRowsInUserTable = 0;
     
     
     [self.window makeKeyAndVisible];
+    
     return YES;
 }
 
@@ -80,6 +93,35 @@ int _totalNoOfRowsInUserTable = 0;
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
+    
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\nNo Internet Connection");
+    }
+    else
+    {
+        if(_kinveyPingSuccess)
+        {
+            NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
+            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+            NSDate *currDate = [NSDate date];
+            NSString *todayDate = [date_formater stringFromDate:currDate];
+            [date_formater release];
+            
+            KCSLogout *logout = [[KCSLogout alloc] init];
+            logout.logouttime = todayDate;
+            logout.sessionId = _globalSessionId;
+            [_globalSessionId release];
+            
+            [logout saveToCollection:_logoutCollection withDelegate:self];
+            
+            [logout release];
+        }
+    }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -92,7 +134,6 @@ int _totalNoOfRowsInUserTable = 0;
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
@@ -100,10 +141,50 @@ int _totalNoOfRowsInUserTable = 0;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\nNo Internet Connection");
+    }
+    else
+    {
+        [[KCSClient sharedClient] initializeKinveyServiceForAppKey:@"kid1945"
+                                                     withAppSecret:@"8f0b10ceba3c4bfa8f4ea03e42093231"
+                                                      usingOptions:nil];
+        
+        
+        [KCSPing pingKinveyWithBlock:^(KCSPingResult *result) {
+            // This block gets executed when the ping completes
+            
+            if (result.pingWasSuccessful){
+                _kinveyPingSuccess = TRUE;
+                
+                _loginCollection = [[[KCSClient sharedClient]
+                                     collectionFromString:@"Login"
+                                     withClass:[KCSLogin class]] retain];
+                
+                _logoutCollection = [[[KCSClient sharedClient]
+                                      collectionFromString:@"Logout"
+                                      withClass:[KCSLogout class]] retain];
+                
+                [[[KCSClient sharedClient] currentUser] loadWithDelegate:self]; 
+                NSLog(@"\n\n%@",[result description]);
+            } 
+            else 
+            {
+                NSLog(@"\n\n%@",[result description]);
+                _kinveyPingSuccess = FALSE;
+            }
+        }];
+        
+    }
+    
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -113,6 +194,92 @@ int _totalNoOfRowsInUserTable = 0;
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
+}
+
+
+/************************************************************************************************************/
+/*                                          Kinvey Delegate Methods                                         */
+/************************************************************************************************************/
+
+//Persistable Delegate Methods
+// Right now just pop-up an alert about what we got back from Kinvey during
+// the save. Normally you would want to implement more code here
+// This is called when the save completes successfully
+- (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
+{
+    NSLog(@"%@",[result description]);
+}
+
+// Right now just pop-up an alert about the error we got back from Kinvey during
+// the save attempt. Normally you would want to implement more code here
+// This is called when a save fails
+- (void)entity:(id)entity operationDidFailWithError:(NSError *)error
+{
+    NSLog(@"\n%@",[error localizedDescription]);
+    NSLog(@"\n%@",[error localizedFailureReason]);
+    
+    NSString *classname = NSStringFromClass([entity class]);
+    if([classname isEqualToString:@"KCSLogin"])
+    {
+        [entity saveToCollection:_loginCollection withDelegate:self];
+    }
+    if([classname isEqualToString:@"KCSLogout"])
+    {
+        [entity saveToCollection:_logoutCollection withDelegate:self];
+    }
+}
+
+//Collection Delegate Methods
+- (void)collection:(KCSCollection *)collection didCompleteWithResult:(NSArray *)result{
+    
+    NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
+    [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+    NSDate *currDate = [NSDate date];
+    NSString *todayDate = [date_formater stringFromDate:currDate];
+    [date_formater release];
+    
+    _globalSessionId = [[NSString alloc] initWithFormat:@"%d",[result count]+1];
+    
+    KCSLogin *loginDetails = [[KCSLogin alloc] init];
+    
+    loginDetails.userId = _kinveyUserId;
+    
+    loginDetails.logintime = todayDate;
+    
+    loginDetails.sessionId = [NSString stringWithFormat:@"%d",[result count]+1];
+    
+    [loginDetails saveToCollection:_loginCollection withDelegate:self];
+    
+    [loginDetails release];
+    
+    result = nil;
+    [result release];
+}
+
+- (void)collection:(KCSCollection *)collection didFailWithError:(NSError *)error{
+    NSLog(@"\n%@",[error localizedDescription]);
+    NSLog(@"\n%@",[error localizedFailureReason]);
+}
+
+//Entity Delegate Methods
+// This is called when the load completes successfully
+- (void)entity:(id<KCSPersistable>)entity fetchDidCompleteWithResult:(NSUserDefaults *)result
+{
+    _kinveyUserId = [NSString stringWithString:[result objectForKey:@"username"]];
+    if(_kinveyPingSuccess)
+    {
+        [_loginCollection fetchAllWithDelegate:self];
+    }
+}
+
+// Right now just pop-up an alert about the error we got back from Kinvey during
+// the load attempt. Normally you would want to implement more code here
+// This is called when a load fails
+- (void)entity:(id<KCSPersistable>)entity fetchDidFailWithError:(NSError *)error
+{
+    NSLog(@"\n%@",[error localizedDescription]);
+    NSLog(@"\n%@",[error localizedFailureReason]);
+    [[[KCSClient sharedClient] currentUser] loadWithDelegate:self];
 }
 
 @end

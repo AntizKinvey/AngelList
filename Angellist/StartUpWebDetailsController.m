@@ -11,6 +11,7 @@
 
 @implementation StartUpWebDetailsController
 
+extern NSMutableArray *displayStartUpNameArray;
 extern NSMutableArray *displayStartUpAngelUrlArray;
 extern int _rowNumberInStartUps;
 
@@ -19,6 +20,7 @@ extern int _rowNumberInStartUps;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.title = [displayStartUpNameArray objectAtIndex:_rowNumberInStartUps];
     }
     return self;
 }

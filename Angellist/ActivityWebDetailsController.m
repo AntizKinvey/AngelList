@@ -11,6 +11,7 @@
 
 @implementation ActivityWebDetailsController
 
+extern NSMutableArray *actorNameArray;
 extern NSMutableArray *actorUrlArray;
 extern int _rowNumberInActivity;
 
@@ -21,6 +22,7 @@ UIButton* backButton;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.title = [actorNameArray objectAtIndex:_rowNumberInActivity];
     }
     return self;
 }
@@ -69,7 +71,7 @@ UIButton* backButton;
 -(void)viewWillDisappear:(BOOL)animated
 {
     [webView setDelegate:nil];
-   
+  
 }
 
 - (void)viewDidUnload

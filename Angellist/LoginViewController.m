@@ -47,7 +47,7 @@ NSString *_angelUserName;
     [super viewDidLoad];
     webView.delegate = self;
     webView.scrollView.bounces = NO;
-    
+
     [loading.layer setCornerRadius:18.0f];
     
     
@@ -88,6 +88,10 @@ NSString *_angelUserName;
         
         baseString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:0];
         
+        if([strFromURL isEqualToString:@"http://antiztech.com/angellist/?error=access_denied&error_description=The+resource+owner+denied+your+request."])
+        {
+            [self closeAction];
+        }
         if([baseString isEqualToString:@"http://antiztech.com/angellist/?code"])
         {
             queryString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:1];
@@ -127,6 +131,21 @@ NSString *_angelUserName;
             _angelUserId = [json objectForKey:@"id"];
             _angelUserName = [json objectForKey:@"name"];
             
+            NSString *fbUrl = [json objectForKey:@"facebook_url"];
+            NSString *twUrl = [json objectForKey:@"twitter_url"];
+            
+            if((fbUrl == (NSString *)[NSNull null]) || [fbUrl isEqualToString:@""] )
+            {
+                fbUrl = @"NA";
+            }
+            if((twUrl == (NSString *)[NSNull null]) || [twUrl isEqualToString:@""] )
+            {
+                twUrl = @"NA";
+            }
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",fbUrl] forAttribute:@"facebookUrl"];
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",twUrl] forAttribute:@"twitterUrl"];
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",access_token] forAttribute:@"access_token"];
+            [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
             
             access_token_received = FALSE;
             _loggedIn = TRUE;
@@ -176,6 +195,29 @@ NSString *_angelUserName;
     {
         return NO;
     }
+}
+
+/************************************************************************************************************/
+/*                                          Kinvey Delegate Methods                                         */
+/************************************************************************************************************/
+
+//Persistable Delegate Methods
+// Right now just pop-up an alert about what we got back from Kinvey during
+// the save. Normally you would want to implement more code here
+// This is called when the save completes successfully
+- (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
+{
+    NSLog(@"\n\n%@",[result description]);
+}
+
+// Right now just pop-up an alert about the error we got back from Kinvey during
+// the save attempt. Normally you would want to implement more code here
+// This is called when a save fails
+- (void)entity:(id)entity operationDidFailWithError:(NSError *)error
+{
+    NSLog(@"\n\n%@",[error localizedDescription]);
+    NSLog(@"\n\n%@",[error localizedFailureReason]);
+    [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
 }
 
 @end

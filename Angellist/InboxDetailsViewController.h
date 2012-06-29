@@ -8,22 +8,22 @@
 
 #import <UIKit/UIKit.h>
 
-@interface InboxDetailsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UITextFieldDelegate>
+@interface InboxDetailsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UITextViewDelegate>
 {
     
     IBOutlet UITableView *tableMsgDetails;
-    IBOutlet UITextField *textViewReply;
+    IBOutlet UITextView *textViewReply;
     
     
 }
 
 @property(nonatomic, retain)IBOutlet UITableView *tableMsgDetails;
-@property(nonatomic, retain)IBOutlet UITextField *textViewReply;
+@property(nonatomic, retain)IBOutlet UITextView *textViewReply;
 
 -(IBAction)returnkeyboard:(id)sender;
 -(void)setViewMoveUp:(BOOL)moveUp;
 -(void)startLoadingImagesConcurrently;
 -(void)getTime;
--(void)getrequest;
+-(void)getrequestDetails;
 
 @end

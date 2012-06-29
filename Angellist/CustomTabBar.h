@@ -10,7 +10,7 @@
 
 @interface CustomTabBar : UITabBarController
 {
-    UIButton *btn1;
+//    UIButton *btn1;
     UIButton *btn2;
     UIButton *btn3;
     UIButton *btn4;

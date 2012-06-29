@@ -18,7 +18,6 @@ NSString *_angelUserIdFromDB;
 NSString *_angelUserNameFromDB;
 NSString *access_tokenFromDB;
 
-
 @synthesize feedImagesArrayFromDirectoryFromDB;
 @synthesize actorTypeArrayFromDB;
 @synthesize actorIdArrayFromDB;
@@ -27,9 +26,6 @@ NSString *access_tokenFromDB;
 @synthesize actorTaglineArrayFromDB;
 @synthesize feedDescDisplayArrayFromDB;
 @synthesize feedImageArrayFromDB;
-
-
-
 @synthesize startUpIdsArrayFromDB;
 @synthesize startUpNameArrayFromDB;
 @synthesize startUpAngelUrlArrayFromDB;
@@ -40,6 +36,9 @@ NSString *access_tokenFromDB;
 @synthesize startUpLocationArrayFromDB;
 @synthesize startUpMarketArrayFromDB;
 @synthesize startUpLogoImageInDirectoryFromDB;
+@synthesize inboxTotalFromDB;
+@synthesize inboxViewedFromDB;
+@synthesize inboxThreadIdFromDB;
 
 ///To check filePath
 -(NSString *) filePath {
@@ -118,11 +117,68 @@ NSString *access_tokenFromDB;
     }
 }
 
+//Table for message status
+-(void) createTableInboxDetails:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 
+{
+    char *err;
+    NSString *sql = [NSString stringWithFormat:
+                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT)", tableName, field1, field2, field3];
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    { 
+        sqlite3_close(db);
+        NSAssert(0, @"Table Inbox failed to create.");
+    }
+}
+
+
 //Insert Values to User Table
+
+-(void) insertRecordIntoInbox: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value
+{
+    
+    NSString *sql = [NSString stringWithFormat:
+                     @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@') VALUES ('%@','%@', '%@')", tableName, field1, field2, field3, field1Value, field2Value, field3Value];
+    char *err;
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    {
+        sqlite3_close(db);
+        NSAssert(0, @"Error Inserting to table Inbox."); 
+    } 
+}
+
+
+
 -(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value
 {
     NSString *sql = [NSString stringWithFormat:
                      @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@', '%@') VALUES ('%@','%@', '%@', '%@')", tableName, field1, field2, field3, field4, field1Value, field2Value, field3Value, field4Value];
+    char *err;
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    {
+        sqlite3_close(db);
+        NSAssert(0, @"Error Inserting to table User."); 
+    } 
+}
+
+
+-(void) updateRecordIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value
+{
+    
+    NSString *sql = [NSString stringWithFormat:
+                     @"UPDATE '%@' SET %@= '%@' , %@= '%@' WHERE %@= '%@' ", tableName, field2,field2Value, field3,  field3Value,field1, field1Value];
+    char *err;
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    {
+        sqlite3_close(db);
+        NSAssert(0, @"Error Inserting to table User."); 
+    } 
+}
+
+
+-(void) updateStatusIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value 
+{
+    NSString *sql = [NSString stringWithFormat:
+                     @"UPDATE '%@' SET %@= '%@' WHERE %@= '%@' ", tableName, field1,field1Value, field2,  field2Value];
     char *err;
     if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
     {
@@ -207,6 +263,48 @@ NSString *access_tokenFromDB;
     return _noOfRowsInUserTable;
 }
 
+-(void) retrieveInboxDetails
+{
+    [inboxThreadIdFromDB removeAllObjects];
+    [inboxTotalFromDB removeAllObjects];
+    [inboxViewedFromDB removeAllObjects];
+    
+    NSString *sql = @"SELECT * FROM Inbox";
+    
+    sqlite3_stmt *statement;
+    
+    if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
+    {
+        while(sqlite3_step(statement) == SQLITE_ROW)
+        {
+            char *field1 = (char *) sqlite3_column_text(statement,0);
+            NSString *field1Str = [[NSString alloc] initWithUTF8String:field1];
+            NSString *str1 = [[NSString alloc] initWithFormat:@"%@", field1Str];
+            [inboxThreadIdFromDB addObject:str1];
+            
+            char *field2 = (char *) sqlite3_column_text(statement,1);
+            NSString *field2Str = [[NSString alloc] initWithUTF8String:field2];
+            NSString *str2 = [[NSString alloc] initWithFormat:@"%@", field2Str];
+            [inboxTotalFromDB addObject:str2];
+            
+            char *field3 = (char *) sqlite3_column_text(statement,2);
+            NSString *field3Str = [[NSString alloc] initWithUTF8String:field3];
+            NSString *str3 = [[NSString alloc] initWithFormat:@"%@", field3Str];
+            [inboxViewedFromDB addObject:str3];
+            
+            
+            [field1Str release];
+            [field2Str release];
+            [field3Str release];
+            [str1 release];
+            [str2 release];
+            [str3 release];
+        }
+        sqlite3_finalize(statement);
+    }
+}
+
+
 -(void) retrieveUserDetails
 {
     NSString *sql = @"SELECT username,angelUserId,access_token FROM User";
@@ -251,7 +349,7 @@ NSString *access_tokenFromDB;
     
     if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
     {
-        
+       
         while(sqlite3_step(statement) == SQLITE_ROW)
         {
             char *field1 = (char *) sqlite3_column_text(statement,0);

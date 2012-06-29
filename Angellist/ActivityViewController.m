@@ -14,6 +14,8 @@
 
 @implementation ActivityViewController
 
+@synthesize filterView;
+
 NSMutableArray *feedDescArray;
 NSMutableArray *feedDescDisplayArray;
 NSMutableArray *feedImageArray;
@@ -57,21 +59,28 @@ extern BOOL _transitFromActivity;
 extern BOOL _transitFromStartUps;
 
 extern NSString *_currUserId;
-
+int i=1;
 int countDownForView = 0;
 float alphaValue = 1.0;
 NSTimer *timer;
 UIView *notReachable;
-UIButton *filterButton;
+UIButton *filterContainer;
 
-BOOL _dataLoaded = FALSE;
+int _yPos = 5;
+int _xPos = 245;
+int _btnRot = 5;
+
+BOOL _filterFollowed = FALSE;
+BOOL _filterInvested = FALSE;
+BOOL _filterUpdated = FALSE;
+BOOL _filterIntroduced = FALSE;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Recent Activity";
+        self.title = @"Activity";
     }
     return self;
 }
@@ -92,32 +101,45 @@ BOOL _dataLoaded = FALSE;
     }
     
     loadingView.hidden = YES;
-    filterButton.enabled = YES;
+
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
+
     
     //---set the text to display for the cell---
     NSString *cellValue = [feedDescDisplayArray objectAtIndex:indexPath.row]; 
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(80, 7, 210, 75)] autorelease];
+        UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 75)] autorelease];
         cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellTextLabel.numberOfLines = 50;
         cellTextLabel.backgroundColor = [UIColor clearColor];
         cellTextLabel.text = cellValue;
-        cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
+        cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
         [cell.contentView addSubview:cellTextLabel];
         
         UIImage *image = [UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:indexPath.row]];
-        UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 7, 70, 70)];
+        UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
         cellImageView.image = image;
+        cellImageView.layer.cornerRadius = 3.5f;
+        cellImageView.layer.masksToBounds = YES;
         [cell.contentView addSubview:cellImageView];
         [cellImageView release];
+        
+        NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
+       
+        CGSize constrainedSize = CGSizeMake(310, 20000);
+        CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+        if (!cellTextLabel)
+            cellTextLabel = (UILabel*)[cell viewWithTag:1];
+        [cellTextLabel setText:strContent1];
+        [cellTextLabel setFrame:CGRectMake(70, 9, 210, MAX(exactSize.height, 20.0f))];
+
     }
     else
     {
@@ -138,9 +160,42 @@ BOOL _dataLoaded = FALSE;
     return cell; 
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSString *text = [feedDescDisplayArray objectAtIndex:[indexPath row]];
+    
+    CGSize constraint = CGSizeMake(310, 20000.0f);
+    
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    
+    CGFloat height = MAX(size.height, 44.0f);
+    
+    return height + (15 * 2);
+    
+}
+
+
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
+    if(([feedDescDisplayArray count] == 0) && ((_filterFollowed == TRUE) || (_filterInvested == TRUE) || (_filterUpdated == TRUE) || (_filterIntroduced == TRUE)))
+    {
+        UILabel *alertPopup = [[UILabel alloc] initWithFrame:CGRectMake(20, 155, 280, 30)];
+        alertPopup.text = @"No Activity to display!";
+        alertPopup.backgroundColor = [UIColor clearColor];
+        alertPopup.textColor = [UIColor grayColor];
+        alertPopup.textAlignment = UITextAlignmentCenter;
+        alertPopup.tag = 404;
+        [[self.view viewWithTag:404] removeFromSuperview];
+        [self.view addSubview:alertPopup];
+        [alertPopup release];
+    }
+    if([feedDescDisplayArray count] != 0)
+    { 
+        [[self.view viewWithTag:404] removeFromSuperview];
+    }
+    
     return [feedDescDisplayArray count];
 }
 
@@ -189,7 +244,8 @@ BOOL _dataLoaded = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-
+//        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+//        [myAlert show];
     }
     else
     {
@@ -217,7 +273,7 @@ BOOL _dataLoaded = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-
+        NSLog(@"No Internet Connection");
     }
     else
     {
@@ -278,7 +334,7 @@ BOOL _dataLoaded = FALSE;
         self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
     }
     
-    _filterNames = [[NSArray arrayWithObjects:@"Followed", @"Invested", @"New Status", @"Took Intro", @"All", nil] retain];
+    _filterNames = [[NSArray arrayWithObjects:@"followed.png", @"invested.png", @"new-status.png", @"introduced.png", @"all.png", nil] retain];
     
     //Add background image to navigation title bar
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
@@ -287,17 +343,17 @@ BOOL _dataLoaded = FALSE;
     self.tabBarItem.title = @"Activity";
     
     //Add image to navigation bar button
-    UIImage* image = [UIImage imageNamed:@"filter.png"];
+    UIImage* image = [UIImage imageNamed:@"filteri.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    filterButton = [[UIButton alloc] initWithFrame:frame];
-    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-    [filterButton addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
+    filterContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
+    [filterContainer setBackgroundImage:image forState:UIControlStateNormal];
+    [filterContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
+    [filterContainer addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
     
-    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterButton];
+    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
     self.navigationItem.rightBarButtonItem = filterButtonItem;
     [filterButtonItem release];
-    [filterButton release];
-    
+ 
     
     
     feedDescArray = [[NSMutableArray alloc] init];
@@ -323,7 +379,6 @@ BOOL _dataLoaded = FALSE;
     actorTaglineArray = [[NSMutableArray alloc] init];
     
     
-    
     filterDescArray = [[NSMutableArray alloc] init];
     filterImageArray = [[NSMutableArray alloc] init];
     
@@ -336,7 +391,7 @@ BOOL _dataLoaded = FALSE;
     filterFeedImagesArrayFromDirectory = [[NSMutableArray alloc] init];
     
     userFollowingIds = [[NSMutableArray alloc] init];
-//////////////////////////////////////////////////////////////////////////////////////    
+   
     _dbmanager.feedImagesArrayFromDirectoryFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.actorTypeArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.actorIdArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
@@ -345,7 +400,7 @@ BOOL _dataLoaded = FALSE;
     _dbmanager.actorTaglineArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.feedDescDisplayArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.feedImageArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
-//////////////////////////////////////////////////////////////////////////////////////    
+   
     [self performSelectorInBackground:@selector(getUserFollowingDetails) withObject:nil];
     [self performSelectorInBackground:@selector(getStartUpFollowingDetails) withObject:nil];
     
@@ -387,7 +442,7 @@ BOOL _dataLoaded = FALSE;
     }
     else
     {
-        filterButton.enabled = NO;
+
         //Get feeds
         NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/feed"];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -613,53 +668,372 @@ BOOL _dataLoaded = FALSE;
 }
 
 
+
+-(void)animateFilter1
+{
+    [filterContainer setUserInteractionEnabled:NO];
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+   
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButtons.frame = CGRectMake(_xPos, _yPos, 78, 51);
+    filterButtons.tag = i;
+    if(i > 0)
+    {
+        filterButtons.transform = CGAffineTransformMakeRotation((0.0174*_btnRot));
+    }
+    
+    [self.view addSubview:filterButtons];
+    
+    
+    if(i==2)
+    {
+        
+        _xPos = _xPos - 13;
+        _yPos = _yPos + 50;
+    }
+    else if(i==3)
+    {
+        
+        _xPos = _xPos - 16;
+        _yPos = _yPos + 50;
+    }
+    else if(i==4)
+    {
+        
+        _xPos = _xPos - 20;
+        _yPos = _yPos + 47;
+    }
+    else 
+    {
+        
+        _xPos = _xPos - 6;
+        _yPos = _yPos + 50;
+    }
+    
+    
+    _btnRot = _btnRot + 5;
+  
+    
+    _showFilterMenu = TRUE;
+    
+    i++;
+    if (i>=5) {
+        i=5;
+    }
+     
+
+    [self performSelector:@selector(animateFilter2) withObject:nil afterDelay:0.05];
+}
+
+-(void)animateFilter2
+{
+   
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+    
+      NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    
+    [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButtons.frame = CGRectMake(_xPos, _yPos, 78, 51);
+    filterButtons.tag = i;
+    if(i > 0)
+    {
+        filterButtons.transform = CGAffineTransformMakeRotation((0.0174*_btnRot));
+    }
+    
+    [self.view addSubview:filterButtons];
+    
+    
+    if(i==2)
+    {
+        
+        _xPos = _xPos - 13;
+        _yPos = _yPos + 50;
+    }
+    else if(i==3)
+    {
+        
+        _xPos = _xPos - 16;
+        _yPos = _yPos + 50;
+    }
+    else if(i==4)
+    {
+        
+        _xPos = _xPos - 20;
+        _yPos = _yPos + 47;
+    }
+    else 
+    {
+        
+        _xPos = _xPos - 6;
+        _yPos = _yPos + 50;
+    }
+    
+    
+    _btnRot = _btnRot + 5;
+    
+    
+    _showFilterMenu = TRUE;
+    
+    i++;
+    if (i>=5) {
+        i=5;
+    }
+   
+    
+    [self performSelector:@selector(animateFilter3) withObject:nil afterDelay:0.05];
+}
+
+-(void)animateFilter3
+{
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+    
+   
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    //              filterButton.titleLabel.textAlignment = UITextAlignmentCenter;
+    [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButtons.frame = CGRectMake(_xPos, _yPos, 78, 51);
+    filterButtons.tag = i;
+    if(i > 0)
+    {
+        filterButtons.transform = CGAffineTransformMakeRotation((0.0174*_btnRot));
+    }
+    
+    [self.view addSubview:filterButtons];
+    
+    
+    if(i==2)
+    {
+        
+        _xPos = _xPos - 13;
+        _yPos = _yPos + 50;
+    }
+    else if(i==3)
+    {
+        
+        _xPos = _xPos - 16;
+        _yPos = _yPos + 50;
+    }
+    else if(i==4)
+    {
+        
+        _xPos = _xPos - 20;
+        _yPos = _yPos + 47;
+    }
+    else 
+    {
+        
+        _xPos = _xPos - 6;
+        _yPos = _yPos + 50;
+    }
+    
+    
+    _btnRot = _btnRot + 5;
+   
+    [filterView release];
+    
+    _showFilterMenu = TRUE;
+    
+    i++;
+    if (i>=5) {
+        i=5;
+    }
+   
+    
+    [self performSelector:@selector(animateFilter4) withObject:nil afterDelay:0.05];
+}
+
+
+-(void)animateFilter4
+{
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+    
+  
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+   
+    [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButtons.frame = CGRectMake(_xPos, _yPos, 78, 51);
+    filterButtons.tag = i;
+    if(i > 0)
+    {
+        filterButtons.transform = CGAffineTransformMakeRotation((0.0174*_btnRot));
+    }
+    
+    [self.view addSubview:filterButtons];
+    
+    
+    if(i==2)
+    {
+        
+        _xPos = _xPos - 13;
+        _yPos = _yPos + 50;
+    }
+    else if(i==3)
+    {
+        
+        _xPos = _xPos - 16;
+        _yPos = _yPos + 50;
+    }
+    else if(i==4)
+    {
+        
+        _xPos = _xPos - 20;
+        _yPos = _yPos + 47;
+    }
+    else 
+    {
+        
+        _xPos = _xPos - 6;
+        _yPos = _yPos + 50;
+    }
+    
+    
+    _btnRot = _btnRot + 5;
+    
+    _showFilterMenu = TRUE;
+    
+    i++;
+    if (i>=5) {
+        i=5;
+    }
+    
+   
+    [self performSelector:@selector(animateFilter5) withObject:nil afterDelay:0.05];
+}
+
+
+-(void)animateFilter5
+{
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
+        
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+
+    [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButtons.frame = CGRectMake(_xPos, _yPos, 78, 51);
+    filterButtons.tag = i;
+    if(i > 0)
+    {
+        filterButtons.transform = CGAffineTransformMakeRotation((0.0174*_btnRot));
+    }
+    
+    [self.view addSubview:filterButtons];
+    
+    
+    if(i==2)
+    {
+        
+        _xPos = _xPos - 13;
+        _yPos = _yPos + 50;
+    }
+    else if(i==3)
+    {
+        
+        _xPos = _xPos - 16;
+        _yPos = _yPos + 50;
+    }
+    else if(i==4)
+    {
+        
+        _xPos = _xPos - 20;
+        _yPos = _yPos + 47;
+    }
+    else 
+    {
+        
+        _xPos = _xPos - 6;
+        _yPos = _yPos + 50;
+    }
+    
+    
+    _btnRot = _btnRot + 5;
+      
+    _showFilterMenu = TRUE;
+    
+    i++;
+    if (i>=5) {
+        i=5;
+        
+        _yPos = 5;
+        _xPos = 245;
+        _btnRot = 5;
+    }
+    
+    
+    
+    [filterContainer setUserInteractionEnabled:YES];
+}
+
+
 - (void)filterButtonSelected:(id)sender {
-       UIView *filtersList;
+    // whatever needs to happen when button is tapped
+   
+    //Check for the availability of Internet
+
+    UIView *filtersList;
     
     if(_showFilterMenu == FALSE)
     {
+        [filterContainer setSelected:TRUE];
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
-            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+            filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
             [filterView  setBackgroundColor: [UIColor blackColor]];
-            [filterView setAlpha:0.6f];
+            [filterView setAlpha:0.4f];
             filterView.tag = 1000;
             [self.view addSubview:filterView];
-            
-            filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 145)];
-            [filtersList  setBackgroundColor: [UIColor blackColor]];
-            [filtersList.layer setCornerRadius:18.0f];
-            [filtersList setAlpha:1.0f];
-            filtersList.tag = 1001;
-            [self.view addSubview:filtersList];
-            
-            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-            
-            int _yPos = 5;
-            
-            for (int i=1; i<=5; i++) 
-            {
-                UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-                [filterButton setTitle:[NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                filterButton.frame = CGRectMake(14, _yPos, 120, 25);
-                filterButton.tag = i;
-                [filtersList addSubview:filterButton];
-                
-                _yPos = _yPos + 27;
-            }
-            
-            
-            [filtersList release];
-            [filterView release];
-            
-            _showFilterMenu = TRUE;
+
+            [self performSelector:@selector(animateFilter1) withObject:nil afterDelay:0.05];  
         }
         else
         {
-            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
+            filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
             [filterView  setBackgroundColor: [UIColor blackColor]];
             [filterView setAlpha:0.6f];
             filterView.tag = 1000;
@@ -701,10 +1075,52 @@ BOOL _dataLoaded = FALSE;
     }
     else
     {
+        [filterContainer setSelected:FALSE];
         [[self.view viewWithTag:1000] removeFromSuperview];
-        [[self.view viewWithTag:1001] removeFromSuperview];
+        [[self.view viewWithTag:i] removeFromSuperview];
+
+        i--;
+        [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.07];
         _showFilterMenu = FALSE;
     }
+  
+}
+
+-(void)backAnimateFilter1
+{
+    [filterContainer setUserInteractionEnabled:NO];
+    
+    [[self.view viewWithTag:i] removeFromSuperview];
+    i--;
+    [self performSelector:@selector(backAnimateFilter2) withObject:nil afterDelay:0.07];
+}
+
+-(void)backAnimateFilter2
+{
+    
+    [[self.view viewWithTag:i] removeFromSuperview];
+    i--;
+    [self performSelector:@selector(backAnimateFilter3) withObject:nil afterDelay:0.07];
+}
+
+-(void)backAnimateFilter3
+{
+    
+    [[self.view viewWithTag:i] removeFromSuperview];
+    i--;
+    [self performSelector:@selector(backAnimateFilter4) withObject:nil afterDelay:0.07];
+}
+
+-(void)backAnimateFilter4
+{
+    
+    [[self.view viewWithTag:i] removeFromSuperview];
+    i--;
+    if (i<=1) {
+        i=1;
+    }
+    
+    [filterContainer setUserInteractionEnabled:YES];
 }
 
 -(void)getFilteredList:(id)sender
@@ -748,7 +1164,8 @@ BOOL _dataLoaded = FALSE;
     switch(_tagID)
     {
             //Implement Following
-        case 1 : for(int k=0; k<[feedDescDisplayArray count];k++)
+        case 1 : _filterFollowed = TRUE;
+                 for(int k=0; k<[feedDescDisplayArray count];k++)
                  {
                      NSString *checkStr = [feedDescDisplayArray objectAtIndex:k];
                      if([checkStr rangeOfString:@"followed"].location != NSNotFound)
@@ -768,7 +1185,7 @@ BOOL _dataLoaded = FALSE;
                      }
                  }
                 
-                 self.title = @"Recent Activity - Followed";
+                 self.title = @"Activity - Followed";
                  self.tabBarItem.title = @"Activity";
             
                  [feedDescDisplayArray removeAllObjects];
@@ -792,13 +1209,17 @@ BOOL _dataLoaded = FALSE;
                  [actorTaglineArray addObjectsFromArray:filterTaglineArray];
             
                  _showFilterMenu = FALSE;
+            [filterContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
+            [[self.view viewWithTag:i] removeFromSuperview];
+            i--;
+            [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  [table reloadData];
                 break;
             
             //Implement Invested    
-        case 2 : for(int k=0; k<[feedDescDisplayArray count];k++)
+        case 2 : _filterInvested = TRUE;
+                 for(int k=0; k<[feedDescDisplayArray count];k++)
                  {
                      NSString *checkStr = [feedDescDisplayArray objectAtIndex:k];
                      if([checkStr rangeOfString:@"invested"].location != NSNotFound)
@@ -817,7 +1238,7 @@ BOOL _dataLoaded = FALSE;
                      }
                  } 
 
-                 self.title = @"Recent Activity - Invested";
+                 self.title = @"Activity - Invested";
                  self.tabBarItem.title = @"Activity";
             
                  [feedDescDisplayArray removeAllObjects];
@@ -842,12 +1263,16 @@ BOOL _dataLoaded = FALSE;
             
                  [table reloadData];
                  _showFilterMenu = FALSE;
+            [filterContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
+            [[self.view viewWithTag:i] removeFromSuperview];
+            i--;
+            [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  break;
             
             //Implement Updated    
-        case 3 : for(int k=0; k<[feedDescDisplayArray count];k++)
+        case 3 : _filterUpdated = TRUE;
+                 for(int k=0; k<[feedDescDisplayArray count];k++)
                  {
                      NSString *checkStr = [feedDescDisplayArray objectAtIndex:k];
                      if([checkStr rangeOfString:@"updated"].location != NSNotFound)
@@ -866,7 +1291,7 @@ BOOL _dataLoaded = FALSE;
                      }
                  } 
 
-                 self.title = @"Recent Activity - Updated";
+                 self.title = @"Activity - Updated";
                  self.tabBarItem.title = @"Activity";
             
                  [feedDescDisplayArray removeAllObjects];
@@ -891,12 +1316,16 @@ BOOL _dataLoaded = FALSE;
             
                  [table reloadData]; 
                  _showFilterMenu = FALSE;
+            [filterContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview]; 
+            [[self.view viewWithTag:i] removeFromSuperview];
+            i--;
+            [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  break;
             
             //Implement Took Intro    
-        case 4 : for(int k=0; k<[feedDescDisplayArray count];k++)
+        case 4 : _filterIntroduced = TRUE;
+                 for(int k=0; k<[feedDescDisplayArray count];k++)
                  {
                      NSString *checkStr = [feedDescDisplayArray objectAtIndex:k];
                      if([checkStr rangeOfString:@"took intro"].location != NSNotFound)
@@ -915,7 +1344,7 @@ BOOL _dataLoaded = FALSE;
                      }
                  } 
 
-                 self.title = @"Recent Activity - Took intro";
+                 self.title = @"Activity - Introduced";
                  self.tabBarItem.title = @"Activity";
             
                  [feedDescDisplayArray removeAllObjects];
@@ -940,18 +1369,28 @@ BOOL _dataLoaded = FALSE;
             
                  [table reloadData];
                  _showFilterMenu = FALSE;
+            [filterContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
+            [[self.view viewWithTag:i] removeFromSuperview];
+            i--;
+            [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  break; 
             
             //Implement All    
-        case 5 : [table reloadData];
-                 self.title = @"Recent Activity";
+        case 5 : _filterFollowed = FALSE;
+                 _filterInvested = FALSE;
+                 _filterUpdated = FALSE;
+                 _filterIntroduced = FALSE;
+                 [table reloadData];
+                 self.title = @"Activity";
                  self.tabBarItem.title = @"Activity";
             
                  _showFilterMenu = FALSE;
+            [filterContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
+            [[self.view viewWithTag:i] removeFromSuperview];
+            i--;
+            [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  break;    
     }
 }

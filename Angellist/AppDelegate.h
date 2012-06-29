@@ -8,12 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
+#import <KinveyKit/KinveyKit.h>
 
 @class ViewController,ContainerViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, KCSPersistableDelegate, KCSCollectionDelegate, KCSEntityDelegate>
 {
     DBManager *_dbmanager;
+    KCSCollection *loginCollection;
+    KCSCollection *logoutCollection;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -22,5 +25,8 @@
 
 @property (strong, nonatomic) ContainerViewController *containerViewController;
 
+@property (nonatomic, retain) KCSCollection *loginCollection;
+
+@property (nonatomic, retain) KCSCollection *logoutCollection;
 
 @end

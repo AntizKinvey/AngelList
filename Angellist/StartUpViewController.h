@@ -13,8 +13,12 @@
 {
      IBOutlet UITableView *table;
      IBOutlet UIView *loadingView;
+    IBOutlet UIButton *moreButton;
      DBManager *_dbmanager;
+    UIView *filterView;
 }
+
+@property(nonatomic,retain) UIView *filterView;
 
 -(void) getDetailsOfFollowing;
 -(void) getDetailsOfPortfolio;
@@ -29,5 +33,7 @@
 
 -(void) saveImagesOfStartUpsPortfolio;
 -(void) saveStartUpsPortfolioDetailsToDB;
+
+-(IBAction)moreButtonAction:(id)sender;
 
 @end

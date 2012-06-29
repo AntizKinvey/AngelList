@@ -32,6 +32,15 @@
 
 - (void)viewDidLoad
 {
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+    {
+        self.navigationController.navigationBar.frame = CGRectMake(0, 0, 320, 45);
+    }
+    else
+    {
+        self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
+    }
+    
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     

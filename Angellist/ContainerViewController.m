@@ -68,13 +68,12 @@ NSString *_currAccessToken;
     
     _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserIdFromDB];
     _currAccessToken = [[NSString alloc] initWithFormat:@"%@",access_tokenFromDB];
-    
-    UIViewController *viewController1, *viewController2, *viewController3, *viewController4;
-    UINavigationController *navigationcontroller1,*navigationcontroller2,*navigationcontroller3,*navigationcontroller4;
+   
+    UIViewController *viewController2, *viewController3, *viewController4;
+    UINavigationController *navigationcontroller2,*navigationcontroller3,*navigationcontroller4;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        viewController1 = [[[HomeViewController alloc] initWithNibName:@"HomeViewController_iPhone" bundle:nil] autorelease];
-        navigationcontroller1 = [[[UINavigationController alloc] initWithRootViewController:viewController1] autorelease];
+     
         
         viewController2 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPhone" bundle:nil] autorelease];
         navigationcontroller2 = [[[UINavigationController alloc] initWithRootViewController:viewController2] autorelease];
@@ -87,8 +86,7 @@ NSString *_currAccessToken;
     }
     else
     {
-        viewController1 = [[[HomeViewController alloc] initWithNibName:@"HomeViewController_iPad" bundle:nil] autorelease];
-        navigationcontroller1 = [[[UINavigationController alloc] initWithRootViewController:viewController1] autorelease];
+    
         
         viewController2 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPad" bundle:nil] autorelease];
         navigationcontroller2 = [[[UINavigationController alloc] initWithRootViewController:viewController2] autorelease];
@@ -102,7 +100,7 @@ NSString *_currAccessToken;
     
     
     self.tabBarController = [[[CustomTabBar alloc] init] autorelease];
-    self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller1, navigationcontroller2, navigationcontroller3, navigationcontroller4, nil];
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller2, navigationcontroller3, navigationcontroller4, nil];
     [self.view addSubview:self.tabBarController.view];
     
     [super viewDidLoad];

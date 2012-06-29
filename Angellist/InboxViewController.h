@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
 @interface InboxViewController : UIViewController<UITableViewDataSource, UITableViewDelegate>
 {
@@ -14,7 +15,7 @@
     UILabel *label;
     IBOutlet UIView *loading;
     
-   
+    DBManager *_dbmanager;
     
     
 }
@@ -25,5 +26,6 @@
 -(void)getTime;
 -(void)startLoadingImagesConcurrently;
 -(void)sendRequestToFetch;
+-(void)readUnread:(int)msgCount;
 
 @end

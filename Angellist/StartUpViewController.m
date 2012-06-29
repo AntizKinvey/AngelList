@@ -13,6 +13,7 @@
 #import "Reachability.h"
 
 @implementation StartUpViewController
+@synthesize filterView;
 
 NSMutableArray *startUpIdsArray;
 NSMutableArray *startUpNameArray;
@@ -53,12 +54,19 @@ BOOL _showFilterMenuInStartUps = FALSE;
 int _rowNumberInStartUps = 0;
 NSArray *_filterStartUpNames;
 
-UIButton *filterButton;
+UIButton *filterContainer;
 
 int countDown = 0;
 float alphaValueInStartUp = 1.0;
 UIView *notReachableView;
 NSTimer *timer;
+
+int _addFilter=1;
+int _yPosSp = 5;
+int _xPosSp = 245;
+int _btnRotSp = 5;
+
+int startUpsLoadCount = 10; 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -86,7 +94,6 @@ NSTimer *timer;
     }
     
     loadingView.hidden = YES;
-    filterButton.enabled = YES;
     
     
     //---create new cell if no reusable cell is available---
@@ -108,23 +115,28 @@ NSTimer *timer;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 8, 210, 20)] autorelease];
+        UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 8, 210, 20)] autorelease];
         cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellNameLabel.text = cellNameValue;
         cellNameLabel.backgroundColor = [UIColor clearColor];
         cellNameLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
-        cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
+        cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
         [cell.contentView addSubview:cellNameLabel];
         
-        UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(85, 26, 210, 30)] autorelease];
+        
+        NSString *text1 = cellHighConceptValue;
+        CGSize constraint1 = CGSizeMake(270, 20000.0f);
+        CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
+        
+        UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 26, 210, size1.height)] autorelease];//26
         cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellHighConceptLabel.numberOfLines = 5;
         cellHighConceptLabel.text = cellHighConceptValue;
         cellHighConceptLabel.backgroundColor = [UIColor clearColor];
-        cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:13];
+        cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
         [cell.contentView addSubview:cellHighConceptLabel];
         
-        UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(82, 61, 210, 30)] autorelease];
+        UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(68, cellHighConceptLabel.frame.size.height + 35, 210, 30)] autorelease];//61
         cellLocationLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellLocationLabel.text = cellLocationValue;
         cellLocationLabel.backgroundColor = [UIColor clearColor];
@@ -132,12 +144,13 @@ NSTimer *timer;
         cellLocationLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:10];
         [cell.contentView addSubview:cellLocationLabel];
         
-
-            UIImage *image = [UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:indexPath.row]];
-            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 8, 50, 50)];
-            cellImageView.image = image;
-            [cell.contentView addSubview:cellImageView];
-            [cellImageView release];
+        UIImage *image = [UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:indexPath.row]];
+        UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+        cellImageView.image = image;
+        cellImageView.layer.cornerRadius = 3.5f;
+        cellImageView.layer.masksToBounds = YES;
+        [cell.contentView addSubview:cellImageView];
+        [cellImageView release];
 
     }
     else
@@ -175,15 +188,65 @@ NSTimer *timer;
     return cell; 
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *text = [displayStartUpHighConceptArray objectAtIndex:indexPath.row];
+    CGSize constraint = CGSizeMake(270, 20000.0f);
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    
+    return size.height + 60;
+}
+
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-    if(([displayStartUpNameArray count] == 0) && (_filterFollow == TRUE))
+    if(([displayStartUpNameArray count] == 0) && ((_filterFollow == TRUE) || (_filterPortfolio == TRUE)))
     {
+        UILabel *alertPopup = [[UILabel alloc] initWithFrame:CGRectMake(20, 155, 280, 30)];
+        alertPopup.text = @"No StartUps to display!";
+        alertPopup.backgroundColor = [UIColor clearColor];
+        alertPopup.textColor = [UIColor grayColor];
+        alertPopup.textAlignment = UITextAlignmentCenter;
+        alertPopup.tag = 404;
+        [[self.view viewWithTag:404] removeFromSuperview];
+        [self.view addSubview:alertPopup];
+        [alertPopup release];
+        
         loadingView.hidden = YES;
-//        filterButton.enabled = YES;
     }
-    return [displayStartUpNameArray count];
+    if([displayStartUpNameArray count] != 0)
+    {
+        [[self.view viewWithTag:404] removeFromSuperview];
+    }
+    
+    
+    
+    if((_filterFollow == FALSE) && (_filterPortfolio == FALSE))
+    {
+        moreButton.hidden = FALSE;
+        if(startUpsLoadCount == 10)
+        {
+            if([displayStartUpNameArray count] == 0)
+            {
+                return [displayStartUpNameArray count];
+            }
+            else
+            {
+                int _toLoad = 0;
+                _toLoad = [displayStartUpNameArray count] - 20;
+                return [displayStartUpNameArray count] - _toLoad;
+            }
+        }
+        else
+        {
+            return startUpsLoadCount + 10;
+        }
+    }
+    else
+    {
+        moreButton.hidden = TRUE;
+        return [displayStartUpNameArray count];
+    }
 }
 
 
@@ -225,10 +288,36 @@ NSTimer *timer;
     // Release any cached data, images, etc that aren't in use.
 }
 
+-(IBAction)moreButtonAction:(id)sender
+{
+    if(startUpsLoadCount >= ([displayStartUpNameArray count] - 10))
+    {
+//        [moreButton setUserInteractionEnabled:NO];
+        [moreButton setTitle:@"No more StartUps" forState:UIControlStateNormal];
+    }
+    else
+    {
+        startUpsLoadCount = startUpsLoadCount + 10;
+        [moreButton setTitle:@"Loading..." forState:UIControlStateNormal];
+        [moreButton setUserInteractionEnabled:NO];
+        [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(timeComplete) userInfo:nil repeats:NO];
+    }
+    
+}
+
+-(void) timeComplete
+{
+    [moreButton setTitle:@"More" forState:UIControlStateNormal];
+    [moreButton setUserInteractionEnabled:YES];
+    [table reloadData];
+}
+
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
+    _dbmanager = [[DBManager alloc] init];
+    [_dbmanager openDB];
     notReachableView = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
     notReachableView.alpha = 0;
     [notReachableView.layer setCornerRadius:10.0f];
@@ -291,24 +380,26 @@ NSTimer *timer;
     _dbmanager.startUpMarketArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.startUpLogoImageInDirectoryFromDB = [[[NSMutableArray alloc] init] autorelease];
     
-    _filterStartUpNames = [[NSArray arrayWithObjects:@"Following", @"Portfolio", @"Trending", @"All", nil] retain];
+    _filterStartUpNames = [[NSArray arrayWithObjects:@"following.png", @"portfolio.png", @"all.png", @"trending.png", nil] retain];
     
     //Add background image to navigation title bar
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
     //Add image to navigation bar button
-    UIImage* image = [UIImage imageNamed:@"filter.png"];
+    UIImage* image = [UIImage imageNamed:@"filteri.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    filterButton = [[UIButton alloc] initWithFrame:frame];
-    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-    [filterButton addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
+    filterContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
+    [filterContainer setBackgroundImage:image forState:UIControlStateNormal];
+    [filterContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
+    [filterContainer addTarget:self action:@selector(filterButtonSelectedStartUp:) forControlEvents:UIControlStateHighlighted];
 
     
-    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterButton];
+    
+    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
     self.navigationItem.rightBarButtonItem = filterButtonItem;
     [filterButtonItem release];
-    [filterButton release];
+//    [filterButton release];
     
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -350,9 +441,9 @@ NSTimer *timer;
     }
     else
     {
-        filterButton.enabled = NO;
+        NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/startups/batch?ids=445,87,97,117,127,147,166,167,179,193,203,223,227,289,292,303,304,312,319,321,323,96447,95646,95473,94779,93606,93179,93089,92151,90626,90609,90306,89402,87788,87484,84913,84880,84711,83262,82265,80743,80742,77600,76074,75777,75769,72754,70465,67887,67482"];
         
-        NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/startups/batch?ids=6702,445,87,97,117,127,147,166,167,179,193,203,223,227,289,292,303,304,312,319,321,323"];
+        
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
         
@@ -396,19 +487,36 @@ NSTimer *timer;
                      [startUpLogoUrlArray addObject:[startUpLogoUrl objectAtIndex:i]];
                      [displayStartUpLogoUrlArray addObject:[startUpLogoUrl objectAtIndex:i]];
                      
-                     [startUpProductDescArray addObject:[startUpProductDesc objectAtIndex:i]];
-                     [displayStartUpProductDescArray addObject:[startUpProductDesc objectAtIndex:i]];
+                     if([startUpProductDesc objectAtIndex:i] == (NSString *)[NSNull null] || ([[startUpProductDesc objectAtIndex:i] isEqualToString:@""]))
+                     {
+                         [startUpProductDescArray addObject:@"No Information"];
+                         [displayStartUpProductDescArray addObject:@"No Information"];
+                     }
+                     else
+                     {
+                         [startUpProductDescArray addObject:[startUpProductDesc objectAtIndex:i]];
+                         [displayStartUpProductDescArray addObject:[startUpProductDesc objectAtIndex:i]];
+                     }
                      
-                     [startUpHighConceptArray addObject:[startUpHighConcept objectAtIndex:i]];
-                     [displayStartUpHighConceptArray addObject:[startUpHighConcept objectAtIndex:i]];
+                     if([startUpHighConcept objectAtIndex:i] == (NSString *)[NSNull null] || ([[startUpHighConcept objectAtIndex:i] isEqualToString:@""]))
+                     {
+                         [startUpHighConceptArray addObject:@"No Information"];
+                         [displayStartUpHighConceptArray addObject:@"No Information"];
+                     }
+                     else
+                     {
+                         [startUpHighConceptArray addObject:[startUpHighConcept objectAtIndex:i]];
+                         [displayStartUpHighConceptArray addObject:[startUpHighConcept objectAtIndex:i]];
+                     }
+                     
                      
                      [startUpFollowerCountArray addObject:[startUpFollowerCount objectAtIndex:i]];
                      [displayStartUpFollowerCountArray addObject:[startUpFollowerCount objectAtIndex:i]];
                      
                      if([startUpLocation objectAtIndex:i] == (NSString*)[NSNull null])
                      {
-                         [startUpLocationArray addObject:@"NA"];
-                         [displayStartUpLocationArray addObject:@"NA"];
+                         [startUpLocationArray addObject:@"No Information"];
+                         [displayStartUpLocationArray addObject:@"No Information"];
                      }
                      else
                      {
@@ -445,11 +553,23 @@ NSTimer *timer;
                      NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[startUpMarketArray objectAtIndex:k]];
                      if([checkStr rangeOfString:@"("].location != NSNotFound)
                      {
-                         [startUpMarketArray replaceObjectAtIndex:k withObject:@"No data"];
-                         [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No data"];
+                         [startUpMarketArray replaceObjectAtIndex:k withObject:@"No Information"];
+                         [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No Information"];
                      }
                      [checkStr release];
                  }
+                 
+                 for(int k=0; k<[startUpLocationArray count]; k++)
+                 {
+                     NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[startUpLocationArray objectAtIndex:k]];
+                     if([checkStr rangeOfString:@"("].location != NSNotFound)
+                     {
+                         [startUpLocationArray replaceObjectAtIndex:k withObject:@"No Information"];
+                         [displayStartUpLocationArray replaceObjectAtIndex:k withObject:@"No Information"];
+                     }
+                     [checkStr release];
+                 }
+                 
                  for(int k=0; k<[startUpProductDescArray count]; k++)
                  {
                      NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpProductDescArray objectAtIndex:k]]];
@@ -460,6 +580,18 @@ NSTimer *timer;
                      [displayStartUpProductDescArray replaceObjectAtIndex:k withObject:theMutableString];
                      [theMutableString release];
                  }
+                 
+                 for(int k=0; k<[startUpNameArray count]; k++)
+                 {
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpNameArray objectAtIndex:k]]];
+                     
+                     [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     
+                     [startUpNameArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [displayStartUpNameArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [theMutableString release];
+                 }
+                 
                  [self saveImagesOfStartUps];
                  [table reloadData];
              }
@@ -521,60 +653,30 @@ NSTimer *timer;
 
 
 
-- (void)filterButtonSelected:(id)sender 
+- (void)filterButtonSelectedStartUp:(id)sender 
 {
-
+   
     
     UIView *filtersList;
     
     if(_showFilterMenuInStartUps == FALSE)
     {
+        filterContainer.selected = TRUE;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
-            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+            filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
             [filterView  setBackgroundColor: [UIColor blackColor]];
             [filterView setAlpha:0.6f];
             filterView.tag = 1000;
             [self.view addSubview:filterView];
             
-            filtersList = [[UIView alloc] initWithFrame:CGRectMake(165, 0, 150, 120)];
-            [filtersList  setBackgroundColor: [UIColor blackColor]];
-            [filtersList.layer setCornerRadius:18.0f];
-            [filtersList setAlpha:1.0f];
-            filtersList.tag = 1001;
-            [self.view addSubview:filtersList];
-            
-            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
-            
-            int _yPos = 5;
-            
-            for (int i=1; i<=4; i++) 
-            {
-                UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
-                [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
-                [filterButtons setTitle:[NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(i-1)]] forState:UIControlStateNormal];
-                [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-                filterButtons.frame = CGRectMake(14, _yPos, 120, 25);
-                filterButtons.tag = i;
-                [filtersList addSubview:filterButtons];
-                
-                if(i==3)
-                {
-                    filterButtons.enabled = NO;
-                }
-                
-                _yPos = _yPos + 27;
-            }
-            
-            [filtersList release];
-            [filterView release];
+            [self performSelector:@selector(animateFilter1) withObject:nil afterDelay:0.05];
             
             _showFilterMenuInStartUps = TRUE;
         }
         else
         {
-            UIView *filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
+            filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 1024)];
             [filterView  setBackgroundColor: [UIColor blackColor]];
             [filterView setAlpha:0.6f];
             filterView.tag = 1000;
@@ -587,7 +689,7 @@ NSTimer *timer;
             filtersList.tag = 1001;
             [self.view addSubview:filtersList];
             
-            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            UIImage* image = [UIImage imageNamed:@"filters.png"];
             
             int _yPos = ((1024*5)/480);
             
@@ -618,11 +720,330 @@ NSTimer *timer;
     }
     else
     {
+        filterContainer.selected = FALSE;
         [[self.view viewWithTag:1000] removeFromSuperview];
-        [[self.view viewWithTag:1001] removeFromSuperview];
+        [[self.view viewWithTag:_addFilter] removeFromSuperview];
+        _addFilter--;
+        [self performSelector:@selector(backAnimFilter1) withObject:nil afterDelay:0.05];
         _showFilterMenuInStartUps = FALSE;
     }
 }
+
+-(void)backAnimFilter1
+{
+    [filterContainer setUserInteractionEnabled:NO];
+    [[self.view viewWithTag:_addFilter] removeFromSuperview];
+    _addFilter--;
+    [self performSelector:@selector(backAnimFilter2) withObject:nil afterDelay:0.05];
+}
+
+-(void)backAnimFilter2
+{
+    
+    [[self.view viewWithTag:_addFilter] removeFromSuperview];
+    _addFilter--;
+    [self performSelector:@selector(backAnimFilter3) withObject:nil afterDelay:0.05];
+}
+
+-(void)backAnimFilter3
+{
+    
+    [[self.view viewWithTag:_addFilter] removeFromSuperview];
+    _addFilter--;
+    if (_addFilter<=1) {
+        _addFilter=1;
+    }
+   
+    [filterContainer setUserInteractionEnabled:YES];
+}
+
+
+-(void)animateFilter1
+{
+    [filterContainer setUserInteractionEnabled:NO];
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+    
+  
+    
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
+    [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    
+    [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButton.frame = CGRectMake(_xPosSp, _yPosSp, 78, 51);
+    filterButton.tag = _addFilter;
+    if(_addFilter > 0)
+    {
+        filterButton.transform = CGAffineTransformMakeRotation((0.0174*_btnRotSp));
+    }
+    
+    [self.view addSubview:filterButton];
+    
+    
+    if(_addFilter==2)
+    {
+        
+        _xPosSp = _xPosSp - 13;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==3)
+    {
+        
+        _xPosSp = _xPosSp - 16;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==4)
+    {
+        
+        _xPosSp = _xPosSp - 20;
+        _yPosSp = _yPosSp + 47;
+    }
+    else 
+    {
+        
+        _xPosSp = _xPosSp - 6;
+        _yPosSp = _yPosSp + 50;
+    }
+    
+    
+    _btnRotSp = _btnRotSp + 5;
+    
+    
+    _showFilterMenuInStartUps = TRUE;
+    
+    _addFilter++;
+    if (_addFilter>=4) {
+        _addFilter=4;
+    }
+   
+   
+    [self performSelector:@selector(animateFilter2) withObject:nil afterDelay:0.05];
+}
+
+
+
+-(void)animateFilter2
+{
+       
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+    
+        
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
+    [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+    
+    [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButton.frame = CGRectMake(_xPosSp, _yPosSp, 78, 51);
+    filterButton.tag = _addFilter;
+    if(_addFilter > 0)
+    {
+        filterButton.transform = CGAffineTransformMakeRotation((0.0174*_btnRotSp));
+    }
+    
+    [self.view addSubview:filterButton];
+    
+    
+    if(_addFilter==2)
+    {
+        
+        _xPosSp = _xPosSp - 13;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==3)
+    {
+        
+        _xPosSp = _xPosSp - 16;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==4)
+    {
+        
+        _xPosSp = _xPosSp - 20;
+        _yPosSp = _yPosSp + 47;
+    }
+    else 
+    {
+        
+        _xPosSp = _xPosSp - 6;
+        _yPosSp = _yPosSp + 50;
+    }
+    
+    
+    _btnRotSp = _btnRotSp + 5;
+    // }
+    
+    
+    
+    _showFilterMenuInStartUps = TRUE;
+    
+    _addFilter++;
+    if (_addFilter>=4) {
+        _addFilter=4;
+    }
+   
+   
+    [self performSelector:@selector(animateFilter3) withObject:nil afterDelay:0.05];
+}
+
+-(void)animateFilter3
+{
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+    
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
+    [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+   
+    [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButton.frame = CGRectMake(_xPosSp, _yPosSp, 78, 51);
+    filterButton.tag = _addFilter;
+    if(_addFilter > 0)
+    {
+        filterButton.transform = CGAffineTransformMakeRotation((0.0174*_btnRotSp));
+    }
+    
+    [self.view addSubview:filterButton];
+    
+    
+    if(_addFilter==2)
+    {
+        
+        _xPosSp = _xPosSp - 13;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==3)
+    {
+        
+        _xPosSp = _xPosSp - 16;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==4)
+    {
+        
+        _xPosSp = _xPosSp - 20;
+        _yPosSp = _yPosSp + 47;
+    }
+    else 
+    {
+        
+        _xPosSp = _xPosSp - 6;
+        _yPosSp = _yPosSp + 50;
+    }
+    
+    
+    _btnRotSp = _btnRotSp + 5;
+    
+    
+    _showFilterMenuInStartUps = TRUE;
+    
+    _addFilter++;
+    if (_addFilter>=4) {
+        _addFilter=4;
+        
+    }
+    
+    
+    [self performSelector:@selector(animateFilter4) withObject:nil afterDelay:0.05];
+}
+
+-(void)animateFilter4
+{
+   
+    
+    UIImage* image = [UIImage imageNamed:@"filters.png"];
+    UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [filterButton setBackgroundImage:image forState:UIControlStateNormal];
+    
+    
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
+    [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    
+    filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
+   
+    [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
+    
+    [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    filterButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+    [filterButton addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+    filterButton.frame = CGRectMake(_xPosSp, _yPosSp, 78, 51);
+    filterButton.tag = _addFilter;
+    
+    filterButton.hidden = YES;
+    
+    if(_addFilter > 0)
+    {
+        filterButton.transform = CGAffineTransformMakeRotation((0.0174*_btnRotSp));
+    }
+    
+    [self.view addSubview:filterButton];
+    
+    
+    if(_addFilter==2)
+    {
+        
+        _xPosSp = _xPosSp - 13;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==3)
+    {
+        
+        _xPosSp = _xPosSp - 16;
+        _yPosSp = _yPosSp + 50;
+    }
+    else if(_addFilter==4)
+    {
+        
+        _xPosSp = _xPosSp - 20;
+        _yPosSp = _yPosSp + 47;
+    }
+    else 
+    {
+        
+        _xPosSp = _xPosSp - 6;
+        _yPosSp = _yPosSp + 50;
+    }
+    
+    
+    _btnRotSp = _btnRotSp + 5;
+    
+    
+    _showFilterMenuInStartUps = TRUE;
+    
+    _addFilter++;
+    if (_addFilter>=4) {
+        _addFilter=4;
+        
+        _yPosSp = 5;
+        _xPosSp = 245;
+        _btnRotSp = 5;
+    }
+    
+    [filterContainer setUserInteractionEnabled:YES];
+}
+
+
+
 
 -(void)getFilteredList:(id)sender
 {
@@ -646,49 +1067,64 @@ NSTimer *timer;
         case 1 : _filterFollow = TRUE;
                  _showFilterMenuInStartUps = FALSE;
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
-                  
+                 [[self.view viewWithTag:_addFilter] removeFromSuperview];
+                 _addFilter--;
+                 [self performSelector:@selector(backAnimFilter1) withObject:nil afterDelay:0.05];
+                  filterContainer.selected = FALSE;
                  self.title = @"StartUps - Following";
                  self.navigationController.title = @"StartUps";
-            
+                
                  [self getDetailsOfFollowing];
-//                 filterButton.enabled = NO;     
+//                  
                  break;
             
             //Implement Portfolio    
         case 2 : 
             _filterPortfolio = TRUE;
             _showFilterMenuInStartUps = FALSE;
+            filterContainer.selected = FALSE;
             [[self.view viewWithTag:1000] removeFromSuperview];
-            [[self.view viewWithTag:1001] removeFromSuperview];
+            [[self.view viewWithTag:_addFilter] removeFromSuperview];
+            _addFilter--;
+            [self performSelector:@selector(backAnimFilter1) withObject:nil afterDelay:0.05];
             
             self.title = @"StartUps - Portfolio";
             self.navigationController.title = @"StartUps";
             [self getDetailsOfPortfolio];
-//            filterButton.enabled = NO;   
+//              
             
             break;
             
             //Implement Trending 
         case 3 :  
             
-            _showFilterMenuInStartUps = FALSE;
-            [[self.view viewWithTag:1000] removeFromSuperview];
-            [[self.view viewWithTag:1001] removeFromSuperview]; 
+                _filterFollow = FALSE; 
+                _filterPortfolio = FALSE;
+                filterContainer.selected = FALSE;
+                [self getDetailsOfAll];
+                [table reloadData];
+            
+                self.title = @"StartUps";
+                self.navigationController.title = @"StartUps";
+            
+                _showFilterMenuInStartUps = FALSE;
+                [[self.view viewWithTag:1000] removeFromSuperview];
+                [[self.view viewWithTag:1001] removeFromSuperview];
+                [[self.view viewWithTag:_addFilter] removeFromSuperview];
+                _addFilter--;
+                [self performSelector:@selector(backAnimFilter1) withObject:nil afterDelay:0.05];
+            
+            
+            
             break;
             
             //Implement All    
-        case 4 : _filterFollow = FALSE; 
-                 _filterPortfolio = FALSE;
-                 [self getDetailsOfAll];
-                 [table reloadData];
-            
-                 self.title = @"StartUps";
-                 self.navigationController.title = @"StartUps";
-            
-                 _showFilterMenuInStartUps = FALSE;
+        case 4 : _showFilterMenuInStartUps = FALSE;
+                 filterContainer.selected = FALSE;
                  [[self.view viewWithTag:1000] removeFromSuperview];
-                 [[self.view viewWithTag:1001] removeFromSuperview];
+                 [[self.view viewWithTag:_addFilter] removeFromSuperview];
+                 _addFilter--;
+                 [self performSelector:@selector(backAnimFilter1) withObject:nil afterDelay:0.05];
                  break;    
     }
 }
@@ -717,6 +1153,7 @@ NSTimer *timer;
 
         [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
         
+
         [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
         
 
@@ -737,10 +1174,8 @@ NSTimer *timer;
 
         [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
         
-
         [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
         
-
         [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
         
         [table reloadData];
@@ -748,7 +1183,6 @@ NSTimer *timer;
     else
     {
         loadingView.hidden = NO;
-        filterButton.enabled = NO;
         
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/users/%@/following?type=startup",_currUserId]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -857,11 +1291,11 @@ NSTimer *timer;
                      NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
                      if([checkStr rangeOfString:@"("].location != NSNotFound)
                      {
-                         [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No data"];
+                         [displayStartUpMarketArray replaceObjectAtIndex:k withObject:@"No Information"];
                      }
                      [checkStr release];
                  }
-//                 [self startLoadingImagesConcurrently];
+
                  [self saveImagesOfStartUpsFollowing];
                  [table reloadData];
              }
@@ -950,6 +1384,7 @@ NSTimer *timer;
         
 
         [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
+        
 
         [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
         
@@ -973,7 +1408,7 @@ NSTimer *timer;
     else
     {
         loadingView.hidden = NO;
-        filterButton.enabled = NO;
+
         
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",_currUserId]];//
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -1008,8 +1443,7 @@ NSTimer *timer;
                      [displayStartUpAngelUrlArray addObject:startUpPortfolioAngelUrl];
                      
                      NSString *startUpPortfolioLogoUrl = [portfolio valueForKey:@"thumb_url"];
-//                     [displayStartUpLogoImageDataArray addObject:startUpPortfolioLogoUrl];
-//                     [displayStartUpLogoUrlArray addObject:[UIImage imageNamed:@"placeholder.png"]];
+
                      [displayStartUpLogoUrlArray addObject:startUpPortfolioLogoUrl];
                      
                      NSString *startUpProdDesc = [portfolio valueForKey:@"product_desc"];
@@ -1025,7 +1459,7 @@ NSTimer *timer;
                      [displayStartUpMarketArray addObject:@""];
                      
                  }
-//                 [self startLoadingImagesConcurrently];
+
                  [self saveImagesOfStartUpsPortfolio];
                  [table reloadData];
              }

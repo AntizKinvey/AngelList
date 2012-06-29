@@ -8,8 +8,11 @@
 
 #import "InboxDetailsViewController.h"
 #import "InboxViewController.h"
-#define kOFFSET_FOR_KEYBOARD 160.0
+#import <QuartzCore/QuartzCore.h>
 
+#define kOFFSET_FOR_KEYBOARD 160.0
+#define CELL_CONTENT_WIDTH 320.0f
+#define CELL_CONTENT_MARGIN 10.0f
 
 @implementation InboxDetailsViewController
 
@@ -42,7 +45,7 @@ NSMutableArray *displayImage;
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
-    
+    textViewReply.delegate = self;
     //---try to get a reusable cell--- 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
@@ -56,48 +59,94 @@ NSMutableArray *displayImage;
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        
+       
     }
-
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(90, 0, 210, 50)];
+    UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(75, 0, 210, 50)];
     name.text = [_msgUser objectAtIndex:indexPath.row]; 
-    name.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
+    name.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+    name.lineBreakMode = UILineBreakModeWordWrap;
+    name.numberOfLines = 0;
     [cell.contentView addSubview:name];
     name.backgroundColor = [UIColor clearColor];
-    [name release];
+  
     
-    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(90, 40, 210, 50)];
+    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(75, 40, 210, 50)];
     msgLabel.text = [_messBody objectAtIndex:indexPath.row]; 
-    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+    msgLabel.lineBreakMode = UILineBreakModeWordWrap;
+    msgLabel.numberOfLines = 0;
     [cell.contentView addSubview:msgLabel];
     msgLabel.backgroundColor = [UIColor clearColor];
-    [msgLabel release];
+  
     
     UILabel *msgLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
     msgLabel1.text = [_displayTime objectAtIndex:indexPath.row]; 
-    msgLabel1.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:8];
+    msgLabel1.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
+    msgLabel1.lineBreakMode = UILineBreakModeWordWrap;
+    msgLabel1.numberOfLines = 0;
     [cell.contentView addSubview:msgLabel1];
     msgLabel1.backgroundColor = [UIColor clearColor];
-    [msgLabel1 release];
+ 
     
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 70, 70)];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
     imageView.image = [displayImage objectAtIndex:indexPath.row];
     [cell.contentView addSubview:imageView];
-    [imageView release];
+
     
+    NSString *strContent1 = [_messBody objectAtIndex:[indexPath row]];
+    NSString *strContent2 = [_msgUser objectAtIndex:indexPath.row]; 
+    NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
+    CGSize constrainedSize = CGSizeMake(310, 20000);
+    CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+    if (!msgLabel)
+        msgLabel = (UILabel*)[cell viewWithTag:1];
+    [msgLabel setText:strContent1];
+    [msgLabel setFrame:CGRectMake(75, 30, 210, MAX(exactSize.height, 20.0f))];
+    
+    if (!msgLabel1)
+        msgLabel1 = (UILabel*)[cell viewWithTag:1];
+    [msgLabel1 setText:strContent3];
+    [msgLabel1 setFrame:CGRectMake(220, msgLabel.frame.size.height+30, 210, 35)];
+    
+    if (!name)
+        name = (UILabel*)[cell viewWithTag:1];
+    [name setText:strContent2];
+    [name setFrame:CGRectMake(75, 0, 210, 40)];
+    
+    [name release];
+    [msgLabel release];
+    [msgLabel1 release];
+    [imageView release];
+
     return cell;   
     
 }
 
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    
+    if([text isEqualToString:@"\n"]) {
+        [textView resignFirstResponder];
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (void)viewDidLoad
 {
-    [self getrequest];
+    textViewReply.layer.cornerRadius = 10.0f;
+    textViewReply.layer.borderColor = [UIColor grayColor].CGColor;
+    textViewReply.layer.borderWidth = 1.0f;
+    [self getrequestDetails];
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }
 
 
--(void)getrequest
+-(void)getrequestDetails
 {
     
     _messBody = [[NSMutableArray alloc] init];
@@ -122,9 +171,9 @@ NSMutableArray *displayImage;
     [backButtonItem release];
     [backButton release];
     
+  
     
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_currAccessToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"GET"];
@@ -132,7 +181,7 @@ NSMutableArray *displayImage;
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
-   
+    
     
     NSArray *arrayMessages = [json valueForKey:@"messages"];
     NSArray *arrayUser = [json valueForKey:@"users"];
@@ -161,7 +210,7 @@ NSMutableArray *displayImage;
             
         }
         else {
-           
+            
             [_msgUser addObject:[user2Diction valueForKey:@"name"]];
             [_otherUser addObject:[user2Diction valueForKey:@"image"]];
         }
@@ -203,8 +252,7 @@ NSMutableArray *displayImage;
         
         NSString *picLoad = [NSString stringWithFormat:@"%@",[_otherUser objectAtIndex:asyncCount]];
         NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-      
-        
+               
         UIImage* image = [UIImage imageWithData:imageData];
         
         if (image != nil) {
@@ -236,15 +284,20 @@ NSMutableArray *displayImage;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
 
-   // NSInteger integer = 2;
+   
     return [_msgUser count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    return 100.0;
+        NSString *text = [_messBody objectAtIndex:[indexPath row]];
+        CGSize constraint = CGSizeMake(310, 20000.0f);
+        CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+        CGFloat height = MAX(size.height, 0.0f);
+        
+        return height + (30 * 2);
 }
+
 
 
 -(IBAction)returnkeyboard:(id)sender
@@ -258,20 +311,18 @@ NSMutableArray *displayImage;
 {
     
     NSString *postMsg = [NSString stringWithFormat:@"%@",textViewReply.text];
-    
    
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=0923767ad7d007d4c519aa45a1129f73",threadValue,postMsg]];
-    
+    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=0923767ad7d007d4c519aa45a1129f73",threadValue,postMsg]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+   
 
-    [self getrequest];
-    [textViewReply setPlaceholder:@"Type your message..."];
+    [self getrequestDetails];
+  
     [tableMsgDetails reloadData];
-    
+    textViewReply.text =@"";
 
 }
 
@@ -279,7 +330,7 @@ NSMutableArray *displayImage;
     [self setViewMoveUp:YES];
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)sender {
+- (void)textViewDidBeginEditing:(UITextField *)sender {
     stayup1 = YES;
     
     if ([sender isEqual:textViewReply])
@@ -290,14 +341,14 @@ NSMutableArray *displayImage;
 
 }
 
-- (void)textFieldDidEndEditing:(UITextField *)sender {
+- (void)textViewDidEndEditing:(UITextField *)sender {
     stayup1 = NO;
     if ([sender isEqual:textViewReply])
     {
         [self setViewMoveUp:NO];
         
     }
-
+//    
 }
 
 
@@ -335,7 +386,6 @@ NSMutableArray *displayImage;
     for (int time=0; time < [_time count]; time++) { 
         
         NSString *timeStamp = [NSString stringWithFormat:@"%@",[_time objectAtIndex:time]];
-        
         NSDateFormatter *dateForm = [[NSDateFormatter alloc] init];
         [dateForm setDateFormat:@"YYYY-MM-dd'T'HH:mm:ss'Z'"];
         [dateForm setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
@@ -390,9 +440,17 @@ NSMutableArray *displayImage;
         
         [_displayTime addObject:displayTime];
         [cal release];
+        [dateForm release];
         
     }
     
+}
+
+
+-(void)dealloc
+{
+
+    [super dealloc];
 }
 
 
