@@ -11,6 +11,7 @@
 
 @implementation ActivityWebDetailsController
 
+// array from feed details
 extern NSMutableArray *actorNameArray;
 extern NSMutableArray *actorUrlArray;
 extern int _rowNumberInActivity;
@@ -44,6 +45,7 @@ UIButton* backButton;
     
     [loading.layer setCornerRadius:18.0f];
     
+    // back button
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
     backButton = [[UIButton alloc] initWithFrame:frame];
@@ -55,6 +57,7 @@ UIButton* backButton;
     [backButtonItem release];
     [backButton release];
     
+    // load angellist URL
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
@@ -71,7 +74,7 @@ UIButton* backButton;
 -(void)viewWillDisappear:(BOOL)animated
 {
     [webView setDelegate:nil];
-  
+    
 }
 
 - (void)viewDidUnload
@@ -98,6 +101,8 @@ UIButton* backButton;
     loading.hidden = YES;
 }
 
+
+// To support orientations 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations

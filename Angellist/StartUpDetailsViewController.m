@@ -7,7 +7,6 @@
 //
 
 #import "StartUpDetailsViewController.h"
-#import "AsyncImageView.h"
 #import "StartUpWebDetailsController.h"
 #import "Reachability.h"
 #import <QuartzCore/QuartzCore.h>
@@ -73,6 +72,7 @@ KCSCollection *_detailsCollection;
     {
         if(indexPath.row == 0)
         {
+            //Image to be displayed
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
             cellImageView.image = [displayInCells objectAtIndex:0];
             cellImageView.layer.cornerRadius = 3.5f;
@@ -80,6 +80,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:cellImageView];
             [cellImageView release];
             
+            //startup name to be displayed
             UILabel *startUpNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
             startUpNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
             startUpNamelabel.lineBreakMode = UILineBreakModeWordWrap;
@@ -93,6 +94,7 @@ KCSCollection *_detailsCollection;
             CGSize constraint1 = CGSizeMake(270, 20000.0f);
             CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
             
+            //startup description to be displayed
             UILabel *startUpDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 160, 270, size1.height)];
             startUpDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
             int numLines = (int)(startUpDesclabel.frame.size.height/startUpDesclabel.font.leading);
@@ -103,7 +105,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:startUpDesclabel];
             [startUpDesclabel release];
             
-            
+            //startup locations to be displayed
             UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpDesclabel.frame.size.height+180, 270, 30)];
             startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
             startUpLocationlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
@@ -118,7 +120,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:startUpLocationlabel];
             [startUpLocationlabel release];
             
-            // startups market label  
+            // startup market label  
             UILabel *startUpMarketlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpDesclabel.frame.size.height+210, 270, 30)];
             startUpMarketlabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
             startUpMarketlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
@@ -132,6 +134,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:startUpMarketlabel];
             [startUpMarketlabel release];
             
+            //startUp follower count to be displayed
             UILabel *startUpFollowerslabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 20, 270, 30)];
             startUpFollowerslabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
             startUpFollowerslabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
@@ -223,11 +226,12 @@ KCSCollection *_detailsCollection;
     }
     else
     {
+        //Kinvey UserActivity collection
         _detailsCollection = [[[KCSClient sharedClient]
                                collectionFromString:@"UserActivity"
                                withClass:[KCSUserActivity class]] retain];
         
-        
+        //Set details of user activity
         KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
         userActivity.sessionId = _globalSessionId;
         userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:_rowNumberInStartUps]];
@@ -235,23 +239,25 @@ KCSCollection *_detailsCollection;
         [userActivity release];
     }
     
-    
+    //Follow button
     followButton = [[UIButton alloc] init];
     [followButton setBackgroundImage:[UIImage imageNamed:@"follow.png"] forState:UIControlStateNormal];
     [followButton addTarget:self action:@selector(followStartUp) forControlEvents:UIControlStateHighlighted];
     followButton.hidden = YES;
     
+    //Unfollow button
     unfollowButton = [[UIButton alloc] init];
     [unfollowButton setBackgroundImage:[UIImage imageNamed:@"unfollow.png"] forState:UIControlStateNormal];
     [unfollowButton addTarget:self action:@selector(unfollowStartUp) forControlEvents:UIControlStateHighlighted];
     unfollowButton.hidden = YES;
     
+    //More button
     moreButton = [[UIButton alloc] init];
     [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
     [moreButton addTarget:self action:@selector(startUpDetails) forControlEvents:UIControlStateHighlighted];
     
     
-    
+    //Array that displays startUp details
     displayInCells = [[NSMutableArray alloc] init];
     
     [displayInCells addObject:[UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:_rowNumberInStartUps]]];
@@ -272,6 +278,7 @@ KCSCollection *_detailsCollection;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+//Method invoked when selecting more button
 -(void)startUpDetails
 {
     //Check for the availability of Internet
@@ -299,6 +306,7 @@ KCSCollection *_detailsCollection;
     }
 }
 
+//Method to follow startUp
 -(void)followStartUp
 {
     //Check for the availability of Internet
@@ -324,6 +332,7 @@ KCSCollection *_detailsCollection;
     }
 }
 
+//Method to unfollow startUp
 -(void)unfollowStartUp
 {
     //Check for the availability of Internet

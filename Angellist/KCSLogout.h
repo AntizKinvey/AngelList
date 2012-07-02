@@ -11,8 +11,11 @@
 
 @interface KCSLogout : NSObject <KCSPersistable>
 
+//Id of object which is created default in Kinvey or can be manually specified
 @property (retain, nonatomic) NSString *objectId;
+//Time of logout that user logs out of app
 @property (retain, nonatomic) NSString *logouttime;
+//Session Id to determine at what time the user logs in
 @property (retain, nonatomic) NSString *sessionId;
 
 @end

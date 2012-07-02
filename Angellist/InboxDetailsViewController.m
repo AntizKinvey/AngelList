@@ -16,13 +16,14 @@
 
 @implementation InboxDetailsViewController
 
-extern int threadValue;
-extern NSString *_currAccessToken;
+extern int threadValue; // thread id from inbox screen
+extern NSString *_currAccessToken; // access token
 BOOL stayup1, fromInboxDetails;
-NSMutableArray *_msgUser;
-NSMutableArray *_otherUser;
 
-NSMutableArray *_messBody;
+NSMutableArray *_msgUser; // array for message user
+NSMutableArray *_otherUser; // array for the other user in the conversation
+
+NSMutableArray *_messBody; // 
 NSMutableArray *_sen_id;
 NSMutableArray *_rec_id;
 NSMutableArray *_time;
@@ -42,6 +43,7 @@ NSMutableArray *displayImage;
     return self;
 }
 
+// TableView delegate method to display informations in a tableview
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
@@ -64,6 +66,7 @@ NSMutableArray *displayImage;
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
+    // label to display names
     UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(75, 0, 210, 50)];
     name.text = [_msgUser objectAtIndex:indexPath.row]; 
     name.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
@@ -71,8 +74,8 @@ NSMutableArray *displayImage;
     name.numberOfLines = 0;
     [cell.contentView addSubview:name];
     name.backgroundColor = [UIColor clearColor];
-  
-    
+   
+    // label to display messages
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(75, 40, 210, 50)];
     msgLabel.text = [_messBody objectAtIndex:indexPath.row]; 
     msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
@@ -81,7 +84,7 @@ NSMutableArray *displayImage;
     [cell.contentView addSubview:msgLabel];
     msgLabel.backgroundColor = [UIColor clearColor];
   
-    
+    // label to display time
     UILabel *msgLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
     msgLabel1.text = [_displayTime objectAtIndex:indexPath.row]; 
     msgLabel1.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
@@ -89,13 +92,13 @@ NSMutableArray *displayImage;
     msgLabel1.numberOfLines = 0;
     [cell.contentView addSubview:msgLabel1];
     msgLabel1.backgroundColor = [UIColor clearColor];
- 
-    
+  
+    // image view to display images
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
     imageView.image = [displayImage objectAtIndex:indexPath.row];
     [cell.contentView addSubview:imageView];
-
-    
+ 
+    // labels to conform to the dynamic cell height with respect to text
     NSString *strContent1 = [_messBody objectAtIndex:[indexPath row]];
     NSString *strContent2 = [_msgUser objectAtIndex:indexPath.row]; 
     NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
@@ -125,6 +128,7 @@ NSMutableArray *displayImage;
     
 }
 
+// return keyboard on 'Done' button
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     
     if([text isEqualToString:@"\n"]) {
@@ -145,7 +149,7 @@ NSMutableArray *displayImage;
     // Do any additional setup after loading the view from its nib.
 }
 
-
+//get details of the conversation
 -(void)getrequestDetails
 {
     
@@ -172,8 +176,8 @@ NSMutableArray *displayImage;
     [backButton release];
     
   
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73
+    // URL request
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_currAccessToken]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"GET"];
@@ -226,13 +230,15 @@ NSMutableArray *displayImage;
 
     
 }
+
+// navigate back to inbox
 -(void) backAction:(id)sender
 {
     fromInboxDetails = TRUE;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-
+// functions load images Concurrently
 -(void)startLoadingImagesConcurrently
 {
     
@@ -279,15 +285,17 @@ NSMutableArray *displayImage;
     
 }
 
-
+ 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
 
-   
+    // retun numver of messages in the conversation to set the number of rows in the tableview
     return [_msgUser count];
 }
 
+
+// To display the height of each cell conforming to the text length
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
         NSString *text = [_messBody objectAtIndex:[indexPath row]];
@@ -299,14 +307,14 @@ NSMutableArray *displayImage;
 }
 
 
-
+// return keyboard
 -(IBAction)returnkeyboard:(id)sender
 { 
 
     [textViewReply resignFirstResponder];
 }
 
-
+// post a reply from the user
 -(IBAction)postReply:(id)sender
 {
     
@@ -320,11 +328,15 @@ NSMutableArray *displayImage;
    
 
     [self getrequestDetails];
-  
+  // reload table
     [tableMsgDetails reloadData];
     textViewReply.text =@"";
 
 }
+
+
+
+//  methods move the view up while replying through the text view // 
 
 - (void)keyboardWillShow:(NSNotification *)notif{
     [self setViewMoveUp:YES];
@@ -348,7 +360,7 @@ NSMutableArray *displayImage;
         [self setViewMoveUp:NO];
         
     }
-//    
+    
 }
 
 
@@ -380,6 +392,9 @@ NSMutableArray *displayImage;
 }
 
 
+
+
+// display time
 -(void)getTime
 {
     
@@ -461,6 +476,7 @@ NSMutableArray *displayImage;
     // e.g. self.myOutlet = nil;
 }
 
+//To support orientations
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);

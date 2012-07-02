@@ -17,28 +17,26 @@
 
 extern NSString *_currAccessToken;
 
-NSMutableArray *_senderName;
-NSMutableArray *_recepientName;
-NSMutableArray *_imageOfRecepient;
-NSMutableArray *_imageOfSender;
-NSMutableArray *_userids;
-NSMutableArray *_sender;
-NSMutableArray *_recepient;
-NSMutableArray *_read;
-NSMutableArray *_threadId;
-NSMutableArray *_msgbody;
-NSMutableArray *_placeHolder;
-NSMutableArray *_time;
-NSMutableArray *_displayTime;
-NSMutableArray *_totalMsgCount;
+NSMutableArray *_senderName; // sender name
+NSMutableArray *_recepientName; // recepient name
+NSMutableArray *_imageOfRecepient; // image of recepient 
+NSMutableArray *_imageOfSender; // image of sender
+NSMutableArray *_userids; // user ids
+NSMutableArray *_sender; // sender ids
+NSMutableArray *_recepient; // recepient ids
+NSMutableArray *_read; // viewed status
+NSMutableArray *_threadId; // thread id
+NSMutableArray *_msgbody; // message body
+NSMutableArray *_placeHolder; // place holder images
+NSMutableArray *_time; // time got from response
+NSMutableArray *_displayTime; // display time
+NSMutableArray *_totalMsgCount; // total message count
 
 
 extern BOOL fromInboxDetails;
 
-NSString *threadIdString;
-
-int threadValue = 0;
-
+NSString *threadIdString; // thread id string for database
+int threadValue = 0; // thread id for inbox details
 int countDownInbox = 0;
 float alphaValueInInbox = 1.0;
 NSTimer *timerInbox;
@@ -80,6 +78,8 @@ UIView *noInternetView;
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
+    
+    // label to display sender name
     label = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 50)];
     label.text = [_senderName objectAtIndex:indexPath.row];
     label.backgroundColor = [UIColor clearColor];
@@ -102,6 +102,7 @@ UIView *noInternetView;
     [cell.contentView addSubview:label];
     [label release];
     
+    // label to display message
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
     msgLabel.text = [_displayTime objectAtIndex:indexPath.row]; 
     msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
@@ -109,6 +110,7 @@ UIView *noInternetView;
     msgLabel.backgroundColor = [UIColor clearColor];
     [msgLabel release];
     
+    // label to display time  
     UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 40, 210, 30)];
     timeLabel.text = [_msgbody objectAtIndex:indexPath.row]; 
     timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
@@ -118,6 +120,7 @@ UIView *noInternetView;
     [cell.contentView addSubview:timeLabel];
     [timeLabel release];
     
+    // image view to display image of the sender
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
     imageView.image = [_placeHolder objectAtIndex:indexPath.row];
     imageView.layer.cornerRadius = 3.5f;
@@ -125,6 +128,7 @@ UIView *noInternetView;
     [cell.contentView addSubview:imageView];
     [imageView release];
     
+    // To conform to the table dynamic cell height
     NSString *strContent1 = [_msgbody objectAtIndex:[indexPath row]];
     NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
      NSString *strContent4 = [_senderName objectAtIndex:indexPath.row];
@@ -153,24 +157,19 @@ UIView *noInternetView;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-    
+    // return number of message thread count in database
     return [_dbmanager.inboxThreadIdFromDB count];
 }
 
+
+ // for dynamic cell height according to the text
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    
     NSString *text = [_msgbody objectAtIndex:[indexPath row]];
-    
     CGSize constraint = CGSizeMake(310, 20000.0f);
-    
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
-    
     CGFloat height = MAX(size.height, 44.0f);
-    
-   
-    
     return height + (30 * 2);
 
 }
@@ -195,6 +194,7 @@ UIView *noInternetView;
         }
         
         if (fromInboxDetails == TRUE) {
+            // to load messages again when returned from inbox details
             fromInboxDetails = FALSE;
             [self sendRequestToFetch];
             [_dbmanager retrieveInboxDetails];
@@ -209,22 +209,8 @@ UIView *noInternetView;
 -(void)viewDidAppear:(BOOL)animated
 {
    
-
+//  [tableview reloadData];
     [super viewDidAppear:animated];
-}
-
--(void) fadeView
-{
-    if(countDownInbox < 35)
-    {
-        countDownInbox++;
-        noInternetView.alpha = alphaValueInInbox;
-        alphaValueInInbox = alphaValueInInbox - 0.03;
-    }
-    else
-    {
-        [timerInbox invalidate];
-    }
 }
 
 
@@ -244,6 +230,7 @@ UIView *noInternetView;
     noInternetView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:noInternetView];
     
+    // Label to display the message no interbnet connection when offline
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(7, 53, 106, 46)];
     msgLabel.text = @"No Internet Connection";
     msgLabel.textAlignment = UITextAlignmentCenter;
@@ -262,7 +249,7 @@ UIView *noInternetView;
     [notReachView release];
     [noInternetView release];
     
-    
+    // to check whether it is an iphone or not and load the views accordingly
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
         self.navigationController.navigationBar.frame = CGRectMake(0, 0, 320, 45);
@@ -271,6 +258,8 @@ UIView *noInternetView;
     {
         self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
     }
+    
+    // image for the navigation bar background
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
@@ -289,27 +278,27 @@ UIView *noInternetView;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-
+      countDownInbox = 0;
 
         [super viewDidLoad];
     }
     else
     {
+        // to fetch request from AngelList
         [self sendRequestToFetch];
         
          [super viewDidLoad];
         // Do any additional setup after loading the view from its nib.
-        // [self performSelector:@selector(loadImagesToTable) withObject:nil afterDelay:0.5];
+        
         [self startLoadingImagesConcurrently];
     }
     
-    
-    
 }
 
+// to fetch request from AngelList
 -(void)sendRequestToFetch
 {
-   
+   // send GET request to AngelList to fetch the messages
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
@@ -318,13 +307,11 @@ UIView *noInternetView;
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
    
-    
     NSString *stringResponse = [NSString stringWithFormat:@"%@",[json valueForKey:@"success"]];
-    
     
     if ([stringResponse isEqual:@"0"]) {
         UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
-        labelError.text = @"No scope for messages";
+        labelError.text = @"User is not authorized to message";
         labelError.textColor = [UIColor grayColor];
         labelError.textAlignment = UITextAlignmentCenter;
         [labelError setBackgroundColor:[UIColor clearColor]];
@@ -332,6 +319,8 @@ UIView *noInternetView;
         [labelError release];
     }
     else {
+        
+        
         NSArray *_messageThreads = [json valueForKey:@"messages"];
         _senderName = [[NSMutableArray alloc] init];
         _imageOfSender = [[NSMutableArray alloc] init];
@@ -366,7 +355,6 @@ UIView *noInternetView;
             [_msgbody addObject:[[diction valueForKey:@"last_message"] valueForKey:@"body"]];
             [_time addObject:[[diction valueForKey:@"last_message"] valueForKey:@"created_at"]];
             
-
                 [self readUnread:_userCount];
                 if(_userCount == [_messageThreads count]-1)
                 {
@@ -401,17 +389,16 @@ UIView *noInternetView;
             }
             
             [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
-           
+            // NSString *dateString = [NSString stringWithFormat:@"%@"
         }
-        
         
         [self getTime]; 
         
-
     }
        
 }
 
+// Functions to display images concurrently 
 -(void)startLoadingImagesConcurrently
 {
     
@@ -461,12 +448,17 @@ UIView *noInternetView;
     
 }
 
+
+
+
+// Function to display the status of the message.
 -(void)readUnread:(int)msgCount
 {
    
     [_dbmanager retrieveInboxDetails];
     
         if ([_dbmanager.inboxThreadIdFromDB count] != 0) {
+
             if ([_dbmanager.inboxThreadIdFromDB count] !=[_threadId count]) {  
                 
                 
@@ -498,6 +490,7 @@ UIView *noInternetView;
      
 }
 
+// To display time on screen
 -(void)getTime
 {
     
@@ -570,6 +563,7 @@ UIView *noInternetView;
 
 }
 
+// to come back from inbox details
 -(void) backAction:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -582,6 +576,7 @@ UIView *noInternetView;
     // e.g. self.myOutlet = nil;
 }
 
+// TableView delegate method to navigate to the details of a message and display the conversation in that particular thread
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
@@ -612,7 +607,7 @@ UIView *noInternetView;
     [self.navigationController pushViewController:detailsViewController animated:YES];
 }
 
-
+// To support orientations
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -625,6 +620,7 @@ UIView *noInternetView;
         return NO;
     }
 }
+
 
 -(void) dealloc
 {

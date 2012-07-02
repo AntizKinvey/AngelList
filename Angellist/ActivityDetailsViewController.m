@@ -14,7 +14,8 @@
 
 @implementation ActivityDetailsViewController
 
-extern NSMutableArray *actorTypeArray;
+// arrays from activity screen
+extern NSMutableArray *actorTypeArray; 
 extern NSMutableArray *actorIdArray;
 extern NSMutableArray *actorNameArray;
 extern NSMutableArray *actorUrlArray;
@@ -68,6 +69,7 @@ KCSCollection *_detailsCollection;
     {
         if(indexPath.row == 0)
         {
+            // image view to display image of user/startup
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
             cellImageView.image = [displayInCells objectAtIndex:0];
             cellImageView.layer.cornerRadius = 3.5f;
@@ -75,6 +77,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:cellImageView];
             [cellImageView release];
             
+            // label to display name of the user/startup
             UILabel *actorNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
             actorNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
             actorNamelabel.lineBreakMode = UILineBreakModeWordWrap;
@@ -84,6 +87,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:actorNamelabel];
             [actorNamelabel release];
             
+            // label to display description
              NSString *text = [displayInCells objectAtIndex:2];
              CGSize constraint = CGSizeMake(270, 20000.0f);
             CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
@@ -98,7 +102,7 @@ KCSCollection *_detailsCollection;
             [cell.contentView addSubview:actorDesclabel];
             [actorDesclabel release];
                 
-            
+            // for displaying follow / unfollow button
             if([userFollowingIds containsObject:[actorIdArray objectAtIndex:_rowNumberInActivity]])
             {
                 unfollowButton.hidden = NO;
@@ -161,6 +165,8 @@ KCSCollection *_detailsCollection;
 
 - (void)viewDidLoad
 {
+    
+    // back button 
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
     backButton = [[UIButton alloc] initWithFrame:frame];
@@ -178,7 +184,7 @@ KCSCollection *_detailsCollection;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"\n\nNo Internet Connection");
+        NSLog(@"\n\n No Internet Connection");
     }
     else
     {
@@ -195,23 +201,24 @@ KCSCollection *_detailsCollection;
     }
    
     
-    
+    // follow button
     followButton = [[UIButton alloc] init];
     [followButton setBackgroundImage:[UIImage imageNamed:@"follow.png"] forState:UIControlStateNormal];
     [followButton addTarget:self action:@selector(followActor) forControlEvents:UIControlStateHighlighted];
     followButton.hidden = YES;
-
+    
+    // unfollow button
     unfollowButton = [[UIButton alloc] init];
     [unfollowButton setBackgroundImage:[UIImage imageNamed:@"unfollow.png"] forState:UIControlStateNormal];
     [unfollowButton addTarget:self action:@selector(unfollowActor) forControlEvents:UIControlStateHighlighted];
     unfollowButton.hidden = YES;
 
+    // more button
     moreButton = [[UIButton alloc] init];
     [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
     [moreButton addTarget:self action:@selector(actorDetails) forControlEvents:UIControlStateHighlighted];
     
-    
-    
+
     
     displayInCells = [[NSMutableArray alloc] init];
     [displayInCells addObject:[UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]]];
@@ -256,6 +263,7 @@ KCSCollection *_detailsCollection;
     
 }
 
+// follow user / startup
 -(void)followActor
 {
     //Check for the availability of Internet
@@ -282,6 +290,8 @@ KCSCollection *_detailsCollection;
     
 }
 
+
+// unfollow user/startup
 -(void)unfollowActor
 {
     //Check for the availability of Internet

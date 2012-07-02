@@ -24,11 +24,11 @@
 @synthesize logoutCollection=_logoutCollection;
 
 
-BOOL _kinveyPingSuccess = FALSE;
-NSString *_globalSessionId;
-NSString *_kinveyUserId; 
+BOOL _kinveyPingSuccess = FALSE;//Ping to Kinvey flag
+NSString *_globalSessionId;//Contains unique session Id
+NSString *_kinveyUserId;//Id of user of current device assigned by Kinvey 
 
-int _totalNoOfRowsInUserTable = 0;
+int _totalNoOfRowsInUserTable = 0;//No. of rows in User table 
 
 - (void)dealloc
 {
@@ -43,23 +43,33 @@ int _totalNoOfRowsInUserTable = 0;
 {
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 
+    //Create an object to access methods of database
     _dbmanager = [[DBManager alloc] init];
-    
+    //Create database if not created
     [_dbmanager openDB];
+    
+    //Create tables to do database operations
+    //Create table Activity to store details of feeds
     [_dbmanager createTableActivity:@"Activity" withField1:@"activityId" withField2:@"feedDescription" withField3:@"feedImageUrl" withField4:@"actorType" withField5:@"actorId" withField6:@"actorName" withField7:@"actorUrl" withField8:@"actorTagline" withField9:@"feedImagePath"];
     
+    //Create table StartUps that contains all startUps 
     [_dbmanager createTableStartUps:@"StartUps" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
+    //Create table Following to store details of startups of user's following
     [_dbmanager createTableStartUpsFollowing:@"Following" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
+    //Create table Portfolio to store details of startups of user's portfolio
     [_dbmanager createTableStartUpsPortfolio:@"Portfolio" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
+    //Create table Inbox
     [_dbmanager createTableInboxDetails:@"Inbox" withField1:@"threadId" withField2:@"total" withField3:@"viewed"];
     
+    //Get the number of rows in User table
     _totalNoOfRowsInUserTable = [_dbmanager retrieveUserFromDB];
     
     if(_totalNoOfRowsInUserTable == 0)
     {
+        //Create table User
         [_dbmanager createTableUser:@"User" withField1:@"UID" withField2:@"username" withField3:@"angelUserId" withField4:@"access_token"];
         
         // Override point for customization after application launch.
@@ -111,7 +121,7 @@ int _totalNoOfRowsInUserTable = 0;
             NSDate *currDate = [NSDate date];
             NSString *todayDate = [date_formater stringFromDate:currDate];
             [date_formater release];
-            
+            //Set logout details of user
             KCSLogout *logout = [[KCSLogout alloc] init];
             logout.logouttime = todayDate;
             logout.sessionId = _globalSessionId;
@@ -154,6 +164,7 @@ int _totalNoOfRowsInUserTable = 0;
     }
     else
     {
+        //Ping to Kinvey using app key and app secret 
         [[KCSClient sharedClient] initializeKinveyServiceForAppKey:@"kid1945"
                                                      withAppSecret:@"8f0b10ceba3c4bfa8f4ea03e42093231"
                                                       usingOptions:nil];
@@ -162,8 +173,10 @@ int _totalNoOfRowsInUserTable = 0;
         [KCSPing pingKinveyWithBlock:^(KCSPingResult *result) {
             // This block gets executed when the ping completes
             
+            //If result is successful set Kinvey ping flag to true
             if (result.pingWasSuccessful){
                 _kinveyPingSuccess = TRUE;
+                
                 
                 _loginCollection = [[[KCSClient sharedClient]
                                      collectionFromString:@"Login"
@@ -239,7 +252,7 @@ int _totalNoOfRowsInUserTable = 0;
     [date_formater release];
     
     _globalSessionId = [[NSString alloc] initWithFormat:@"%d",[result count]+1];
-    
+    //Set login details of user
     KCSLogin *loginDetails = [[KCSLogin alloc] init];
     
     loginDetails.userId = _kinveyUserId;

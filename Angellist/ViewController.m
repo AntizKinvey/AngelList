@@ -78,7 +78,7 @@ ContainerViewController *_containerViewController;
 	[super viewDidDisappear:animated];
 }
 
-
+//Button action to open login screen
 -(IBAction) loginFromAngellist:(id) sender
 {
     //Check for the availability of Internet
@@ -95,11 +95,13 @@ ContainerViewController *_containerViewController;
         loginFromAL = TRUE;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
+            //Open Login screen
             _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
             [self presentModalViewController:_loginView animated:YES];
         }
         else
         {
+            //Open Login screen
             _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
             [self presentModalViewController:_loginView animated:YES];
             

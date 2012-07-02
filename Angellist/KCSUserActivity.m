@@ -44,9 +44,9 @@
     if (mapping == nil){
         // Assign the mapping
         mapping = [[NSDictionary dictionaryWithObjectsAndKeys:
-                    @"_id", @"objectId",
-                    @"sessionId", @"sessionId",
-                    @"urlLinkVisited", @"urlLinkVisited",
+                    @"_id", @"objectId",//Id of object which is created default in Kinvey or can be manually specified
+                    @"sessionId", @"sessionId",//Session Id to determine at what time the user logs in
+                    @"urlLinkVisited", @"urlLinkVisited",//Activity of user at a particular session
                     nil] retain];
     }
     

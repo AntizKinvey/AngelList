@@ -9,47 +9,41 @@
 #import <QuartzCore/QuartzCore.h>
 #import "StartUpViewController.h"
 #import "StartUpDetailsViewController.h"
-#import "AsyncImageView.h"
 #import "Reachability.h"
 
 @implementation StartUpViewController
 @synthesize filterView;
 
-NSMutableArray *startUpIdsArray;
-NSMutableArray *startUpNameArray;
-NSMutableArray *startUpAngelUrlArray;
-NSMutableArray *startUpLogoUrlArray;
-NSMutableArray *startUpProductDescArray;
-NSMutableArray *startUpHighConceptArray;
-NSMutableArray *startUpFollowerCountArray;
-NSMutableArray *startUpLocationArray;
-NSMutableArray *startUpMarketArray;
-NSMutableArray *startUpLogoImageInDirectory;
+NSMutableArray *startUpIdsArray;//Complete Ids of StartUps
+NSMutableArray *startUpNameArray;//Complete names of StartUps
+NSMutableArray *startUpAngelUrlArray;//Complete angellist url's of StartUps
+NSMutableArray *startUpLogoUrlArray;//Complete logo url's of StartUps
+NSMutableArray *startUpProductDescArray;//Complete product description of StartUps
+NSMutableArray *startUpHighConceptArray;//Complete high concept of StartUps
+NSMutableArray *startUpFollowerCountArray;//Complete follower count of StartUps
+NSMutableArray *startUpLocationArray;//Complete locations of StartUps
+NSMutableArray *startUpMarketArray;//Complete market of StartUps
+NSMutableArray *startUpLogoImageInDirectory;//Complete logo image paths of StartUps
 
-NSMutableArray *displayStartUpIdsArray;
-NSMutableArray *displayStartUpNameArray;
-NSMutableArray *displayStartUpAngelUrlArray;
-NSMutableArray *displayStartUpLogoUrlArray;
-NSMutableArray *displayStartUpProductDescArray;
-NSMutableArray *displayStartUpHighConceptArray;
-NSMutableArray *displayStartUpFollowerCountArray;
-NSMutableArray *displayStartUpLocationArray;
-NSMutableArray *displayStartUpMarketArray;
-NSMutableArray *displayStartUpLogoImageInDirectory;
+NSMutableArray *displayStartUpIdsArray;//Ids of StartUps to be displayed
+NSMutableArray *displayStartUpNameArray;//Names of StartUps to be displayed
+NSMutableArray *displayStartUpAngelUrlArray;//Angellist url's of StartUps to be displayed
+NSMutableArray *displayStartUpLogoUrlArray;//Logo url's of StartUps to be displayed
+NSMutableArray *displayStartUpProductDescArray;//Complete product description of StartUps to be displayed
+NSMutableArray *displayStartUpHighConceptArray;//High concept of StartUps to be displayed
+NSMutableArray *displayStartUpFollowerCountArray;//Follower count of StartUps to be displayed
+NSMutableArray *displayStartUpLocationArray;//Locations of StartUps to be displayed
+NSMutableArray *displayStartUpMarketArray;//Market of StartUps to be displayed
+NSMutableArray *displayStartUpLogoImageInDirectory;//Logo image paths of StartUps to be displayed
 
-NSMutableArray *displayStartUpLogoImageDataArray;
 
-extern NSMutableArray *userFollowingIds;
+extern NSMutableArray *userFollowingIds;//Array of user following Ids
 
-extern BOOL _transitFromStartUps;
-extern BOOL _transitFromActivity;
+extern NSString *_currUserId;//Angellist user Id used to send requests
 
-extern NSString *_angelUserId;
-extern NSString *_currUserId;
-
-BOOL _filterFollow = FALSE;
-BOOL _filterPortfolio = FALSE;
-BOOL _showFilterMenuInStartUps = FALSE;
+BOOL _filterFollow = FALSE;//Flag to be set when request to following is sent
+BOOL _filterPortfolio = FALSE;//Flag to be set when request to portfolio is sent
+BOOL _showFilterMenuInStartUps = FALSE;//Flag to be set when filter displays on screen
 
 int _rowNumberInStartUps = 0;
 NSArray *_filterStartUpNames;
@@ -94,23 +88,20 @@ int startUpsLoadCount = 10;
     }
     
     loadingView.hidden = YES;
-    
+    filterContainer.enabled = YES;
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
-    else 
-    {
-        AsyncImageView* oldImage = (AsyncImageView*)
-        [cell.contentView viewWithTag:999];
-        [oldImage removeFromSuperview];
-    }
-    
+
     //---set the text to display for the cell---
+    //Set the name of startUp
     NSString *cellNameValue = [displayStartUpNameArray objectAtIndex:indexPath.row]; 
+    //Set the high concept of startUp
     NSString *cellHighConceptValue = [displayStartUpHighConceptArray objectAtIndex:indexPath.row]; 
+    //Set the locations of startUp
     NSString *cellLocationValue = [displayStartUpLocationArray objectAtIndex:indexPath.row]; 
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
@@ -188,6 +179,7 @@ int startUpsLoadCount = 10;
     return cell; 
 }
 
+//Returns dynamic cell height to be displayed
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *text = [displayStartUpHighConceptArray objectAtIndex:indexPath.row];
@@ -213,6 +205,7 @@ int startUpsLoadCount = 10;
         [alertPopup release];
         
         loadingView.hidden = YES;
+        filterContainer.enabled = YES;
     }
     if([displayStartUpNameArray count] != 0)
     {
@@ -220,7 +213,7 @@ int startUpsLoadCount = 10;
     }
     
     
-    
+    //Returns more number of startUps when more button is clicked
     if((_filterFollow == FALSE) && (_filterPortfolio == FALSE))
     {
         moreButton.hidden = FALSE;
@@ -250,7 +243,7 @@ int startUpsLoadCount = 10;
 }
 
 
-
+//This method is called when a row in table is selected
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     _rowNumberInStartUps = indexPath.row;
@@ -288,11 +281,11 @@ int startUpsLoadCount = 10;
     // Release any cached data, images, etc that aren't in use.
 }
 
+//Method to load more startUps
 -(IBAction)moreButtonAction:(id)sender
 {
     if(startUpsLoadCount >= ([displayStartUpNameArray count] - 10))
     {
-//        [moreButton setUserInteractionEnabled:NO];
         [moreButton setTitle:@"No more StartUps" forState:UIControlStateNormal];
     }
     else
@@ -318,33 +311,11 @@ int startUpsLoadCount = 10;
 {
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
-    notReachableView = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
-    notReachableView.alpha = 0;
-    [notReachableView.layer setCornerRadius:10.0f];
-    notReachableView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:notReachableView];
-    
-    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(7, 53, 106, 46)];
-    msgLabel.text = @"No Internet Connection";
-    msgLabel.textAlignment = UITextAlignmentCenter;
-    msgLabel.numberOfLines = 2;
-    msgLabel.backgroundColor = [UIColor clearColor];
-    msgLabel.textColor = [UIColor whiteColor];
-    msgLabel.font = [UIFont fontWithName:@"System" size:10.0];
-    [notReachableView addSubview:msgLabel];
-    
-    UIImage *notReachableImage = [UIImage imageNamed:@"closebutton.png"];
-    UIImageView *notReachView = [[UIImageView alloc] initWithFrame:CGRectMake(41, 20, 37, 37)];
-    notReachView.image = notReachableImage;
-    [notReachableView addSubview:notReachView];
-    
-    [msgLabel release];
-    [notReachView release];
-    [notReachableView release];
     
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
     
+    //Create objects of all arrays
     startUpIdsArray = [[NSMutableArray alloc] init];
     startUpNameArray = [[NSMutableArray alloc] init];
     startUpAngelUrlArray = [[NSMutableArray alloc] init];
@@ -367,7 +338,6 @@ int startUpsLoadCount = 10;
     
     startUpLogoImageInDirectory = [[NSMutableArray alloc] init];
     displayStartUpLogoImageInDirectory = [[NSMutableArray alloc] init];
-    displayStartUpLogoImageDataArray = [[NSMutableArray alloc] init];
     
     _dbmanager.startUpIdsArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.startUpNameArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
@@ -399,7 +369,6 @@ int startUpsLoadCount = 10;
     UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
     self.navigationItem.rightBarButtonItem = filterButtonItem;
     [filterButtonItem release];
-//    [filterButton release];
     
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -407,6 +376,7 @@ int startUpsLoadCount = 10;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
+        //If offline retrieve startUp details from local database
         [_dbmanager retrieveStartUpsDetails];
         
         [startUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
@@ -441,13 +411,15 @@ int startUpsLoadCount = 10;
     }
     else
     {
+        filterContainer.enabled = NO;
+        
+        //Send URL request to get list of startUps
         NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/startups/batch?ids=445,87,97,117,127,147,166,167,179,193,203,223,227,289,292,303,304,312,319,321,323,96447,95646,95473,94779,93606,93179,93089,92151,90626,90609,90306,89402,87788,87484,84913,84880,84711,83262,82265,80743,80742,77600,76074,75777,75769,72754,70465,67887,67482"];
         
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
-        
-        
+
         [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
                                completionHandler:^(NSURLResponse *response,
                                                    NSData *data,
@@ -456,6 +428,8 @@ int startUpsLoadCount = 10;
              if ([data length] >0 && error == nil)
              {
                  NSError* error;
+                 
+                 //Process json data obtained from response
                  NSDictionary* json = [NSJSONSerialization 
                                        JSONObjectWithData:data //1
                                        options:kNilOptions 
@@ -520,6 +494,7 @@ int startUpsLoadCount = 10;
                      }
                      else
                      {
+                         //Replace special characters from json data obtained from response
                          NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpLocation objectAtIndex:i]]];
                          for(int j=0; j<[[startUpLocation objectAtIndex:i] count]; j++)
                          {
@@ -570,6 +545,17 @@ int startUpsLoadCount = 10;
                      [checkStr release];
                  }
                  
+                 for(int k=0; k<[startUpHighConceptArray count]; k++)
+                 {
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpHighConceptArray objectAtIndex:k]]];
+                     
+                     [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     
+                     [startUpHighConceptArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [displayStartUpHighConceptArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [theMutableString release];
+                 }
+                 
                  for(int k=0; k<[startUpProductDescArray count]; k++)
                  {
                      NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[startUpProductDescArray objectAtIndex:k]]];
@@ -610,7 +596,7 @@ int startUpsLoadCount = 10;
 }
 
 
-
+//Save images of StartUps
 -(void) saveImagesOfStartUps
 {
     for(int imageNumber=1; imageNumber<=[displayStartUpLogoUrlArray count]; imageNumber++)
@@ -631,6 +617,7 @@ int startUpsLoadCount = 10;
     [self saveStartUpsDetailsToDB];
 }
 
+//Save images of StartUps details
 -(void) saveStartUpsDetailsToDB
 {
     for(int k=0; k<[startUpIdsArray count]; k++)
@@ -647,16 +634,14 @@ int startUpsLoadCount = 10;
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[startUpMarketArray objectAtIndex:k]];
         NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[startUpLogoImageInDirectory objectAtIndex:k]];
         
+        //Insert records to startUps table in database
         [_dbmanager insertRecordIntoStartUpsTable:@"StartUps" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
     } 
 }
 
-
-
+//Method invoked when filter button is selected
 - (void)filterButtonSelectedStartUp:(id)sender 
 {
-   
-    
     UIView *filtersList;
     
     if(_showFilterMenuInStartUps == FALSE)
@@ -729,6 +714,7 @@ int startUpsLoadCount = 10;
     }
 }
 
+//Methods to reverse animate filter options
 -(void)backAnimFilter1
 {
     [filterContainer setUserInteractionEnabled:NO];
@@ -753,11 +739,10 @@ int startUpsLoadCount = 10;
     if (_addFilter<=1) {
         _addFilter=1;
     }
-   
     [filterContainer setUserInteractionEnabled:YES];
 }
 
-
+//Methods to animate filter options
 -(void)animateFilter1
 {
     [filterContainer setUserInteractionEnabled:NO];
@@ -766,13 +751,10 @@ int startUpsLoadCount = 10;
     UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButton setBackgroundImage:image forState:UIControlStateNormal];
     
-  
-    
     NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
     [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     
     filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-    
     [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -812,19 +794,13 @@ int startUpsLoadCount = 10;
         _xPosSp = _xPosSp - 6;
         _yPosSp = _yPosSp + 50;
     }
-    
-    
     _btnRotSp = _btnRotSp + 5;
-    
-    
     _showFilterMenuInStartUps = TRUE;
     
     _addFilter++;
     if (_addFilter>=4) {
         _addFilter=4;
     }
-   
-   
     [self performSelector:@selector(animateFilter2) withObject:nil afterDelay:0.05];
 }
 
@@ -832,17 +808,15 @@ int startUpsLoadCount = 10;
 
 -(void)animateFilter2
 {
-       
+
     UIImage* image = [UIImage imageNamed:@"filters.png"];
     UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButton setBackgroundImage:image forState:UIControlStateNormal];
     
-        
     NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
     [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     
     filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-    
     [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -856,47 +830,33 @@ int startUpsLoadCount = 10;
     }
     
     [self.view addSubview:filterButton];
-    
-    
+
     if(_addFilter==2)
     {
-        
         _xPosSp = _xPosSp - 13;
         _yPosSp = _yPosSp + 50;
     }
     else if(_addFilter==3)
     {
-        
         _xPosSp = _xPosSp - 16;
         _yPosSp = _yPosSp + 50;
     }
     else if(_addFilter==4)
     {
-        
         _xPosSp = _xPosSp - 20;
         _yPosSp = _yPosSp + 47;
     }
     else 
     {
-        
         _xPosSp = _xPosSp - 6;
         _yPosSp = _yPosSp + 50;
     }
-    
-    
     _btnRotSp = _btnRotSp + 5;
-    // }
-    
-    
-    
     _showFilterMenuInStartUps = TRUE;
-    
     _addFilter++;
     if (_addFilter>=4) {
         _addFilter=4;
     }
-   
-   
     [self performSelector:@selector(animateFilter3) withObject:nil afterDelay:0.05];
 }
 
@@ -910,7 +870,6 @@ int startUpsLoadCount = 10;
     [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     
     filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-   
     [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -924,63 +883,45 @@ int startUpsLoadCount = 10;
     }
     
     [self.view addSubview:filterButton];
-    
-    
     if(_addFilter==2)
     {
-        
         _xPosSp = _xPosSp - 13;
         _yPosSp = _yPosSp + 50;
     }
     else if(_addFilter==3)
     {
-        
         _xPosSp = _xPosSp - 16;
         _yPosSp = _yPosSp + 50;
     }
     else if(_addFilter==4)
     {
-        
         _xPosSp = _xPosSp - 20;
         _yPosSp = _yPosSp + 47;
     }
     else 
     {
-        
         _xPosSp = _xPosSp - 6;
         _yPosSp = _yPosSp + 50;
     }
-    
-    
     _btnRotSp = _btnRotSp + 5;
-    
-    
     _showFilterMenuInStartUps = TRUE;
-    
     _addFilter++;
     if (_addFilter>=4) {
         _addFilter=4;
-        
     }
-    
-    
     [self performSelector:@selector(animateFilter4) withObject:nil afterDelay:0.05];
 }
 
 -(void)animateFilter4
 {
-   
-    
     UIImage* image = [UIImage imageNamed:@"filters.png"];
     UIButton *filterButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButton setBackgroundImage:image forState:UIControlStateNormal];
-    
-    
+
     NSString *imageName = [NSString stringWithFormat:@"%@",[_filterStartUpNames objectAtIndex:(_addFilter-1)]];
     [filterButton setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     
     filterButton.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-   
     [[filterButton titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -1026,25 +967,20 @@ int startUpsLoadCount = 10;
     
     
     _btnRotSp = _btnRotSp + 5;
-    
-    
     _showFilterMenuInStartUps = TRUE;
-    
     _addFilter++;
     if (_addFilter>=4) {
         _addFilter=4;
-        
         _yPosSp = 5;
         _xPosSp = 245;
         _btnRotSp = 5;
     }
-    
     [filterContainer setUserInteractionEnabled:YES];
 }
 
 
 
-
+//Get list of filters
 -(void)getFilteredList:(id)sender
 {
     [displayStartUpIdsArray removeAllObjects];
@@ -1056,7 +992,6 @@ int startUpsLoadCount = 10;
     [displayStartUpFollowerCountArray removeAllObjects];
     [displayStartUpLocationArray removeAllObjects];
     [displayStartUpMarketArray removeAllObjects];
-    [displayStartUpLogoImageDataArray removeAllObjects];
     [displayStartUpLogoImageInDirectory removeAllObjects];
     
     int _tagID = [sender tag];
@@ -1074,8 +1009,7 @@ int startUpsLoadCount = 10;
                  self.title = @"StartUps - Following";
                  self.navigationController.title = @"StartUps";
                 
-                 [self getDetailsOfFollowing];
-//                  
+                 [self getDetailsOfFollowing];   
                  break;
             
             //Implement Portfolio    
@@ -1091,13 +1025,11 @@ int startUpsLoadCount = 10;
             self.title = @"StartUps - Portfolio";
             self.navigationController.title = @"StartUps";
             [self getDetailsOfPortfolio];
-//              
             
             break;
             
             //Implement Trending 
         case 3 :  
-            
                 _filterFollow = FALSE; 
                 _filterPortfolio = FALSE;
                 filterContainer.selected = FALSE;
@@ -1116,7 +1048,7 @@ int startUpsLoadCount = 10;
             
             
             
-            break;
+                break;
             
             //Implement All    
         case 4 : _showFilterMenuInStartUps = FALSE;
@@ -1129,7 +1061,7 @@ int startUpsLoadCount = 10;
     }
 }
 
-
+//Get details of following startUps by user
 -(void) getDetailsOfFollowing
 {
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -1150,32 +1082,24 @@ int startUpsLoadCount = 10;
         
         [_dbmanager retrieveStartUpsFollowingDetails];
         
-
         [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
         
-
         [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
         
-
         [displayStartUpAngelUrlArray addObjectsFromArray:_dbmanager.startUpAngelUrlArrayFromDB];
         
-
         [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
         
-
         [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
         
-
         [displayStartUpHighConceptArray addObjectsFromArray:_dbmanager.startUpHighConceptArrayFromDB];
         
-
         [displayStartUpFollowerCountArray addObjectsFromArray:_dbmanager.startUpFollowerCountArrayFromDB];
         
-
         [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
-        
+
         [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
-        
+
         [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
         
         [table reloadData];
@@ -1183,7 +1107,9 @@ int startUpsLoadCount = 10;
     else
     {
         loadingView.hidden = NO;
+        filterContainer.enabled = NO;
         
+        //Send request to get startUps followed by user
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/users/%@/following?type=startup",_currUserId]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
@@ -1195,6 +1121,7 @@ int startUpsLoadCount = 10;
          {
              if ([data length] >0 && error == nil)
              {
+                 //Process json data
                  NSError* error;
                  NSDictionary* json = [NSJSONSerialization 
                                        JSONObjectWithData:data //1
@@ -1209,32 +1136,83 @@ int startUpsLoadCount = 10;
                  {
                      NSDictionary *following = [startUpFollowing objectAtIndex:k];
                      
-                     NSString* startUpFollowIds = [following valueForKey:@"id"];
-                     [displayStartUpIdsArray addObject:startUpFollowIds];
-                     if(![userFollowingIds containsObject:startUpFollowIds])
+                     NSString *startUpFollowHidden = [following valueForKey:@"hidden"];
+                     NSLog(@"VALUE = %d",[startUpFollowHidden intValue]);
+                     
+                     if([startUpFollowHidden intValue] == 0)
                      {
-                         [userFollowingIds addObject:startUpFollowIds];
-                     }
-                     
-                     NSString* startUpFollowNames = [following valueForKey:@"name"];
-                     [displayStartUpNameArray addObject:startUpFollowNames];
-                     
-                     NSString* startUpFollowAngelUrl = [following valueForKey:@"angellist_url"]; //2
-                     [displayStartUpAngelUrlArray addObject:startUpFollowAngelUrl];
-                     
-                     NSString* startUpFollowLogoUrl = [following valueForKey:@"thumb_url"]; //2
-
-                     [displayStartUpLogoUrlArray addObject:startUpFollowLogoUrl];
-                      
-                     NSString* startUpFollowProductDesc = [following valueForKey:@"product_desc"]; //2
-                     [displayStartUpProductDescArray addObject:startUpFollowProductDesc];
-                     
-                     NSString* startUpFollowHighConcept = [following valueForKey:@"high_concept"]; //2
-                     [displayStartUpHighConceptArray addObject:startUpFollowHighConcept];
-                     
-                     NSString* startUpFollowFollowerCount = [following valueForKey:@"follower_count"]; //2
-                     [displayStartUpFollowerCountArray addObject:startUpFollowFollowerCount];
-                     
+                         NSString* startUpFollowIds = [following valueForKey:@"id"];
+                         [displayStartUpIdsArray addObject:startUpFollowIds];
+                         if(![userFollowingIds containsObject:startUpFollowIds])
+                         {
+                             [userFollowingIds addObject:startUpFollowIds];
+                         }
+                         
+                         
+                         
+                         NSString* startUpFollowNames = [following valueForKey:@"name"];
+                         [displayStartUpNameArray addObject:startUpFollowNames];
+                         
+                         NSString* startUpFollowAngelUrl = [following valueForKey:@"angellist_url"]; //2
+                         [displayStartUpAngelUrlArray addObject:startUpFollowAngelUrl];
+                         
+                         NSString* startUpFollowLogoUrl = [following valueForKey:@"thumb_url"]; //2
+                         [displayStartUpLogoUrlArray addObject:startUpFollowLogoUrl];
+                         
+                         NSString* startUpFollowProductDesc = [following valueForKey:@"product_desc"]; //2
+                         if(startUpFollowProductDesc == (NSString *)[NSNull null])
+                         {
+                             [displayStartUpProductDescArray addObject:@"No Information"];
+                         }
+                         else
+                         {
+                             [displayStartUpProductDescArray addObject:startUpFollowProductDesc];
+                         }
+                         
+                         NSString* startUpFollowHighConcept = [following valueForKey:@"high_concept"]; //2
+                         if(startUpFollowHighConcept == (NSString *)[NSNull null])
+                         {
+                             [displayStartUpHighConceptArray addObject:@"No Information"];
+                         }
+                         else
+                         {
+                             [displayStartUpHighConceptArray addObject:startUpFollowHighConcept];
+                         }
+                         
+                         
+                         NSString* startUpFollowFollowerCount = [following valueForKey:@"follower_count"]; //2
+                         [displayStartUpFollowerCountArray addObject:startUpFollowFollowerCount];
+                         
+                         
+                         for(int k=0; k<[displayStartUpNameArray count]; k++)
+                         {
+                             NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:k]]];
+                             
+                             [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             
+                             [displayStartUpNameArray replaceObjectAtIndex:k withObject:theMutableString];
+                             [theMutableString release];
+                         }
+                         for(int k=0; k<[displayStartUpHighConceptArray count]; k++)
+                         {
+                             NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpHighConceptArray objectAtIndex:k]]];
+                             
+                             [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             
+                             [displayStartUpHighConceptArray replaceObjectAtIndex:k withObject:theMutableString];
+                             [theMutableString release];
+                         }
+                         
+                         for(int k=0; k<[displayStartUpProductDescArray count]; k++)
+                         {
+                             NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpProductDescArray objectAtIndex:k]]];
+                             
+                             [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                             
+                             [displayStartUpProductDescArray replaceObjectAtIndex:k withObject:theMutableString];
+                             [theMutableString release];
+                         }
+                     }//End If
                  }
                  
                  
@@ -1255,13 +1233,18 @@ int startUpsLoadCount = 10;
                                            error:&error];
                      
                      NSArray* startUpFollowingLocations = [[json valueForKey:@"locations"] valueForKey:@"display_name"]; //2
+                     
                      NSString* startUpFollowingMarkets = [[json valueForKey:@"markets"] valueForKey:@"display_name"]; //2
                      
+                     if([startUpFollowingLocations count] == 0)
+                     {
+                         [displayStartUpLocationArray addObject:@"No Information"];
+                     }
                      for(int j=0; j<[startUpFollowingLocations count]; j++)
                      {
                          if([startUpFollowingLocations objectAtIndex:j] == (NSString*)[NSNull null])
                          {
-                             [displayStartUpLocationArray addObject:@"NA"];
+                             [displayStartUpLocationArray addObject:@"No Information"];
                          }
                          else
                          {
@@ -1276,7 +1259,7 @@ int startUpsLoadCount = 10;
                              [theMutableString release];
                          } 
                      }
-                     
+                    
                      NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",startUpFollowingMarkets]];
                      [theMutableString replaceOccurrencesOfString:@"\"" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
                      [theMutableString replaceOccurrencesOfString:@"(" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
@@ -1295,7 +1278,15 @@ int startUpsLoadCount = 10;
                      }
                      [checkStr release];
                  }
-
+                 for(int k=0; k<[displayStartUpLocationArray count]; k++)
+                 {
+                     NSString *checkStr = [[NSString alloc] initWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
+                     if([checkStr rangeOfString:@"("].location != NSNotFound)
+                     {
+                         [displayStartUpLocationArray replaceObjectAtIndex:k withObject:@"No Information"];
+                     }
+                     [checkStr release];
+                 }
                  [self saveImagesOfStartUpsFollowing];
                  [table reloadData];
              }
@@ -1311,6 +1302,7 @@ int startUpsLoadCount = 10;
     }
 }
 
+//Save images of following startUps by user
 -(void) saveImagesOfStartUpsFollowing
 {
     for(int imageNumber=1; imageNumber<=[displayStartUpLogoUrlArray count]; imageNumber++)
@@ -1325,12 +1317,12 @@ int startUpsLoadCount = 10;
         
         [image release];
         
-
         [displayStartUpLogoImageInDirectory addObject:savedImagePath];
     }
     [self saveStartUpsFollowingDetailsToDB];
 }
 
+//Save details of following startUps by user to database
 -(void) saveStartUpsFollowingDetailsToDB
 {
     for(int k=0; k<[displayStartUpIdsArray count]; k++)
@@ -1347,12 +1339,13 @@ int startUpsLoadCount = 10;
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
         NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
         
+        //Insert records of startUps to Folowing table
         [_dbmanager insertRecordIntoStartUpsFollowingTable:@"Following" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
     }
 }
 
 
-
+//Get details of portfolio startUps by user
 -(void) getDetailsOfPortfolio
 {
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -1372,34 +1365,24 @@ int startUpsLoadCount = 10;
         [_dbmanager.startUpLogoImageInDirectoryFromDB removeAllObjects];
         
         [_dbmanager retrieveStartUpsPortfolioDetails];
-        
 
         [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
-        
 
         [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
-        
 
         [displayStartUpAngelUrlArray addObjectsFromArray:_dbmanager.startUpAngelUrlArrayFromDB];
-        
 
         [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
-        
 
         [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
-        
 
         [displayStartUpHighConceptArray addObjectsFromArray:_dbmanager.startUpHighConceptArrayFromDB];
-        
 
         [displayStartUpFollowerCountArray addObjectsFromArray:_dbmanager.startUpFollowerCountArrayFromDB];
-        
 
         [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
-        
 
         [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
-        
 
         [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
         
@@ -1408,9 +1391,9 @@ int startUpsLoadCount = 10;
     else
     {
         loadingView.hidden = NO;
-
-        
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",_currUserId]];//
+        filterContainer.enabled = NO;
+        //Send request to get details of portfolio
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",_currUserId]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
         
@@ -1421,6 +1404,7 @@ int startUpsLoadCount = 10;
          {
              if ([data length] >0 && error == nil)
              {
+                 //Process json data
                  NSError* error;
                  NSDictionary* json = [NSJSONSerialization 
                                        JSONObjectWithData:data //1
@@ -1433,33 +1417,63 @@ int startUpsLoadCount = 10;
                  {
                      NSDictionary *portfolio = [startUpPortfolio objectAtIndex:k];
                      
-                     NSString *startUpPortfolioId = [portfolio valueForKey:@"id"];
-                     [displayStartUpIdsArray addObject:startUpPortfolioId];
+                     NSString *startUpPortfolioHidden = [portfolio valueForKey:@"hidden"];
                      
-                     NSString *startUpPortfolioName = [portfolio valueForKey:@"name"];
-                     [displayStartUpNameArray addObject:startUpPortfolioName];
-                     
-                     NSString *startUpPortfolioAngelUrl = [portfolio valueForKey:@"angellist_url"];
-                     [displayStartUpAngelUrlArray addObject:startUpPortfolioAngelUrl];
-                     
-                     NSString *startUpPortfolioLogoUrl = [portfolio valueForKey:@"thumb_url"];
-
-                     [displayStartUpLogoUrlArray addObject:startUpPortfolioLogoUrl];
-                     
-                     NSString *startUpProdDesc = [portfolio valueForKey:@"product_desc"];
-                     [displayStartUpProductDescArray addObject:startUpProdDesc];
-                     
-                     NSString *startUpPortfolioHighConcept = [portfolio valueForKey:@"high_concept"];
-                     [displayStartUpHighConceptArray addObject:startUpPortfolioHighConcept];
-                     
-                     NSString *startUpPortfolioFollowerCount = [portfolio valueForKey:@"follower_count"];
-                     [displayStartUpFollowerCountArray addObject:startUpPortfolioFollowerCount];
-                     
-                     [displayStartUpLocationArray addObject:@""];
-                     [displayStartUpMarketArray addObject:@""];
-                     
+                     if ([startUpPortfolioHidden intValue] == 0) 
+                     {
+                         NSString *startUpPortfolioId = [portfolio valueForKey:@"id"];
+                         [displayStartUpIdsArray addObject:startUpPortfolioId];
+                         
+                         NSString *startUpPortfolioName = [portfolio valueForKey:@"name"];
+                         [displayStartUpNameArray addObject:startUpPortfolioName];
+                         
+                         NSString *startUpPortfolioAngelUrl = [portfolio valueForKey:@"angellist_url"];
+                         [displayStartUpAngelUrlArray addObject:startUpPortfolioAngelUrl];
+                         
+                         NSString *startUpPortfolioLogoUrl = [portfolio valueForKey:@"thumb_url"];
+                         [displayStartUpLogoUrlArray addObject:startUpPortfolioLogoUrl];
+                         
+                         NSString *startUpProdDesc = [portfolio valueForKey:@"product_desc"];
+                         [displayStartUpProductDescArray addObject:startUpProdDesc];
+                         
+                         NSString *startUpPortfolioHighConcept = [portfolio valueForKey:@"high_concept"];
+                         [displayStartUpHighConceptArray addObject:startUpPortfolioHighConcept];
+                         
+                         NSString *startUpPortfolioFollowerCount = [portfolio valueForKey:@"follower_count"];
+                         [displayStartUpFollowerCountArray addObject:startUpPortfolioFollowerCount];
+                         
+                         [displayStartUpLocationArray addObject:@""];
+                         [displayStartUpMarketArray addObject:@""];
+                     } 
                  }
-
+                 
+                 for(int k=0; k<[displayStartUpNameArray count]; k++)
+                 {
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:k]]];
+                     
+                     [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     
+                     [displayStartUpNameArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [theMutableString release];
+                 }
+                 for(int k=0; k<[displayStartUpHighConceptArray count]; k++)
+                 {
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpHighConceptArray objectAtIndex:k]]];
+                     
+                     [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     
+                     [displayStartUpHighConceptArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [theMutableString release];
+                 }
+                 for(int k=0; k<[displayStartUpProductDescArray count]; k++)
+                 {
+                     NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpProductDescArray objectAtIndex:k]]];
+                     
+                     [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                     
+                     [displayStartUpProductDescArray replaceObjectAtIndex:k withObject:theMutableString];
+                     [theMutableString release];
+                 }
                  [self saveImagesOfStartUpsPortfolio];
                  [table reloadData];
              }
@@ -1475,6 +1489,7 @@ int startUpsLoadCount = 10;
     }
 }
 
+//Save images of portfolio startUps
 -(void) saveImagesOfStartUpsPortfolio
 {
     for(int imageNumber=1; imageNumber<=[displayStartUpLogoUrlArray count]; imageNumber++)
@@ -1495,6 +1510,7 @@ int startUpsLoadCount = 10;
     [self saveStartUpsPortfolioDetailsToDB];
 }
 
+//Save details of portfolio startUps to database
 -(void) saveStartUpsPortfolioDetailsToDB
 {
     for(int k=0; k<[displayStartUpIdsArray count]; k++)
@@ -1511,10 +1527,12 @@ int startUpsLoadCount = 10;
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
         NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
         
+        //Insert records
         [_dbmanager insertRecordIntoStartUpsPortfolioTable:@"Portfolio" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
     }
 }
 
+//Get details of All StartUps
 -(void) getDetailsOfAll
 {
     [displayStartUpIdsArray addObjectsFromArray:startUpIdsArray];
@@ -1540,6 +1558,7 @@ int startUpsLoadCount = 10;
 
 -(void) dealloc
 {
+    //Release all arrays allocated
     [startUpIdsArray release];
     [startUpNameArray release];
     [startUpAngelUrlArray release];
@@ -1562,7 +1581,6 @@ int startUpsLoadCount = 10;
     
     [startUpLogoImageInDirectory release];
     [displayStartUpLogoImageInDirectory release];
-    [displayStartUpLogoImageDataArray release];
     
     [super dealloc];
 }

@@ -20,7 +20,10 @@
 
 @property(nonatomic, retain)UIView *filterView;
 
+// to save images to the documents directory
 -(void) saveImagesOfFeeds;
+
+// to save the details of all feeds to the database
 -(void) saveFeedsDataToDB;
 
 @end

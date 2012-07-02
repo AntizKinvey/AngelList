@@ -9,13 +9,13 @@
 #import <QuartzCore/QuartzCore.h>
 #import "ActivityViewController.h"
 #import "ActivityDetailsViewController.h"
-#import "AsyncImageView.h"
 #import "Reachability.h"
 
 @implementation ActivityViewController
 
 @synthesize filterView;
 
+// arrays to fetch the request
 NSMutableArray *feedDescArray;
 NSMutableArray *feedDescDisplayArray;
 NSMutableArray *feedImageArray;
@@ -29,6 +29,7 @@ NSMutableArray *actorNameArray;
 NSMutableArray *actorUrlArray;
 NSMutableArray *actorTaglineArray;
 
+// arrays to display the feeds
 NSMutableArray *completeActorTypeArray;
 NSMutableArray *completeActorIdArray;
 NSMutableArray *completeActorNameArray;
@@ -38,6 +39,7 @@ NSMutableArray *completeActorTaglineArray;
 NSMutableArray *completeFeedDescDisplayArray;
 NSMutableArray *completeFeedImageArray;
 
+// arrays for filter details
 NSMutableArray *filterDescArray;
 NSMutableArray *filterImageArray;
 
@@ -49,10 +51,12 @@ NSMutableArray *filterNameArray;
 NSMutableArray *filterUrlArray;
 NSMutableArray *filterTaglineArray;
 
+// array of filter names
 NSArray *_filterNames;
 int _rowNumberInActivity = 0;
 BOOL _showFilterMenu = FALSE;
 
+// array of ids of the people/startup user is following
 NSMutableArray *userFollowingIds;
 
 extern BOOL _transitFromActivity;
@@ -64,12 +68,13 @@ int countDownForView = 0;
 float alphaValue = 1.0;
 NSTimer *timer;
 UIView *notReachable;
-UIButton *filterContainer;
+UIButton *filtersContainer;
 
 int _yPos = 5;
 int _xPos = 245;
 int _btnRot = 5;
 
+// for filters selected
 BOOL _filterFollowed = FALSE;
 BOOL _filterInvested = FALSE;
 BOOL _filterUpdated = FALSE;
@@ -101,7 +106,7 @@ BOOL _filterIntroduced = FALSE;
     }
     
     loadingView.hidden = YES;
-
+    filtersContainer.enabled = YES;
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
@@ -113,8 +118,10 @@ BOOL _filterIntroduced = FALSE;
     //---set the text to display for the cell---
     NSString *cellValue = [feedDescDisplayArray objectAtIndex:indexPath.row]; 
     
+    // detect for an iphone view 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
+        // label to display the feed
         UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 75)] autorelease];
         cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellTextLabel.numberOfLines = 50;
@@ -123,6 +130,7 @@ BOOL _filterIntroduced = FALSE;
         cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
         [cell.contentView addSubview:cellTextLabel];
         
+        // image view to display images
         UIImage *image = [UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:indexPath.row]];
         UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
         cellImageView.image = image;
@@ -131,10 +139,11 @@ BOOL _filterIntroduced = FALSE;
         [cell.contentView addSubview:cellImageView];
         [cellImageView release];
         
+        // label to confor to the cell height
         NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
-       
         CGSize constrainedSize = CGSizeMake(310, 20000);
         CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+        
         if (!cellTextLabel)
             cellTextLabel = (UILabel*)[cell viewWithTag:1];
         [cellTextLabel setText:strContent1];
@@ -160,6 +169,7 @@ BOOL _filterIntroduced = FALSE;
     return cell; 
 }
 
+// --dynamic cell height according to the text--
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
@@ -200,7 +210,7 @@ BOOL _filterIntroduced = FALSE;
 }
 
 
-
+// --navigate to activity details--
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     _rowNumberInActivity = indexPath.row;
@@ -236,6 +246,7 @@ BOOL _filterIntroduced = FALSE;
     // Release any cached data, images, etc that aren't in use.
 }
 
+// get people followed by the user
 -(void) getUserFollowingDetails
 {
     //Check for the availability of Internet
@@ -244,8 +255,7 @@ BOOL _filterIntroduced = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-//        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-//        [myAlert show];
+
     }
     else
     {
@@ -265,6 +275,7 @@ BOOL _filterIntroduced = FALSE;
     }
 }
 
+// get startups followed by the user
 -(void) getStartUpFollowingDetails
 {
     //Check for the availability of Internet
@@ -273,7 +284,7 @@ BOOL _filterIntroduced = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"No Internet Connection");
+        
     }
     else
     {
@@ -294,7 +305,6 @@ BOOL _filterIntroduced = FALSE;
 }
 
 #pragma mark - View lifecycle
-
 - (void)viewDidLoad
 {
     
@@ -304,6 +314,7 @@ BOOL _filterIntroduced = FALSE;
     notReachable.backgroundColor = [UIColor blackColor];
     [self.view addSubview:notReachable];
     
+    // label to display message when offline
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(7, 53, 106, 46)];
     msgLabel.text = @"No Internet Connection";
     msgLabel.textAlignment = UITextAlignmentCenter;
@@ -345,16 +356,14 @@ BOOL _filterIntroduced = FALSE;
     //Add image to navigation bar button
     UIImage* image = [UIImage imageNamed:@"filteri.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    filterContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
-    [filterContainer setBackgroundImage:image forState:UIControlStateNormal];
-    [filterContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
-    [filterContainer addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
+    filtersContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
+    [filtersContainer setBackgroundImage:image forState:UIControlStateNormal];
+    [filtersContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
+    [filtersContainer addTarget:self action:@selector(filterButtonSelected:) forControlEvents:UIControlStateHighlighted];
     
-    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
+    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filtersContainer];
     self.navigationItem.rightBarButtonItem = filterButtonItem;
     [filterButtonItem release];
- 
-    
     
     feedDescArray = [[NSMutableArray alloc] init];
     feedDescDisplayArray = [[NSMutableArray alloc] init];
@@ -378,7 +387,6 @@ BOOL _filterIntroduced = FALSE;
     actorUrlArray = [[NSMutableArray alloc] init];
     actorTaglineArray = [[NSMutableArray alloc] init];
     
-    
     filterDescArray = [[NSMutableArray alloc] init];
     filterImageArray = [[NSMutableArray alloc] init];
     
@@ -390,8 +398,7 @@ BOOL _filterIntroduced = FALSE;
     
     filterFeedImagesArrayFromDirectory = [[NSMutableArray alloc] init];
     
-    userFollowingIds = [[NSMutableArray alloc] init];
-   
+    userFollowingIds = [[NSMutableArray alloc] init];    
     _dbmanager.feedImagesArrayFromDirectoryFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.actorTypeArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.actorIdArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
@@ -399,8 +406,7 @@ BOOL _filterIntroduced = FALSE;
     _dbmanager.actorUrlArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.actorTaglineArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.feedDescDisplayArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
-    _dbmanager.feedImageArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
-   
+    _dbmanager.feedImageArrayFromDB = [[[NSMutableArray alloc] init] autorelease];    
     [self performSelectorInBackground:@selector(getUserFollowingDetails) withObject:nil];
     [self performSelectorInBackground:@selector(getStartUpFollowingDetails) withObject:nil];
     
@@ -410,7 +416,6 @@ BOOL _filterIntroduced = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        
         loadingView.hidden = YES;
         [_dbmanager retrieveActivityDetails];
         
@@ -442,7 +447,7 @@ BOOL _filterIntroduced = FALSE;
     }
     else
     {
-
+        filtersContainer.enabled = NO;
         //Get feeds
         NSURL *url = [NSURL URLWithString:@"https://api.angel.co/1/feed"];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -627,7 +632,7 @@ BOOL _filterIntroduced = FALSE;
 
 }
 
-
+// save images to the documents directory
 -(void) saveImagesOfFeeds
 {
     for(int imageNumber=1; imageNumber<=[completeFeedImageArray count]; imageNumber++)
@@ -648,6 +653,7 @@ BOOL _filterIntroduced = FALSE;
     [self saveFeedsDataToDB];
 }
 
+// save data of all feeds to the database
 -(void) saveFeedsDataToDB
 {
     for(int k=0; k<[completeFeedDescDisplayArray count]; k++)
@@ -667,11 +673,10 @@ BOOL _filterIntroduced = FALSE;
     }
 }
 
-
-
+// methods to animate filter options
 -(void)animateFilter1
 {
-    [filterContainer setUserInteractionEnabled:NO];
+    [filtersContainer setUserInteractionEnabled:NO];
     
     UIImage* image = [UIImage imageNamed:@"filters.png"];
     UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -721,33 +726,27 @@ BOOL _filterIntroduced = FALSE;
         _yPos = _yPos + 50;
     }
     
-    
     _btnRot = _btnRot + 5;
-  
-    
     _showFilterMenu = TRUE;
     
     i++;
     if (i>=5) {
         i=5;
     }
-     
 
     [self performSelector:@selector(animateFilter2) withObject:nil afterDelay:0.05];
 }
 
 -(void)animateFilter2
 {
-   
     
     UIImage* image = [UIImage imageNamed:@"filters.png"];
     UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
     
-      NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
     [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
-    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-    
+    filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;  
     [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -790,16 +789,14 @@ BOOL _filterIntroduced = FALSE;
     
     
     _btnRot = _btnRot + 5;
-    
+   
     
     _showFilterMenu = TRUE;
     
     i++;
     if (i>=5) {
         i=5;
-    }
-   
-    
+    }    
     [self performSelector:@selector(animateFilter3) withObject:nil afterDelay:0.05];
 }
 
@@ -810,11 +807,9 @@ BOOL _filterIntroduced = FALSE;
     UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
     
-   
-    NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
+      NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
     [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-    //              filterButton.titleLabel.textAlignment = UITextAlignmentCenter;
     [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -866,8 +861,8 @@ BOOL _filterIntroduced = FALSE;
     if (i>=5) {
         i=5;
     }
-   
     
+   
     [self performSelector:@selector(animateFilter4) withObject:nil afterDelay:0.05];
 }
 
@@ -879,12 +874,12 @@ BOOL _filterIntroduced = FALSE;
     UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
     
-  
+   
     NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
     [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     
     filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-   
+    
     [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -925,32 +920,28 @@ BOOL _filterIntroduced = FALSE;
         _yPos = _yPos + 50;
     }
     
-    
     _btnRot = _btnRot + 5;
-    
     _showFilterMenu = TRUE;
     
     i++;
     if (i>=5) {
         i=5;
     }
-    
-   
+  
     [self performSelector:@selector(animateFilter5) withObject:nil afterDelay:0.05];
 }
 
 
 -(void)animateFilter5
 {
-    
     UIImage* image = [UIImage imageNamed:@"filters.png"];
     UIButton *filterButtons = [UIButton buttonWithType:UIButtonTypeCustom];
     [filterButtons setBackgroundImage:image forState:UIControlStateNormal];
-        
+    
+    
     NSString *imageName = [NSString stringWithFormat:@"%@",[_filterNames objectAtIndex:(i-1)]];
     [filterButtons setBackgroundImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
     filterButtons.titleLabel.lineBreakMode = UILineBreakModeWordWrap;
-
     [[filterButtons titleLabel] setTextAlignment:UITextAlignmentLeft];
     
     [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -993,7 +984,8 @@ BOOL _filterIntroduced = FALSE;
     
     
     _btnRot = _btnRot + 5;
-      
+   
+    
     _showFilterMenu = TRUE;
     
     i++;
@@ -1004,10 +996,8 @@ BOOL _filterIntroduced = FALSE;
         _xPos = 245;
         _btnRot = 5;
     }
-    
-    
-    
-    [filterContainer setUserInteractionEnabled:YES];
+  
+    [filtersContainer setUserInteractionEnabled:YES];
 }
 
 
@@ -1020,7 +1010,7 @@ BOOL _filterIntroduced = FALSE;
     
     if(_showFilterMenu == FALSE)
     {
-        [filterContainer setSelected:TRUE];
+        [filtersContainer setSelected:TRUE];
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
             filterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
@@ -1075,10 +1065,9 @@ BOOL _filterIntroduced = FALSE;
     }
     else
     {
-        [filterContainer setSelected:FALSE];
+        [filtersContainer setSelected:FALSE];
         [[self.view viewWithTag:1000] removeFromSuperview];
         [[self.view viewWithTag:i] removeFromSuperview];
-
         i--;
         [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.07];
         _showFilterMenu = FALSE;
@@ -1086,9 +1075,10 @@ BOOL _filterIntroduced = FALSE;
   
 }
 
+// methods to back animate the filter options
 -(void)backAnimateFilter1
 {
-    [filterContainer setUserInteractionEnabled:NO];
+    [filtersContainer setUserInteractionEnabled:NO];
     
     [[self.view viewWithTag:i] removeFromSuperview];
     i--;
@@ -1120,9 +1110,11 @@ BOOL _filterIntroduced = FALSE;
         i=1;
     }
     
-    [filterContainer setUserInteractionEnabled:YES];
+    [filtersContainer setUserInteractionEnabled:YES];
 }
 
+
+// get the selected filter option details
 -(void)getFilteredList:(id)sender
 {
     [filterDescArray removeAllObjects];
@@ -1209,7 +1201,7 @@ BOOL _filterIntroduced = FALSE;
                  [actorTaglineArray addObjectsFromArray:filterTaglineArray];
             
                  _showFilterMenu = FALSE;
-            [filterContainer setSelected:FALSE];
+            [filtersContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
             [[self.view viewWithTag:i] removeFromSuperview];
             i--;
@@ -1263,7 +1255,7 @@ BOOL _filterIntroduced = FALSE;
             
                  [table reloadData];
                  _showFilterMenu = FALSE;
-            [filterContainer setSelected:FALSE];
+            [filtersContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
             [[self.view viewWithTag:i] removeFromSuperview];
             i--;
@@ -1316,14 +1308,14 @@ BOOL _filterIntroduced = FALSE;
             
                  [table reloadData]; 
                  _showFilterMenu = FALSE;
-            [filterContainer setSelected:FALSE];
+            [filtersContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
             [[self.view viewWithTag:i] removeFromSuperview];
             i--;
             [self performSelector:@selector(backAnimateFilter1) withObject:nil afterDelay:0.05];
                  break;
             
-            //Implement Took Intro    
+            //Implement Introduced    
         case 4 : _filterIntroduced = TRUE;
                  for(int k=0; k<[feedDescDisplayArray count];k++)
                  {
@@ -1369,7 +1361,7 @@ BOOL _filterIntroduced = FALSE;
             
                  [table reloadData];
                  _showFilterMenu = FALSE;
-            [filterContainer setSelected:FALSE];
+            [filtersContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
             [[self.view viewWithTag:i] removeFromSuperview];
             i--;
@@ -1386,7 +1378,7 @@ BOOL _filterIntroduced = FALSE;
                  self.tabBarItem.title = @"Activity";
             
                  _showFilterMenu = FALSE;
-            [filterContainer setSelected:FALSE];
+            [filtersContainer setSelected:FALSE];
                  [[self.view viewWithTag:1000] removeFromSuperview];
             [[self.view viewWithTag:i] removeFromSuperview];
             i--;
@@ -1438,6 +1430,7 @@ BOOL _filterIntroduced = FALSE;
     [super dealloc];
 }
 
+// To support orientations
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations

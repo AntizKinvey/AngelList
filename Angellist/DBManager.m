@@ -69,6 +69,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+// create table for feeds
 -(void) createTableActivity:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9
 {
     char *err;
@@ -81,6 +82,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+// create table for startups
 -(void) createTableStartUps:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11
 {
     char *err;
@@ -93,6 +95,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+// create table for following startups
 -(void) createTableStartUpsFollowing:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11
 {
     char *err;
@@ -105,6 +108,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+// Create table startups in portfolio
 -(void) createTableStartUpsPortfolio:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11
 {
     char *err;
@@ -132,7 +136,6 @@ NSString *access_tokenFromDB;
 
 
 //Insert Values to User Table
-
 -(void) insertRecordIntoInbox: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value
 {
     
@@ -147,7 +150,7 @@ NSString *access_tokenFromDB;
 }
 
 
-
+// Insert record into user table 
 -(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value
 {
     NSString *sql = [NSString stringWithFormat:
@@ -160,7 +163,7 @@ NSString *access_tokenFromDB;
     } 
 }
 
-
+// Update record into inbox table
 -(void) updateRecordIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value
 {
     
@@ -174,7 +177,7 @@ NSString *access_tokenFromDB;
     } 
 }
 
-
+// Update status into Inbox table
 -(void) updateStatusIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value 
 {
     NSString *sql = [NSString stringWithFormat:
@@ -187,7 +190,7 @@ NSString *access_tokenFromDB;
     } 
 }
 
-
+// Insert record into activity table 
 -(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value
 {
     char *err;
@@ -200,7 +203,7 @@ NSString *access_tokenFromDB;
     }
 }
 
-
+// Insert into startup table
 -(void) insertRecordIntoStartUpsTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value
 {
     char *err;
@@ -213,6 +216,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+//Insert number of rows in StartUp Following table
 -(void) insertRecordIntoStartUpsFollowingTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value
 {
     char *err;
@@ -225,6 +229,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+//Insert number of rows in StartUp Portfolio table
 -(void) insertRecordIntoStartUpsPortfolioTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value
 {
     char *err;
@@ -263,6 +268,7 @@ NSString *access_tokenFromDB;
     return _noOfRowsInUserTable;
 }
 
+//Retrieve inbox details
 -(void) retrieveInboxDetails
 {
     [inboxThreadIdFromDB removeAllObjects];
@@ -305,6 +311,7 @@ NSString *access_tokenFromDB;
 }
 
 
+// retrieve User details
 -(void) retrieveUserDetails
 {
     NSString *sql = @"SELECT username,angelUserId,access_token FROM User";
@@ -341,6 +348,7 @@ NSString *access_tokenFromDB;
     }
 }
 
+// retrieve activity details
 -(void) retrieveActivityDetails
 {
     NSString *sql = @"SELECT feedDescription,feedImageUrl,actorType,actorId,actorName,actorUrl,actorTagline,feedImagePath FROM Activity";
@@ -349,7 +357,7 @@ NSString *access_tokenFromDB;
     
     if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
     {
-       
+        NSLog(@"INSIDE ACTIVITY NOT REACHABLE");
         while(sqlite3_step(statement) == SQLITE_ROW)
         {
             char *field1 = (char *) sqlite3_column_text(statement,0);
@@ -414,6 +422,7 @@ NSString *access_tokenFromDB;
 }
 
 
+// retrieve startp details 
 -(void) retrieveStartUpsDetails
 {
     NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM StartUps";
@@ -500,6 +509,7 @@ NSString *access_tokenFromDB;
 }
 
 
+// retrieve startups following details
 -(void) retrieveStartUpsFollowingDetails
 {
     NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM Following";
@@ -585,7 +595,7 @@ NSString *access_tokenFromDB;
     }
 }
 
-
+// retrieve startup portfolio details
 -(void) retrieveStartUpsPortfolioDetails
 {
     NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM Portfolio";

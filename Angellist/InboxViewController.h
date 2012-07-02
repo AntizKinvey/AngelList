@@ -23,9 +23,16 @@
 @property(nonatomic, retain)IBOutlet UITableView *tableview;
 @property(nonatomic, retain)IBOutlet UIView *loading;
 
+// To display time on screen 
 -(void)getTime;
+
+// To load images concurrently 
 -(void)startLoadingImagesConcurrently;
+
+// send request to fetch the data 
 -(void)sendRequestToFetch;
+
+// To display viewed status
 -(void)readUnread:(int)msgCount;
 
 @end

@@ -23,10 +23,11 @@
 
 @property (strong, nonatomic) ViewController *viewController;
 
+//Container that holds all views
 @property (strong, nonatomic) ContainerViewController *containerViewController;
-
+//Collection on Kinvey that contains Login details of user
 @property (nonatomic, retain) KCSCollection *loginCollection;
-
+//Collection on Kinvey that contains Logout details of user
 @property (nonatomic, retain) KCSCollection *logoutCollection;
 
 @end

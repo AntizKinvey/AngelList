@@ -20,11 +20,13 @@
 
 @property(nonatomic,retain) UIView *filterView;
 
+//Method to get details of user following
 -(void) getDetailsOfFollowing;
+//Method to get details of user portfolio
 -(void) getDetailsOfPortfolio;
 -(void) getDetailsOfAll;
 
-//-(void) startLoadingImagesConcurrently;
+//Save images and startUp details to database
 -(void) saveImagesOfStartUps;
 -(void) saveStartUpsDetailsToDB;
 
@@ -34,6 +36,7 @@
 -(void) saveImagesOfStartUpsPortfolio;
 -(void) saveStartUpsPortfolioDetailsToDB;
 
+//Load more startUps
 -(IBAction)moreButtonAction:(id)sender;
 
 @end

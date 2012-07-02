@@ -13,29 +13,32 @@
 {
     sqlite3 *db;
     
-    NSMutableArray *feedImagesArrayFromDirectoryFromDB;
-    NSMutableArray *actorTypeArrayFromDB;
-    NSMutableArray *actorIdArrayFromDB;
-    NSMutableArray *actorNameArrayFromDB;
-    NSMutableArray *actorUrlArrayFromDB;
-    NSMutableArray *actorTaglineArrayFromDB;
-    NSMutableArray *feedDescDisplayArrayFromDB;
-    NSMutableArray *feedImageArrayFromDB;
+    // for feeds
+    NSMutableArray *feedImagesArrayFromDirectoryFromDB; // feed images
+    NSMutableArray *actorTypeArrayFromDB; // type of actor either startup or user
+    NSMutableArray *actorIdArrayFromDB; // actor id
+    NSMutableArray *actorNameArrayFromDB;  // actor name
+    NSMutableArray *actorUrlArrayFromDB; // actor URL array
+    NSMutableArray *actorTaglineArrayFromDB; // actor tagline
+    NSMutableArray *feedDescDisplayArrayFromDB; // feed description display array
+    NSMutableArray *feedImageArrayFromDB; // feed image array from Database
     
-    NSMutableArray *startUpIdsArrayFromDB;
-    NSMutableArray *startUpNameArrayFromDB;
-    NSMutableArray *startUpAngelUrlArrayFromDB;
-    NSMutableArray *startUpLogoUrlArrayFromDB;
-    NSMutableArray *startUpProductDescArrayFromDB;
-    NSMutableArray *startUpHighConceptArrayFromDB;
-    NSMutableArray *startUpFollowerCountArrayFromDB;
-    NSMutableArray *startUpLocationArrayFromDB;
-    NSMutableArray *startUpMarketArrayFromDB;
-    NSMutableArray *startUpLogoImageInDirectoryFromDB;
+    // for startups
+    NSMutableArray *startUpIdsArrayFromDB; // startup ids from database
+    NSMutableArray *startUpNameArrayFromDB; // startup names from database
+    NSMutableArray *startUpAngelUrlArrayFromDB; // angel URL from database
+    NSMutableArray *startUpLogoUrlArrayFromDB; // startup logo URL from database
+    NSMutableArray *startUpProductDescArrayFromDB; // startup product decription array from database
+    NSMutableArray *startUpHighConceptArrayFromDB; // startup high concept array from database
+    NSMutableArray *startUpFollowerCountArrayFromDB; // startup follower count array from database
+    NSMutableArray *startUpLocationArrayFromDB; // startup location array from database
+    NSMutableArray *startUpMarketArrayFromDB; // startup market array from database
+    NSMutableArray *startUpLogoImageInDirectoryFromDB; // startup logo image from database
     
-    NSMutableArray *inboxTotalFromDB;
-    NSMutableArray *inboxThreadIdFromDB;
-    NSMutableArray *inboxViewedFromDB;
+    // for inbox
+    NSMutableArray *inboxTotalFromDB; // total count of messages in inbox
+    NSMutableArray *inboxThreadIdFromDB; // thread ids from database
+    NSMutableArray *inboxViewedFromDB; // status of a inbox messages
     
 }
 
@@ -94,18 +97,22 @@
 //Insert Values to Activity Table
 -(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value;
 
-
+// Insert into startup table
 -(void) insertRecordIntoStartUpsTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
 
+// Insert into startup following table
 -(void) insertRecordIntoStartUpsFollowingTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
 
+// Insert into startup portfolio table
 -(void) insertRecordIntoStartUpsPortfolioTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
 
+// Insert into inbox table
 -(void) insertRecordIntoInbox: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value;
 
-
+// Update into inbox table
 -(void) updateRecordIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value;
 
+// update status inbox table
 -(void) updateStatusIntoInboxTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value;
 
 //Retrieve number of rows in User table
@@ -120,10 +127,13 @@
 //Retrieve StartUps details
 -(void) retrieveStartUpsDetails;
 
+//retrieve startups Following details
 -(void) retrieveStartUpsFollowingDetails;
 
+//Retrieve startups portfolio details
 -(void) retrieveStartUpsPortfolioDetails;
 
+//Retrieve inbox details
 -(void) retrieveInboxDetails;
 
 //Close database

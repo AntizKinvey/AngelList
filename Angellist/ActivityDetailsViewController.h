@@ -12,8 +12,13 @@
 @interface ActivityDetailsViewController : UIViewController <KCSPersistableDelegate>
 {
     IBOutlet UITableView *table;
+    // follow button
     UIButton *followButton;
+    
+    // unfollow button
     UIButton *unfollowButton;
+    
+    // more button
     UIButton *moreButton;
 }
 

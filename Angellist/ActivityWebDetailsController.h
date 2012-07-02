@@ -10,6 +10,7 @@
 
 @interface ActivityWebDetailsController : UIViewController <UIWebViewDelegate>
 {
+    // webview
     IBOutlet UIWebView *webView;
     IBOutlet UIView *loading;
 }

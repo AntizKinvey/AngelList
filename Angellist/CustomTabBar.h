@@ -2,7 +2,7 @@
 //  CustomTabBar.h
 //  CustomTabBarProj
 //
-//  Created by Ram Charan on 6/6/12.
+//  Created by Deepak on 6/6/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -10,16 +10,18 @@
 
 @interface CustomTabBar : UITabBarController
 {
-//    UIButton *btn1;
     UIButton *btn2;
     UIButton *btn3;
     UIButton *btn4;
 }
 
+//Hide existing elements of default tab bar
 -(void) hideExistingTabBar;
 
+//Add custom elements required to tab bar
 -(void) addCustomElements;
 
+//Check the selected tab in tab bar
 -(void) selectTab:(int)tabID;
 
 @end

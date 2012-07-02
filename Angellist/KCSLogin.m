@@ -50,10 +50,10 @@
     if (mapping == nil){
         // Assign the mapping
         mapping = [[NSDictionary dictionaryWithObjectsAndKeys:
-                   @"_id", @"objectId",
-                   @"KinveyUserId", @"userId",
-                   @"logintime", @"logintime",
-                   @"sessionId", @"sessionId",
+                   @"_id", @"objectId",//Id of object which is created default in Kinvey or can be manually specified
+                   @"KinveyUserId", @"userId",//Id of user of current device
+                   @"logintime", @"logintime",//Time of login that user logged into app
+                   @"sessionId", @"sessionId",//Session Id to determine at what time the user logs in
                    nil] retain];
     }
     

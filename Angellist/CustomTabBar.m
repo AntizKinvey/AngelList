@@ -14,12 +14,16 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    //Call to hide existing elements of tab bar
     [self hideExistingTabBar];
+    //Call to add custom elements to tab bar
     [self addCustomElements];
 }
 
+//Hide existing elements of default tab bar
 - (void)hideExistingTabBar
 {
+    //Hide all subviews in tab bar view
     for(UIView *view in self.view.subviews)
     {
         if([view isKindOfClass:[UITabBar class]])
@@ -30,24 +34,23 @@
     }
 }
 
+//Add custom elements required to tab bar
 -(void)addCustomElements
 {
     // Initialise our two images
-
     UIImage *btnImage;
     UIImage *btnImageSelected;
-    
-    
-    // Now we repeat the process for the other buttons
+
     btnImage = [UIImage imageNamed:@"peoplei.png"];
     btnImageSelected = [UIImage imageNamed:@"peoplea.png"];
-    btn2 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn2.frame = CGRectMake(0, 410, 107, 50);
-    [btn2 setBackgroundImage:btnImage forState:UIControlStateNormal];
-    [btn2 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
-    [btn2 setSelected:TRUE];
-    [btn2 setTag:0];
+    btn2 = [UIButton buttonWithType:UIButtonTypeCustom];//Setup the button
+    btn2.frame = CGRectMake(0, 410, 107, 50);// Set the frame (size and position) of the button)
+    [btn2 setBackgroundImage:btnImage forState:UIControlStateNormal];// Set the image for the normal state of the button
+    [btn2 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];// Set the image for the selected state of the button
+    [btn2 setSelected:TRUE];// Set this button as selected (we will select the others to false as we only want Tab 1 to be selected initially
+    [btn2 setTag:0];// Assign the button a "tag" so when our "click" event is called we know which button was pressed.
     
+    // Now we repeat the process for the other buttons
     btnImage = [UIImage imageNamed:@"startupi.png"];
     btnImageSelected = [UIImage imageNamed:@"startupa.png"];
     btn3 = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -63,16 +66,19 @@
     [btn4 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn4 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn4 setTag:2];
-
+    
+    // Add my new buttons to the view
     [self.view addSubview:btn2];
     [self.view addSubview:btn3];
     [self.view addSubview:btn4];
     
+    // Setup event handlers so that the buttonClicked method will respond to the touch up inside event.
     [btn2 addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
     [btn3 addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
     [btn4 addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
 }
 
+//Check the selected tab in tab bar
 - (void)selectTab:(int)tabID
 {
     switch(tabID)
@@ -94,8 +100,10 @@
             break;
     } 
     
+    //Check if selected tab is selected again
     if (self.selectedIndex == tabID) 
     {
+        //Navigate to root view controller
         UINavigationController *navController = (UINavigationController *)[self selectedViewController];
         [navController popToRootViewControllerAnimated:YES];
     } 

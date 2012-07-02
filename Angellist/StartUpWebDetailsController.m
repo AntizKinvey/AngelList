@@ -37,6 +37,7 @@ extern int _rowNumberInStartUps;
 
 - (void)viewDidLoad
 {
+    //Load webview for requested startUp 
     webView.delegate = self;
     webView.scrollView.bounces = NO;
     
@@ -58,7 +59,6 @@ extern int _rowNumberInStartUps;
     [webView loadRequest:request];
     
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
 }
 
 -(void) backAction:(id)sender
@@ -69,7 +69,6 @@ extern int _rowNumberInStartUps;
 -(void)viewWillDisappear:(BOOL)animated
 {
     [webView setDelegate:nil];
-    
 }
 
 - (void)viewDidUnload
