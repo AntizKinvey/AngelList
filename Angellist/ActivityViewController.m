@@ -10,6 +10,8 @@
 #import "ActivityViewController.h"
 #import "ActivityDetailsViewController.h"
 #import "Reachability.h"
+#import "StartUpViewController.h"
+#import "StartUpViewController.h"
 
 @implementation ActivityViewController
 
@@ -79,6 +81,7 @@ BOOL _filterFollowed = FALSE;
 BOOL _filterInvested = FALSE;
 BOOL _filterUpdated = FALSE;
 BOOL _filterIntroduced = FALSE;
+BOOL _startupLoad = FALSE;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -107,6 +110,8 @@ BOOL _filterIntroduced = FALSE;
     
     loadingView.hidden = YES;
     filtersContainer.enabled = YES;
+   
+
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
@@ -141,7 +146,7 @@ BOOL _filterIntroduced = FALSE;
         
         // label to confor to the cell height
         NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
-        CGSize constrainedSize = CGSizeMake(310, 20000);
+        CGSize constrainedSize = CGSizeMake(210, 20000);
         CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
         
         if (!cellTextLabel)
@@ -175,7 +180,7 @@ BOOL _filterIntroduced = FALSE;
     
     NSString *text = [feedDescDisplayArray objectAtIndex:[indexPath row]];
     
-    CGSize constraint = CGSizeMake(310, 20000.0f);
+    CGSize constraint = CGSizeMake(210, 20000.0f);
     
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     
@@ -307,7 +312,8 @@ BOOL _filterIntroduced = FALSE;
 #pragma mark - View lifecycle
 - (void)viewDidLoad
 {
-    
+//    StartUpViewController *start;
+//    [start viewDidLoad];
     notReachable = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
     notReachable.alpha = 0;
     [notReachable.layer setCornerRadius:10.0f];
@@ -628,9 +634,13 @@ BOOL _filterIntroduced = FALSE;
              }         
          }];
     }
+    
     [super viewDidLoad];
-
+    
+  
 }
+
+
 
 // save images to the documents directory
 -(void) saveImagesOfFeeds
@@ -651,6 +661,7 @@ BOOL _filterIntroduced = FALSE;
         [completeFeedImagesArrayFromDirectory addObject:savedImagePath];
     }
     [self saveFeedsDataToDB];
+    
 }
 
 // save data of all feeds to the database

@@ -44,7 +44,8 @@
     btnImage = [UIImage imageNamed:@"peoplei.png"];
     btnImageSelected = [UIImage imageNamed:@"peoplea.png"];
     btn2 = [UIButton buttonWithType:UIButtonTypeCustom];//Setup the button
-    btn2.frame = CGRectMake(0, 410, 107, 50);// Set the frame (size and position) of the button)
+//    btn2.frame = CGRectMake(0, 410, 107, 50);// Set the frame (size and position) of the button)
+    btn2.frame = CGRectMake(0, 410, 106.5, 50);
     [btn2 setBackgroundImage:btnImage forState:UIControlStateNormal];// Set the image for the normal state of the button
     [btn2 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];// Set the image for the selected state of the button
     [btn2 setSelected:TRUE];// Set this button as selected (we will select the others to false as we only want Tab 1 to be selected initially
@@ -54,7 +55,7 @@
     btnImage = [UIImage imageNamed:@"startupi.png"];
     btnImageSelected = [UIImage imageNamed:@"startupa.png"];
     btn3 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn3.frame = CGRectMake(107, 410, 107, 50);
+    btn3.frame = CGRectMake(106.5, 410, 107, 50);
     [btn3 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn3 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn3 setTag:1];
@@ -62,7 +63,7 @@
     btnImage = [UIImage imageNamed:@"inboxi.png"];
     btnImageSelected = [UIImage imageNamed:@"inboxa.png"];
     btn4 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn4.frame = CGRectMake(214, 410, 107, 50);
+    btn4.frame = CGRectMake(213.5, 410, 106.5, 50);
     [btn4 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn4 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn4 setTag:2];

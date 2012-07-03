@@ -54,7 +54,7 @@ NSString *_angelUserName;//Angellist User name
     if(loginFromAL)
     {
         //Send request to get authenticated user
-        NSURL *url = [NSURL URLWithString:@"https://angel.co/api/oauth/authorize?client_id=f91c04a55243218eb588f329ae8bbbb9&response_type=code"];
+        NSURL *url = [NSURL URLWithString:@"https://angel.co/api/oauth/authorize?client_id=f91c04a55243218eb588f329ae8bbbb9&scope=message%20email&response_type=code"];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
         [webView loadRequest:request];
     }
@@ -114,6 +114,7 @@ NSString *_angelUserName;//Angellist User name
                                   error:&error];
             
             access_token = [json objectForKey:@"access_token"];
+            NSLog(@"\n \n access token = %@ \n \n", access_token);
             access_token_received = TRUE;
         }
         

@@ -307,11 +307,9 @@ UIView *noInternetView;
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
    
-    NSString *stringResponse = [NSString stringWithFormat:@"%@",[json valueForKey:@"success"]];
-    
-    if ([stringResponse isEqual:@"0"]) {
+    if ([_msgbody count] == 0) {
         UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
-        labelError.text = @"User is not authorized to message";
+        labelError.text = @"No messages to display!";
         labelError.textColor = [UIColor grayColor];
         labelError.textAlignment = UITextAlignmentCenter;
         [labelError setBackgroundColor:[UIColor clearColor]];
@@ -319,8 +317,7 @@ UIView *noInternetView;
         [labelError release];
     }
     else {
-        
-        
+         
         NSArray *_messageThreads = [json valueForKey:@"messages"];
         _senderName = [[NSMutableArray alloc] init];
         _imageOfSender = [[NSMutableArray alloc] init];

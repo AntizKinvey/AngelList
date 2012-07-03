@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
+#import "StartUpViewController.h"
 
 @interface ActivityViewController : UIViewController <UITableViewDataSource>
 {
@@ -16,6 +17,8 @@
     
     DBManager *_dbmanager;
     UIView *filterView;
+    
+    StartUpViewController *startUpView;
 }
 
 @property(nonatomic, retain)UIView *filterView;

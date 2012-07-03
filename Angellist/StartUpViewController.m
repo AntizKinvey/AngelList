@@ -36,7 +36,7 @@ NSMutableArray *displayStartUpLocationArray;//Locations of StartUps to be displa
 NSMutableArray *displayStartUpMarketArray;//Market of StartUps to be displayed
 NSMutableArray *displayStartUpLogoImageInDirectory;//Logo image paths of StartUps to be displayed
 
-
+extern BOOL _startupLoad;
 extern NSMutableArray *userFollowingIds;//Array of user following Ids
 
 extern NSString *_currUserId;//Angellist user Id used to send requests
@@ -203,7 +203,6 @@ int startUpsLoadCount = 10;
         [[self.view viewWithTag:404] removeFromSuperview];
         [self.view addSubview:alertPopup];
         [alertPopup release];
-        
         loadingView.hidden = YES;
         filterContainer.enabled = YES;
     }
@@ -309,8 +308,36 @@ int startUpsLoadCount = 10;
 
 - (void)viewDidLoad
 {
-    _dbmanager = [[DBManager alloc] init];
-    [_dbmanager openDB];
+    _filterStartUpNames = [[NSArray arrayWithObjects:@"following.png", @"portfolio.png", @"all.png", @"trending.png", nil] retain];
+    
+    //Add background image to navigation title bar
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
+    //Add image to navigation bar button
+    UIImage* image = [UIImage imageNamed:@"filteri.png"];
+    CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
+    filterContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
+    [filterContainer setBackgroundImage:image forState:UIControlStateNormal];
+    [filterContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
+    [filterContainer addTarget:self action:@selector(filterButtonSelectedStartUp:) forControlEvents:UIControlStateHighlighted];
+    
+    
+    
+    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
+    self.navigationItem.rightBarButtonItem = filterButtonItem;
+    [filterButtonItem release];
+
+
+    [self sendRequestForLoad];
+    [super viewDidLoad];
+    
+
+}
+
+// to load the request
+-(void)sendRequestForLoad
+{
     
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
@@ -350,26 +377,7 @@ int startUpsLoadCount = 10;
     _dbmanager.startUpMarketArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.startUpLogoImageInDirectoryFromDB = [[[NSMutableArray alloc] init] autorelease];
     
-    _filterStartUpNames = [[NSArray arrayWithObjects:@"following.png", @"portfolio.png", @"all.png", @"trending.png", nil] retain];
-    
-    //Add background image to navigation title bar
-    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
-    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-    
-    //Add image to navigation bar button
-    UIImage* image = [UIImage imageNamed:@"filteri.png"];
-    CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    filterContainer = [[[UIButton alloc] initWithFrame:frame] autorelease];
-    [filterContainer setBackgroundImage:image forState:UIControlStateNormal];
-    [filterContainer setBackgroundImage:[UIImage imageNamed:@"filtera.png"] forState:UIControlStateSelected];
-    [filterContainer addTarget:self action:@selector(filterButtonSelectedStartUp:) forControlEvents:UIControlStateHighlighted];
-
-    
-    
-    UIBarButtonItem* filterButtonItem = [[UIBarButtonItem alloc] initWithCustomView:filterContainer];
-    self.navigationItem.rightBarButtonItem = filterButtonItem;
-    [filterButtonItem release];
-    
+       
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -419,7 +427,7 @@ int startUpsLoadCount = 10;
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
-
+        
         [NSURLConnection sendAsynchronousRequest:request queue:[[[NSOperationQueue alloc] init] autorelease]
                                completionHandler:^(NSURLResponse *response,
                                                    NSData *data,
@@ -591,10 +599,9 @@ int startUpsLoadCount = 10;
              }         
          }];
     }
-    
-    [super viewDidLoad];
-}
 
+    
+}
 
 //Save images of StartUps
 -(void) saveImagesOfStartUps
