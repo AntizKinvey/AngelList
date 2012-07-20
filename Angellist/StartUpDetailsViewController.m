@@ -42,7 +42,7 @@ KCSCollection *_detailsCollection;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"StartUp";
+       // self.title = @"StartUp";
     }
     return self;
 }
@@ -94,20 +94,11 @@ KCSCollection *_detailsCollection;
             CGSize constraint1 = CGSizeMake(270, 20000.0f);
             CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
             
-            //startup description to be displayed
-            UILabel *startUpDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 160, 270, size1.height)];
-            startUpDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
-            int numLines = (int)(startUpDesclabel.frame.size.height/startUpDesclabel.font.leading);
-            startUpDesclabel.numberOfLines = numLines;
-            startUpDesclabel.backgroundColor = [UIColor clearColor];
-            startUpDesclabel.lineBreakMode = UILineBreakModeWordWrap;
-            startUpDesclabel.text = text1;
-            [cell.contentView addSubview:startUpDesclabel];
-            [startUpDesclabel release];
+           
             
             //startup locations to be displayed
-            UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpDesclabel.frame.size.height+180, 270, 30)];
-            startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+            UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+120, 270, 30)];
+            startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
             startUpLocationlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
             
             startUpLocationlabel.numberOfLines = 0;
@@ -121,8 +112,8 @@ KCSCollection *_detailsCollection;
             [startUpLocationlabel release];
             
             // startup market label  
-            UILabel *startUpMarketlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpDesclabel.frame.size.height+210, 270, 30)];
-            startUpMarketlabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+            UILabel *startUpMarketlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+160, 270, 30)];
+            startUpMarketlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
             startUpMarketlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
             startUpMarketlabel.numberOfLines = 0;
             startUpMarketlabel.backgroundColor = [UIColor clearColor];
@@ -133,6 +124,18 @@ KCSCollection *_detailsCollection;
             startUpMarketlabel.text = displayMarkets;
             [cell.contentView addSubview:startUpMarketlabel];
             [startUpMarketlabel release];
+            
+            
+            //startup description to be displayed
+            UILabel *startUpDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpMarketlabel.frame.size.height+200, 270, size1.height)];
+            startUpDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            int numLines = (int)(startUpDesclabel.frame.size.height/startUpDesclabel.font.leading);
+            startUpDesclabel.numberOfLines = numLines;
+            startUpDesclabel.backgroundColor = [UIColor clearColor];
+            startUpDesclabel.lineBreakMode = UILineBreakModeWordWrap;
+            startUpDesclabel.text = text1;
+            [cell.contentView addSubview:startUpDesclabel];
+            [startUpDesclabel release];
             
             //startUp follower count to be displayed
             UILabel *startUpFollowerslabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 20, 270, 30)];
@@ -211,10 +214,15 @@ KCSCollection *_detailsCollection;
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
     UIBarButtonItem* backButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
+    
+    self.navigationItem.title = [NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:_rowNumberInStartUps]];
     
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -260,7 +268,7 @@ KCSCollection *_detailsCollection;
     //Array that displays startUp details
     displayInCells = [[NSMutableArray alloc] init];
     
-    [displayInCells addObject:[UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:_rowNumberInStartUps]]];
+    [displayInCells addObject:[displayStartUpLogoImageInDirectory objectAtIndex:_rowNumberInStartUps]];
     [displayInCells addObject:[displayStartUpNameArray objectAtIndex:_rowNumberInStartUps]];
     [displayInCells addObject:[displayStartUpProductDescArray objectAtIndex:_rowNumberInStartUps]];
     

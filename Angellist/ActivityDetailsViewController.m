@@ -31,7 +31,7 @@ extern NSString *_currAccessToken;
 extern NSString *_globalSessionId;
 UIButton* backButton;
 
-NSMutableArray *displayInCells;
+NSMutableArray *displayFeedsInCells;
 
 KCSCollection *_detailsCollection;
 
@@ -40,7 +40,7 @@ KCSCollection *_detailsCollection;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Feed";
+       // self.title = @"Feed";
     }
     return self;
 }
@@ -71,7 +71,7 @@ KCSCollection *_detailsCollection;
         {
             // image view to display image of user/startup
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
-            cellImageView.image = [displayInCells objectAtIndex:0];
+            cellImageView.image = [displayFeedsInCells objectAtIndex:0];
             cellImageView.layer.cornerRadius = 3.5f;
             cellImageView.layer.masksToBounds = YES;
             [cell.contentView addSubview:cellImageView];
@@ -82,13 +82,13 @@ KCSCollection *_detailsCollection;
             actorNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
             actorNamelabel.lineBreakMode = UILineBreakModeWordWrap;
             actorNamelabel.backgroundColor = [UIColor clearColor];
-            actorNamelabel.text = [displayInCells objectAtIndex:1];
+            actorNamelabel.text = [displayFeedsInCells objectAtIndex:1];
             actorNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
             [cell.contentView addSubview:actorNamelabel];
             [actorNamelabel release];
             
             // label to display description
-             NSString *text = [displayInCells objectAtIndex:2];
+             NSString *text = [displayFeedsInCells objectAtIndex:2];
              CGSize constraint = CGSizeMake(270, 20000.0f);
             CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
             
@@ -134,21 +134,18 @@ KCSCollection *_detailsCollection;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    NSString *text = [displayInCells objectAtIndex:2];
-    
+    NSString *text = [displayFeedsInCells objectAtIndex:2];
     CGSize constraint = CGSizeMake(270, 20000.0f);
-    
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
 
-    return size.height + 230; //160
-    
+    return size.height + 230; //160    
 }
 
 
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
+    
     return 1;
 }
 
@@ -173,25 +170,30 @@ KCSCollection *_detailsCollection;
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
     UIBarButtonItem* backButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
     
+    self.navigationItem.title = [NSString stringWithFormat:@"%@",[actorNameArray objectAtIndex:_rowNumberInActivity]];
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
+        
         NSLog(@"\n\n No Internet Connection");
+        
     }
     else
     {
         _detailsCollection = [[[KCSClient sharedClient]
                                collectionFromString:@"UserActivity"
                                withClass:[KCSUserActivity class]] retain];
-        
         
         KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
         userActivity.sessionId = _globalSessionId;
@@ -218,13 +220,11 @@ KCSCollection *_detailsCollection;
     [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
     [moreButton addTarget:self action:@selector(actorDetails) forControlEvents:UIControlStateHighlighted];
     
-
+    displayFeedsInCells = [[NSMutableArray alloc] init];
+    [displayFeedsInCells addObject:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]];
     
-    displayInCells = [[NSMutableArray alloc] init];
-    [displayInCells addObject:[UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]]];
-    
-    [displayInCells addObject:[actorNameArray objectAtIndex:_rowNumberInActivity]];
-    [displayInCells addObject:[actorTaglineArray objectAtIndex:_rowNumberInActivity]];
+    [displayFeedsInCells addObject:[actorNameArray objectAtIndex:_rowNumberInActivity]];
+    [displayFeedsInCells addObject:[actorTaglineArray objectAtIndex:_rowNumberInActivity]];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -320,7 +320,7 @@ KCSCollection *_detailsCollection;
 
 -(void) viewWillAppear:(BOOL)animated
 {
-    [displayInCells retain];
+    [displayFeedsInCells retain];
     [super viewWillAppear:animated];
 }
 
@@ -347,18 +347,18 @@ KCSCollection *_detailsCollection;
 
 -(void) dealloc
 {
-    [displayInCells release];
+    [displayFeedsInCells release];
     [followButton release];
     [unfollowButton release];
     [moreButton release];
     [super dealloc];
 }
 
-/************************************************************************************************************/
+//  ****************************************************************************************************/
 /*                                          Kinvey Delegate Methods                                         */
 /************************************************************************************************************/
 
-//Persistable Delegate Methods
+// Persistable Delegate Methods
 // Right now just pop-up an alert about what we got back from Kinvey during
 // the save. Normally you would want to implement more code here
 // This is called when the save completes successfully

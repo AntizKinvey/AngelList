@@ -57,7 +57,7 @@ extern int _rowNumberInStartUps;
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:_rowNumberInStartUps]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
-    
+    webView.scalesPageToFit=YES;
     [super viewDidLoad];
 }
 

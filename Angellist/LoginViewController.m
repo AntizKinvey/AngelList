@@ -66,7 +66,8 @@ NSString *_angelUserName;//Angellist User name
     }
 }
 
-- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
+- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType 
+{
     
     return YES;   
 }
@@ -99,7 +100,7 @@ NSString *_angelUserName;//Angellist User name
         {
             //Get the query string which provides response code and link with the URL request and POST the URL
             queryString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:1];
-            NSString *urlString = [NSString stringWithFormat:@"https://angel.co/api/oauth/token?client_id=f91c04a55243218eb588f329ae8bbbb9&client_secret=80b56220b6fb722bcb8c85aa6f4996f3&code=%@&grant_type=authorization_code",queryString];
+            NSString *urlString = [NSString stringWithFormat:@"https://angel.co/api/oauth/token?client_id=f91c04a55243218eb588f329ae8bbbb9&client_secret=80b56220b6fb722bcb8c85aa6f4996f3&code=28a7eed355eaa3e460f075e0d60b1b40&grant_type=authorization_code",queryString];
             NSURL *url = [NSURL URLWithString:urlString];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             [request setHTTPMethod:@"POST"];
@@ -121,7 +122,7 @@ NSString *_angelUserName;//Angellist User name
         if(access_token_received)
         {
             //Get details of User after getting access token
-            NSString *urlString = [NSString stringWithFormat:@"https://api.angel.co/1/me?access_token=%@",access_token];
+            NSString *urlString = [NSString stringWithFormat:@"https://api.angel.co/1/me?access_token=5dacdd84bb605a030fdaee148b0574c4",access_token];
             NSURL *url = [NSURL URLWithString:urlString];
             NSURLRequest *request = [NSURLRequest requestWithURL:url];
             [webView loadRequest:request]; 
@@ -170,10 +171,14 @@ NSString *_angelUserName;//Angellist User name
 -(void) viewDidAppear:(BOOL)animated
 {
     
+    
+    
 }
 
 -(IBAction)dismissView:(id)sender
 {
+    
+    
     [self closeAction];
 }
 //Close login Page

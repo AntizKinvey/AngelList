@@ -17,6 +17,8 @@
     IBOutlet UIButton *moreButton;
     DBManager *_dbmanager;
     UIView *filterView;
+    UIView *_view2;
+    UILabel *labels;
 }
 
 @property(nonatomic,retain) UIView *filterView;
@@ -36,6 +38,11 @@
 
 -(void) saveImagesOfStartUpsPortfolio;
 -(void) saveStartUpsPortfolioDetailsToDB;
+
+//Save images of trending startUps
+-(void) saveImagesOfStartUpsTrending;
+//Save details of following startUps by user to database
+-(void) saveStartUpsTrendingDetailsToDB;
 
 // to load the request
 -(void)sendRequestForLoad;

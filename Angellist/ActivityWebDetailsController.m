@@ -40,6 +40,7 @@ UIButton* backButton;
 
 - (void)viewDidLoad
 {
+    
     webView.delegate = self;
     webView.scrollView.bounces = NO;
     
@@ -56,12 +57,13 @@ UIButton* backButton;
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
-    
+     self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
     // load angellist URL
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
     
+   
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }
@@ -84,8 +86,9 @@ UIButton* backButton;
     // e.g. self.myOutlet = nil;
 }
 
-- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
+- (BOOL)webView:(UIWebView*)webView1 shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
     
+    webView.scalesPageToFit=YES;
     return YES;   
 }
 

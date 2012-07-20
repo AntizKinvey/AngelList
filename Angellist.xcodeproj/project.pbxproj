@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0710584615B7DE040054699F /* filtertab.png in Resources */ = {isa = PBXBuildFile; fileRef = 0710584515B7DE040054699F /* filtertab.png */; };
+		0778876E15B93991002563EC /* navigationbarfil.png in Resources */ = {isa = PBXBuildFile; fileRef = 0778876C15B93991002563EC /* navigationbarfil.png */; };
+		0778876F15B93991002563EC /* navigationbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 0778876D15B93991002563EC /* navigationbar.png */; };
+		0778877515B93FA7002563EC /* login.png in Resources */ = {isa = PBXBuildFile; fileRef = 0778877415B93FA7002563EC /* login.png */; };
+		07BA9E4B15B0461300791044 /* kinveyLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 07BA9E4915B0461300791044 /* kinveyLogo.png */; };
+		07BA9E4C15B0461300791044 /* angelLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 07BA9E4A15B0461300791044 /* angelLogo.png */; };
 		07C7FA4715A1D4C1000BB04E /* all.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA2015A1D4C1000BB04E /* all.png */; };
 		07C7FA4815A1D4C1000BB04E /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA2115A1D4C1000BB04E /* back.png */; };
 		07C7FA4915A1D4C1000BB04E /* cancel.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA2215A1D4C1000BB04E /* cancel.png */; };
@@ -21,10 +27,8 @@
 		07C7FA5715A1D4C1000BB04E /* introduced.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3015A1D4C1000BB04E /* introduced.png */; };
 		07C7FA5815A1D4C1000BB04E /* invested.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3115A1D4C1000BB04E /* invested.png */; };
 		07C7FA5915A1D4C1000BB04E /* login_bt.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3215A1D4C1000BB04E /* login_bt.png */; };
-		07C7FA5A15A1D4C1000BB04E /* login.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3315A1D4C1000BB04E /* login.png */; };
 		07C7FA5B15A1D4C1000BB04E /* more.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3415A1D4C1000BB04E /* more.png */; };
 		07C7FA5C15A1D4C1000BB04E /* morestartups.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3515A1D4C1000BB04E /* morestartups.png */; };
-		07C7FA5D15A1D4C1000BB04E /* navigationbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3615A1D4C1000BB04E /* navigationbar.png */; };
 		07C7FA5E15A1D4C1000BB04E /* new-status.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3715A1D4C1000BB04E /* new-status.png */; };
 		07C7FA6015A1D4C1000BB04E /* peoplea.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3915A1D4C1000BB04E /* peoplea.png */; };
 		07C7FA6115A1D4C1000BB04E /* peoplei.png in Resources */ = {isa = PBXBuildFile; fileRef = 07C7FA3A15A1D4C1000BB04E /* peoplei.png */; };
@@ -123,6 +127,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0710584515B7DE040054699F /* filtertab.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filtertab.png; sourceTree = "<group>"; };
+		0778876C15B93991002563EC /* navigationbarfil.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navigationbarfil.png; sourceTree = "<group>"; };
+		0778876D15B93991002563EC /* navigationbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navigationbar.png; sourceTree = "<group>"; };
+		0778877415B93FA7002563EC /* login.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = login.png; path = IPhone/login.png; sourceTree = "<group>"; };
+		07BA9E4915B0461300791044 /* kinveyLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kinveyLogo.png; sourceTree = "<group>"; };
+		07BA9E4A15B0461300791044 /* angelLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = angelLogo.png; sourceTree = "<group>"; };
 		07C7FA2015A1D4C1000BB04E /* all.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = all.png; path = IPhone/all.png; sourceTree = "<group>"; };
 		07C7FA2115A1D4C1000BB04E /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back.png; path = IPhone/back.png; sourceTree = "<group>"; };
 		07C7FA2215A1D4C1000BB04E /* cancel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cancel.png; path = IPhone/cancel.png; sourceTree = "<group>"; };
@@ -137,10 +147,8 @@
 		07C7FA3015A1D4C1000BB04E /* introduced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = introduced.png; path = IPhone/introduced.png; sourceTree = "<group>"; };
 		07C7FA3115A1D4C1000BB04E /* invested.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = invested.png; path = IPhone/invested.png; sourceTree = "<group>"; };
 		07C7FA3215A1D4C1000BB04E /* login_bt.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = login_bt.png; path = IPhone/login_bt.png; sourceTree = "<group>"; };
-		07C7FA3315A1D4C1000BB04E /* login.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = login.png; path = IPhone/login.png; sourceTree = "<group>"; };
 		07C7FA3415A1D4C1000BB04E /* more.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = more.png; path = IPhone/more.png; sourceTree = "<group>"; };
 		07C7FA3515A1D4C1000BB04E /* morestartups.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = morestartups.png; path = IPhone/morestartups.png; sourceTree = "<group>"; };
-		07C7FA3615A1D4C1000BB04E /* navigationbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = navigationbar.png; path = IPhone/navigationbar.png; sourceTree = "<group>"; };
 		07C7FA3715A1D4C1000BB04E /* new-status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "new-status.png"; path = "IPhone/new-status.png"; sourceTree = "<group>"; };
 		07C7FA3915A1D4C1000BB04E /* peoplea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = peoplea.png; path = IPhone/peoplea.png; sourceTree = "<group>"; };
 		07C7FA3A15A1D4C1000BB04E /* peoplei.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = peoplei.png; path = IPhone/peoplei.png; sourceTree = "<group>"; };
@@ -309,10 +317,6 @@
 		7884DBDF156F8C3000679076 = {
 			isa = PBXGroup;
 			children = (
-				78DB9A3D159D67720025DFDC /* libz.dylib */,
-				78DB9A39159D67090025DFDC /* libUAirship-1.1.1.a */,
-				78DB9A36159D66EF0025DFDC /* KinveyKit.framework */,
-				78BB084F157BCBDB00822FD9 /* libsqlite3.dylib */,
 				7884DBF4156F8C3000679076 /* Angellist */,
 				7884DBED156F8C3000679076 /* Frameworks */,
 				7884DBEB156F8C3000679076 /* Products */,
@@ -330,6 +334,10 @@
 		7884DBED156F8C3000679076 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				78DB9A3D159D67720025DFDC /* libz.dylib */,
+				78DB9A39159D67090025DFDC /* libUAirship-1.1.1.a */,
+				78BB084F157BCBDB00822FD9 /* libsqlite3.dylib */,
+				78DB9A36159D66EF0025DFDC /* KinveyKit.framework */,
 				78DB9A3B159D67710025DFDC /* CFNetwork.framework */,
 				78DB9A3C159D67710025DFDC /* CoreTelephony.framework */,
 				78DB9A3E159D67720025DFDC /* MobileCoreServices.framework */,
@@ -422,6 +430,9 @@
 		7884DC2E156F9FEE00679076 /* IPhone */ = {
 			isa = PBXGroup;
 			children = (
+				0710584515B7DE040054699F /* filtertab.png */,
+				07BA9E4915B0461300791044 /* kinveyLogo.png */,
+				07BA9E4A15B0461300791044 /* angelLogo.png */,
 				07C7FA2015A1D4C1000BB04E /* all.png */,
 				07C7FA2115A1D4C1000BB04E /* back.png */,
 				07C7FA2215A1D4C1000BB04E /* cancel.png */,
@@ -436,10 +447,11 @@
 				07C7FA3015A1D4C1000BB04E /* introduced.png */,
 				07C7FA3115A1D4C1000BB04E /* invested.png */,
 				07C7FA3215A1D4C1000BB04E /* login_bt.png */,
-				07C7FA3315A1D4C1000BB04E /* login.png */,
+				0778877415B93FA7002563EC /* login.png */,
 				07C7FA3415A1D4C1000BB04E /* more.png */,
 				07C7FA3515A1D4C1000BB04E /* morestartups.png */,
-				07C7FA3615A1D4C1000BB04E /* navigationbar.png */,
+				0778876C15B93991002563EC /* navigationbarfil.png */,
+				0778876D15B93991002563EC /* navigationbar.png */,
 				07C7FA3715A1D4C1000BB04E /* new-status.png */,
 				07C7FA3915A1D4C1000BB04E /* peoplea.png */,
 				07C7FA3A15A1D4C1000BB04E /* peoplei.png */,
@@ -537,10 +549,8 @@
 				07C7FA5715A1D4C1000BB04E /* introduced.png in Resources */,
 				07C7FA5815A1D4C1000BB04E /* invested.png in Resources */,
 				07C7FA5915A1D4C1000BB04E /* login_bt.png in Resources */,
-				07C7FA5A15A1D4C1000BB04E /* login.png in Resources */,
 				07C7FA5B15A1D4C1000BB04E /* more.png in Resources */,
 				07C7FA5C15A1D4C1000BB04E /* morestartups.png in Resources */,
-				07C7FA5D15A1D4C1000BB04E /* navigationbar.png in Resources */,
 				07C7FA5E15A1D4C1000BB04E /* new-status.png in Resources */,
 				07C7FA6015A1D4C1000BB04E /* peoplea.png in Resources */,
 				07C7FA6115A1D4C1000BB04E /* peoplei.png in Resources */,
@@ -571,6 +581,12 @@
 				07CF73BF15A2CC62001FEFD5 /* startupa@2x.png in Resources */,
 				07CF73C015A2CC62001FEFD5 /* startupi@2x.png in Resources */,
 				07CF73CA15A2EFDF001FEFD5 /* morestartups@2x.png in Resources */,
+				07BA9E4B15B0461300791044 /* kinveyLogo.png in Resources */,
+				07BA9E4C15B0461300791044 /* angelLogo.png in Resources */,
+				0710584615B7DE040054699F /* filtertab.png in Resources */,
+				0778876E15B93991002563EC /* navigationbarfil.png in Resources */,
+				0778876F15B93991002563EC /* navigationbar.png in Resources */,
+				0778877515B93FA7002563EC /* login.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,8 +670,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -671,8 +687,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "59FB6C24-E954-4905-8524-4FBDC8532512";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "59FB6C24-E954-4905-8524-4FBDC8532512";
+				PROVISIONING_PROFILE = "745468FB-3EB4-4996-80AA-916140094241";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "745468FB-3EB4-4996-80AA-916140094241";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -683,8 +699,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -694,8 +710,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "59FB6C24-E954-4905-8524-4FBDC8532512";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "59FB6C24-E954-4905-8524-4FBDC8532512";
+				PROVISIONING_PROFILE = "745468FB-3EB4-4996-80AA-916140094241";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "745468FB-3EB4-4996-80AA-916140094241";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -705,6 +721,8 @@
 		7884DC0C156F8C3000679076 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -712,12 +730,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Angellist/Angellist-Prefix.pch";
 				INFOPLIST_FILE = "Angellist/Angellist-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "745468FB-3EB4-4996-80AA-916140094241";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "745468FB-3EB4-4996-80AA-916140094241";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -726,6 +746,8 @@
 		7884DC0D156F8C3000679076 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -733,12 +755,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Angellist/Angellist-Prefix.pch";
 				INFOPLIST_FILE = "Angellist/Angellist-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "745468FB-3EB4-4996-80AA-916140094241";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "745468FB-3EB4-4996-80AA-916140094241";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

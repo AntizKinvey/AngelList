@@ -10,14 +10,20 @@
 #import "DBManager.h"
 #import "StartUpViewController.h"
 
+
 @interface ActivityViewController : UIViewController <UITableViewDataSource>
 {
     IBOutlet UITableView *table;
     IBOutlet UIView *loadingView;
+    UIView *loadOlderFeeds;
+    UIView *_view1;
+    UILabel *label;
     
+    UIImageView *kinvey;
+    UIImageView *angelLogo;
     DBManager *_dbmanager;
     UIView *filterView;
-    
+    UIActivityIndicatorView *labelLoading;
     StartUpViewController *startUpView;
 }
 
@@ -28,5 +34,5 @@
 
 // to save the details of all feeds to the database
 -(void) saveFeedsDataToDB;
-
+-(void)getFeeds;
 @end

@@ -97,7 +97,9 @@ ContainerViewController *_containerViewController;
         {
             //Open Login screen
             _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
+            [_loginView setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
             [self presentModalViewController:_loginView animated:YES];
+            
         }
         else
         {

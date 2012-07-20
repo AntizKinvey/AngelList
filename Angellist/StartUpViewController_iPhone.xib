@@ -120,6 +120,7 @@
 								<string key="NSFrame">{{151, 170}, {20, 20}}</string>
 								<reference key="NSSuperview" ref="1057548675"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:1030</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -142,7 +143,7 @@
 								<int key="IBUIContentMode">7</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">Loading StartUps...</string>
+								<string key="IBUIText">Loading Startups...</string>
 								<reference key="IBUITextColor" ref="655575255"/>
 								<nil key="IBUIHighlightedColor"/>
 								<int key="IBUIBaselineAdjustment">1</int>

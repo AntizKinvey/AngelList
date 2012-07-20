@@ -157,11 +157,9 @@ NSMutableArray *displayImage;
     _sen_id = [[NSMutableArray alloc] init];
     _rec_id = [[NSMutableArray alloc] init];
     _time = [[NSMutableArray alloc] init];
-    
     _msgUser = [[NSMutableArray alloc] init];
     _otherUser = [[NSMutableArray alloc] init];
     displayImage = [[NSMutableArray alloc] init];
-    
     _displayTime = [[NSMutableArray alloc] init];
     
     UIImage* image = [UIImage imageNamed:@"back.png"];
@@ -181,12 +179,9 @@ NSMutableArray *displayImage;
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"GET"];
-    
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
-    
-    
     NSArray *arrayMessages = [json valueForKey:@"messages"];
     NSArray *arrayUser = [json valueForKey:@"users"];
     int user = 0;
@@ -228,7 +223,6 @@ NSMutableArray *displayImage;
     [self startLoadingImagesConcurrently];
     [self getTime];
 
-    
 }
 
 // navigate back to inbox
@@ -310,7 +304,6 @@ NSMutableArray *displayImage;
 // return keyboard
 -(IBAction)returnkeyboard:(id)sender
 { 
-
     [textViewReply resignFirstResponder];
 }
 
@@ -319,25 +312,22 @@ NSMutableArray *displayImage;
 {
     
     NSString *postMsg = [NSString stringWithFormat:@"%@",textViewReply.text];
-   
-    
-    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=0923767ad7d007d4c519aa45a1129f73",threadValue,postMsg]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=%@",threadValue,postMsg,_currAccessToken]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-   
-
     [self getrequestDetails];
+    
   // reload table
     [tableMsgDetails reloadData];
     textViewReply.text =@"";
 
+    
 }
 
 
 
 //  methods move the view up while replying through the text view // 
-
 - (void)keyboardWillShow:(NSNotification *)notif{
     [self setViewMoveUp:YES];
 }

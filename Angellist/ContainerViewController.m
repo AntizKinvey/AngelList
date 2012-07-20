@@ -60,9 +60,7 @@ NSString *_currAccessToken;
     }
     
     [_dbmanager retrieveUserDetails];
-    
     self.tabBarController.delegate=self;
-    
     //Assign angel User Id to global variable
     _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserIdFromDB];
     //Assign angel User access token to global variable

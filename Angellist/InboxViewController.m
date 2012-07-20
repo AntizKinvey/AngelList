@@ -167,7 +167,7 @@ UIView *noInternetView;
 {
     
     NSString *text = [_msgbody objectAtIndex:[indexPath row]];
-    CGSize constraint = CGSizeMake(310, 20000.0f);
+    CGSize constraint = CGSizeMake(310, 300000.0f);
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     CGFloat height = MAX(size.height, 44.0f);
     return height + (30 * 2);
@@ -306,8 +306,9 @@ UIView *noInternetView;
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
-   
-    if ([_msgbody count] == 0) {
+    NSArray *_messageThreads = [json valueForKey:@"messages"];
+    
+    if ([_messageThreads count] == 0) {
         UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
         labelError.text = @"No messages to display!";
         labelError.textColor = [UIColor grayColor];
@@ -318,7 +319,7 @@ UIView *noInternetView;
     }
     else {
          
-        NSArray *_messageThreads = [json valueForKey:@"messages"];
+       
         _senderName = [[NSMutableArray alloc] init];
         _imageOfSender = [[NSMutableArray alloc] init];
         _imageOfRecepient = [[NSMutableArray alloc] init];
@@ -342,7 +343,6 @@ UIView *noInternetView;
             [_sender addObject:[[diction valueForKey:@"last_message"] valueForKey:@"sender_id"]];
             [_recepient addObject:[[diction valueForKey:@"last_message"] valueForKey:@"recipient_id"]];
             [_read addObject:[NSNumber numberWithBool:[[diction valueForKey:@"viewed"]boolValue]]];
-            
             [_totalMsgCount addObject:[diction valueForKey:@"total"]];
             for (int _userCount1=0; _userCount1<[_messageThreads count] ; _userCount1++) 
             {
@@ -415,10 +415,7 @@ UIView *noInternetView;
         
         NSString *picLoad = [NSString stringWithFormat:@"%@",[_imageOfSender objectAtIndex:asyncCount]];
         NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-
-        
         UIImage* image = [UIImage imageWithData:imageData];
-        
         if (image != nil) {
             
             [_placeHolder replaceObjectAtIndex:asyncCount withObject:image];
@@ -437,15 +434,13 @@ UIView *noInternetView;
         NSInteger count = [presentCount integerValue];
         if((count > firstRowShown.row)&&(count < lastRowShown.row))
              [_dbmanager retrieveInboxDetails];
-            [tableview reloadData];
+             [tableview reloadData];
     }
     else
          [_dbmanager retrieveInboxDetails];
         [tableview reloadData]; 
     
 }
-
-
 
 
 // Function to display the status of the message.
@@ -484,7 +479,6 @@ UIView *noInternetView;
                 
                 [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
         }
-     
 }
 
 // To display time on screen
@@ -599,8 +593,6 @@ UIView *noInternetView;
     }
     
     threadValue = [threadIdString intValue];
-   
-    
     [self.navigationController pushViewController:detailsViewController animated:YES];
 }
 

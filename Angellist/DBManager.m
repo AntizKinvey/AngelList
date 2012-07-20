@@ -121,6 +121,19 @@ NSString *access_tokenFromDB;
     }
 }
 
+// Create table startups in portfolio
+-(void) createTableStartUpsTrending:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11
+{
+    char *err;
+    NSString *sql = [NSString stringWithFormat:
+                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT)", tableName, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11];
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    { 
+        sqlite3_close(db);
+        NSAssert(0, @"Table StartUps Portfolio failed to create.");
+    }
+}
+
 //Table for message status
 -(void) createTableInboxDetails:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 
 {
@@ -231,6 +244,19 @@ NSString *access_tokenFromDB;
 
 //Insert number of rows in StartUp Portfolio table
 -(void) insertRecordIntoStartUpsPortfolioTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value
+{
+    char *err;
+    NSString *sql = [NSString stringWithFormat:
+                     @"INSERT OR REPLACE INTO '%@' VALUES ('%@','%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@')", tableName, field1Value, field2Value, field3Value, field4Value, field5Value, field6Value, field7Value, field8Value, field9Value, field10Value, field11Value];
+    if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    { 
+        sqlite3_close(db);
+        NSAssert(0, @"Error Inserting to Table StartUps Following");
+    }
+}
+
+//Insert number of rows in StartUp Trending table
+-(void) insertRecordIntoStartUpsTrendingTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value
 {
     char *err;
     NSString *sql = [NSString stringWithFormat:
@@ -680,6 +706,94 @@ NSString *access_tokenFromDB;
         sqlite3_finalize(statement);
     }
 }
+
+
+// retrieve startups following details
+-(void) retrieveStartUpstrendingDetails
+{
+    NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM Trending";
+    
+    sqlite3_stmt *statement;
+    
+    if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
+    {
+        while(sqlite3_step(statement) == SQLITE_ROW)
+        {
+            char *field1 = (char *) sqlite3_column_text(statement,0);
+            NSString *field1Str = [[NSString alloc] initWithUTF8String:field1];
+            NSString *str1 = [[NSString alloc] initWithFormat:@"%@", field1Str];
+            [startUpIdsArrayFromDB addObject:str1];
+            
+            char *field2 = (char *) sqlite3_column_text(statement,1);
+            NSString *field2Str = [[NSString alloc] initWithUTF8String:field2];
+            NSString *str2 = [[NSString alloc] initWithFormat:@"%@", field2Str];
+            [startUpNameArrayFromDB addObject:str2];
+            
+            char *field3 = (char *) sqlite3_column_text(statement,2);
+            NSString *field3Str = [[NSString alloc] initWithUTF8String:field3];
+            NSString *str3 = [[NSString alloc] initWithFormat:@"%@", field3Str];
+            [startUpAngelUrlArrayFromDB addObject:str3];
+            
+            char *field4 = (char *) sqlite3_column_text(statement,3);
+            NSString *field4Str = [[NSString alloc] initWithUTF8String:field4];
+            NSString *str4 = [[NSString alloc] initWithFormat:@"%@", field4Str];
+            [startUpLogoUrlArrayFromDB addObject:str4];
+            
+            char *field5 = (char *) sqlite3_column_text(statement,4);
+            NSString *field5Str = [[NSString alloc] initWithUTF8String:field5];
+            NSString *str5 = [[NSString alloc] initWithFormat:@"%@", field5Str];
+            [startUpProductDescArrayFromDB addObject:str5];
+            
+            char *field6 = (char *) sqlite3_column_text(statement,5);
+            NSString *field6Str = [[NSString alloc] initWithUTF8String:field6];
+            NSString *str6 = [[NSString alloc] initWithFormat:@"%@", field6Str];
+            [startUpHighConceptArrayFromDB addObject:str6];
+            
+            char *field7 = (char *) sqlite3_column_text(statement,6);
+            NSString *field7Str = [[NSString alloc] initWithUTF8String:field7];
+            NSString *str7 = [[NSString alloc] initWithFormat:@"%@", field7Str];
+            [startUpFollowerCountArrayFromDB addObject:str7];
+            
+            char *field8 = (char *) sqlite3_column_text(statement,7);
+            NSString *field8Str = [[NSString alloc] initWithUTF8String:field8];
+            NSString *str8 = [[NSString alloc] initWithFormat:@"%@", field8Str];
+            [startUpLocationArrayFromDB addObject:str8];
+            
+            char *field9 = (char *) sqlite3_column_text(statement,8);
+            NSString *field9Str = [[NSString alloc] initWithUTF8String:field9];
+            NSString *str9 = [[NSString alloc] initWithFormat:@"%@", field9Str];
+            [startUpMarketArrayFromDB addObject:str9];
+            
+            char *field10 = (char *) sqlite3_column_text(statement,9);
+            NSString *field10Str = [[NSString alloc] initWithUTF8String:field10];
+            NSString *str10 = [[NSString alloc] initWithFormat:@"%@", field10Str];
+            [startUpLogoImageInDirectoryFromDB addObject:str10];
+            
+            [field1Str release];
+            [field2Str release];
+            [field3Str release];
+            [field4Str release];
+            [field5Str release];
+            [field6Str release];
+            [field7Str release];
+            [field8Str release];
+            [field9Str release];
+            [field10Str release];
+            [str1 release];
+            [str2 release];
+            [str3 release];
+            [str4 release];
+            [str5 release];
+            [str6 release];
+            [str7 release];
+            [str8 release];
+            [str9 release];
+            [str10 release];
+        }
+        sqlite3_finalize(statement);
+    }
+}
+
 
 //Close database
 -(void) closeDB

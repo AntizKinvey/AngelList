@@ -61,6 +61,9 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     //Create table Portfolio to store details of startups of user's portfolio
     [_dbmanager createTableStartUpsPortfolio:@"Portfolio" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
+     //Create table Portfolio to store details of trending startups 
+    [_dbmanager createTableStartUpsPortfolio:@"Trending" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
+    
     //Create table Inbox
     [_dbmanager createTableInboxDetails:@"Inbox" withField1:@"threadId" withField2:@"total" withField3:@"viewed"];
     
