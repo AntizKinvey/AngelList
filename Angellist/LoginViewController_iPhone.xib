@@ -67,7 +67,7 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<object class="NSCustomResource" key="IBUIImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">navigationbar.png</string>
+							<string key="NSResourceName">navigationbarNf.png</string>
 						</object>
 					</object>
 					<object class="IBUILabel" id="846762033">
@@ -146,6 +146,7 @@
 								<string key="NSFrame">{{90, 41}, {20, 20}}</string>
 								<reference key="NSSuperview" ref="753425549"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:1030</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -404,8 +405,8 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="cancel.png">{63, 30}</string>
-			<string key="navigationbar.png">{320, 45}</string>
+			<string key="cancel.png">{126, 61}</string>
+			<string key="navigationbarNf.png">{320, 45}</string>
 		</dictionary>
 		<string key="IBCocoaTouchPluginVersion">1181</string>
 	</data>

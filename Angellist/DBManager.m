@@ -17,6 +17,10 @@ extern NSString *access_token;
 NSString *_angelUserIdFromDB;
 NSString *_angelUserNameFromDB;
 NSString *access_tokenFromDB;
+NSString *_angelUserFollowsFromDB;
+NSString *_angelUserImageFromDB;
+NSString *_angelUserEmailFromDB;
+
 
 @synthesize feedImagesArrayFromDirectoryFromDB;
 @synthesize actorTypeArrayFromDB;
@@ -39,6 +43,7 @@ NSString *access_tokenFromDB;
 @synthesize inboxTotalFromDB;
 @synthesize inboxViewedFromDB;
 @synthesize inboxThreadIdFromDB;
+@synthesize _angelUserEmailFromDB, _angelUserIdFromDB, _angelUserNameFromDB, _angelUserImageFromDB, _angelUserFollowsFromDB,access_tokenFromDB, userDetailsArray;
 
 ///To check filePath
 -(NSString *) filePath {
@@ -57,11 +62,11 @@ NSString *access_tokenFromDB;
 }
 
 //Table for MetaData
--(void) createTableUser:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4
+-(void) createTableUser:(NSString *) tableName withField1:(NSString *) field1 withField2:(NSString *) field2 withField3:(NSString *) field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7
 {
     char *err;
     NSString *sql = [NSString stringWithFormat:
-                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT, '%@' TEXT);", tableName, field1, field2, field3, field4];
+                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT);", tableName, field1, field2, field3, field4,field5,field6,field7];
     if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
     { 
         sqlite3_close(db);
@@ -164,16 +169,19 @@ NSString *access_tokenFromDB;
 
 
 // Insert record into user table 
--(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value
+-(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *)field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value
 {
     NSString *sql = [NSString stringWithFormat:
-                     @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@', '%@') VALUES ('%@','%@', '%@', '%@')", tableName, field1, field2, field3, field4, field1Value, field2Value, field3Value, field4Value];
+                     @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@', '%@', '%@', '%@', '%@') VALUES ('%@','%@', '%@', '%@', '%@', '%@', '%@')", tableName, field1, field2, field3, field4, field5, field6, field7, field1Value, field2Value, field3Value, field4Value, field5Value, field6Value, field7Value];
+   
     char *err;
     if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
     {
         sqlite3_close(db);
         NSAssert(0, @"Error Inserting to table User."); 
+        NSLog(@" step 2 ");
     } 
+    NSLog(@" step 3 ");
 }
 
 // Update record into inbox table
@@ -294,6 +302,19 @@ NSString *access_tokenFromDB;
     return _noOfRowsInUserTable;
 }
 
+//Delete User from database
+-(void) deleteUserFromDB
+{
+    NSString *ssql = @"DELETE FROM User";
+    char *err;
+    if (sqlite3_exec(db, [ssql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    {
+        sqlite3_close(db);
+        NSAssert(0, @"Error deleting table."); 
+    }     
+}
+
+
 //Retrieve inbox details
 -(void) retrieveInboxDetails
 {
@@ -340,7 +361,8 @@ NSString *access_tokenFromDB;
 // retrieve User details
 -(void) retrieveUserDetails
 {
-    NSString *sql = @"SELECT username,angelUserId,access_token FROM User";
+    userDetailsArray = [[NSMutableArray alloc] init];
+    NSString *sql = @"SELECT username,angelUserId,access_token,email,image,follows FROM User";
     
     sqlite3_stmt *statement;
        
@@ -363,12 +385,37 @@ NSString *access_tokenFromDB;
             NSString *str3 = [[NSString alloc] initWithFormat:@"%@", field3Str];
             access_tokenFromDB = [NSString stringWithFormat:@"%@",str3];
             
+            char *field4 = (char *) sqlite3_column_text(statement,3);
+            NSString *field4Str = [[NSString alloc] initWithUTF8String:field4];
+            NSString *str4 = [[NSString alloc] initWithFormat:@"%@", field4Str];
+            _angelUserEmailFromDB = [NSString stringWithFormat:@"%@",str4];
+            
+            char *field5 = (char *) sqlite3_column_text(statement,4);
+            NSString *field5Str = [[NSString alloc] initWithUTF8String:field5];
+            NSString *str5 = [[NSString alloc] initWithFormat:@"%@", field5Str];
+            _angelUserImageFromDB = [NSString stringWithFormat:@"%@",str5];
+            
+            char *field6 = (char *) sqlite3_column_text(statement,5);
+            NSString *field6Str = [[NSString alloc] initWithUTF8String:field6];
+            NSString *str6 = [[NSString alloc] initWithFormat:@"%@", field6Str];
+            _angelUserFollowsFromDB = [NSString stringWithFormat:@"%@",str6];
+            
+            [userDetailsArray addObjectsFromArray:[NSArray arrayWithObjects: _angelUserNameFromDB,_angelUserEmailFromDB, _angelUserFollowsFromDB, _angelUserImageFromDB, nil]];
+            
+             NSLog(@"\n \n step 1 = %@ \n \n ",_angelUserNameFromDB);
+            
             [field1Str release];
             [field2Str release];
             [field3Str release];
+            [field4Str release];
+            [field5Str release];
+            [field6Str release];
             [str1 release];
             [str2 release];
             [str3 release];
+            [str4 release];
+            [str5 release];
+            [str6 release];
         }
         sqlite3_finalize(statement);
     }
@@ -692,6 +739,7 @@ NSString *access_tokenFromDB;
             [field8Str release];
             [field9Str release];
             [field10Str release];
+            
             [str1 release];
             [str2 release];
             [str3 release];

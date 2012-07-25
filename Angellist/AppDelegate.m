@@ -23,7 +23,7 @@
 @synthesize loginCollection=_loginCollection;
 @synthesize logoutCollection=_logoutCollection;
 
-
+extern BOOL _loggedOut;
 BOOL _kinveyPingSuccess = FALSE;//Ping to Kinvey flag
 NSString *_globalSessionId;//Contains unique session Id
 NSString *_kinveyUserId;//Id of user of current device assigned by Kinvey 
@@ -43,6 +43,14 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 {
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 
+    [self loginToAngelList];
+    [self.window makeKeyAndVisible];
+    
+    return YES;
+}
+
+-(void)loginToAngelList
+{
     //Create an object to access methods of database
     _dbmanager = [[DBManager alloc] init];
     //Create database if not created
@@ -61,7 +69,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     //Create table Portfolio to store details of startups of user's portfolio
     [_dbmanager createTableStartUpsPortfolio:@"Portfolio" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
-     //Create table Portfolio to store details of trending startups 
+    //Create table Portfolio to store details of trending startups 
     [_dbmanager createTableStartUpsPortfolio:@"Trending" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
     
     //Create table Inbox
@@ -73,7 +81,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     if(_totalNoOfRowsInUserTable == 0)
     {
         //Create table User
-        [_dbmanager createTableUser:@"User" withField1:@"UID" withField2:@"username" withField3:@"angelUserId" withField4:@"access_token"];
+        [_dbmanager createTableUser:@"User" withField1:@"UID" withField2:@"username" withField3:@"angelUserId" withField4:@"access_token" withField5:@"email" withField6:@"image" withField7:@"follows"];
         
         // Override point for customization after application launch.
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -95,9 +103,6 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     }
     
     
-    [self.window makeKeyAndVisible];
-    
-    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

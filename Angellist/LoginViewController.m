@@ -22,6 +22,10 @@ extern BOOL _loggedIn;
 
 NSString *_angelUserId;//Angellist User Id
 NSString *_angelUserName;//Angellist User name
+NSString *_angelUserImage;//Angellist User Image
+NSString *_angelUserEmailId;//Angellist User email id
+NSString *_angelUserFollows;//Angellist User followers
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -45,6 +49,13 @@ NSString *_angelUserName;//Angellist User name
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    _angelUserId = [[NSString alloc] init];
+    _angelUserName = [[NSString alloc] init];
+    _angelUserFollows = [[NSString alloc] init];
+    _angelUserEmailId = [[NSString alloc] init];
+    _angelUserImage = [[NSString alloc] init];
+    
     webView.delegate = self;
     webView.scrollView.bounces = NO;
 
@@ -100,7 +111,7 @@ NSString *_angelUserName;//Angellist User name
         {
             //Get the query string which provides response code and link with the URL request and POST the URL
             queryString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:1];
-            NSString *urlString = [NSString stringWithFormat:@"https://angel.co/api/oauth/token?client_id=f91c04a55243218eb588f329ae8bbbb9&client_secret=80b56220b6fb722bcb8c85aa6f4996f3&code=28a7eed355eaa3e460f075e0d60b1b40&grant_type=authorization_code",queryString];
+            NSString *urlString = [NSString stringWithFormat:@"https://angel.co/api/oauth/token?client_id=f91c04a55243218eb588f329ae8bbbb9&client_secret=80b56220b6fb722bcb8c85aa6f4996f3&code=%@&grant_type=authorization_code",queryString];
             NSURL *url = [NSURL URLWithString:urlString];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             [request setHTTPMethod:@"POST"];
@@ -115,14 +126,14 @@ NSString *_angelUserName;//Angellist User name
                                   error:&error];
             
             access_token = [json objectForKey:@"access_token"];
-            NSLog(@"\n \n access token = %@ \n \n", access_token);
+            
             access_token_received = TRUE;
         }
         
         if(access_token_received)
         {
             //Get details of User after getting access token
-            NSString *urlString = [NSString stringWithFormat:@"https://api.angel.co/1/me?access_token=5dacdd84bb605a030fdaee148b0574c4",access_token];
+            NSString *urlString = [NSString stringWithFormat:@"https://api.angel.co/1/me?access_token=%@",access_token];
             NSURL *url = [NSURL URLWithString:urlString];
             NSURLRequest *request = [NSURLRequest requestWithURL:url];
             [webView loadRequest:request]; 
@@ -135,12 +146,22 @@ NSString *_angelUserName;//Angellist User name
                                   JSONObjectWithData:response
                                   options:kNilOptions 
                                   error:&error];
+           
             
             _angelUserId = [json objectForKey:@"id"];
             _angelUserName = [json objectForKey:@"name"];
+            _angelUserFollows = [json objectForKey:@"follower_count"];
+            _angelUserEmailId = [json objectForKey:@"email"];
+            _angelUserImage = [json objectForKey:@"image"];
             
             NSString *fbUrl = [json objectForKey:@"facebook_url"];
             NSString *twUrl = [json objectForKey:@"twitter_url"];
+            
+             NSLog(@"\n \n id = %@ \n \n", _angelUserId);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserName);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserFollows);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserEmailId);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserImage);
             
             if((fbUrl == (NSString *)[NSNull null]) || [fbUrl isEqualToString:@""] )
             {
@@ -231,6 +252,17 @@ NSString *_angelUserName;//Angellist User name
     NSLog(@"\n\n%@",[error localizedDescription]);
     NSLog(@"\n\n%@",[error localizedFailureReason]);
     [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
+}
+
+-(void)dealloc
+{
+    [_angelUserId release];
+    [_angelUserName release];
+    [_angelUserFollows release];
+    [_angelUserEmailId release];
+    [_angelUserImage release];
+    
+    [super dealloc];
 }
 
 @end

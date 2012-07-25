@@ -30,4 +30,8 @@
 //Collection on Kinvey that contains Logout details of user
 @property (nonatomic, retain) KCSCollection *logoutCollection;
 
+
+
+-(void)loginToAngelList;
+
 @end

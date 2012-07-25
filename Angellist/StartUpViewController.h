@@ -19,6 +19,7 @@
     UIView *filterView;
     UIView *_view2;
     UILabel *labels;
+    NSOperationQueue *tShopQueueStartups;
 }
 
 @property(nonatomic,retain) UIView *filterView;

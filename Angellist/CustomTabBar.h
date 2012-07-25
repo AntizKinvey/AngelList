@@ -13,6 +13,7 @@
     UIButton *btn2;
     UIButton *btn3;
     UIButton *btn4;
+    UIButton *btn5;
 }
 
 //Hide existing elements of default tab bar

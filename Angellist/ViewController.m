@@ -13,10 +13,13 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation ViewController
-
+extern BOOL _allImagesDowloaded;
+extern BOOL _allImagesDownloadDone;
 BOOL loginFromAL = FALSE;
 BOOL loginWithTW = FALSE;
 BOOL _loggedIn = FALSE;
+
+extern BOOL _loggedOut;
 
 @synthesize loginView = _loginView;
 
@@ -46,8 +49,10 @@ ContainerViewController *_containerViewController;
 - (void)viewWillAppear:(BOOL)animated
 {
     
-    if(_loggedIn)
+    if(_loggedIn== TRUE)
     {
+        _allImagesDowloaded = FALSE;
+        _allImagesDownloadDone = FALSE;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
         {
             _containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPhone" bundle:nil] autorelease];
@@ -59,6 +64,9 @@ ContainerViewController *_containerViewController;
         
         [self.view removeFromSuperview];
         [self.view addSubview:_containerViewController.view];
+    }
+    else {
+        [self loginFromAngel];
     }
     [super viewWillAppear:animated];
 }
@@ -76,6 +84,39 @@ ContainerViewController *_containerViewController;
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[super viewDidDisappear:animated];
+}
+
+-(void)loginFromAngel
+{
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        [myAlert show];
+    }
+    else
+    {
+        loginFromAL = TRUE;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+        {
+            //Open Login screen
+            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
+            [_loginView setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+            [self presentModalViewController:_loginView animated:YES];
+            
+        }
+        else
+        {
+            //Open Login screen
+            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
+            [self presentModalViewController:_loginView animated:YES];
+            
+        }
+    }
+
 }
 
 //Button action to open login screen

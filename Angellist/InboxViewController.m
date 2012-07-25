@@ -260,7 +260,7 @@ UIView *noInternetView;
     }
     
     // image for the navigation bar background
-    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbar.png"];
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
     self.tabBarItem.title = @"Inbox";
@@ -299,7 +299,7 @@ UIView *noInternetView;
 -(void)sendRequestToFetch
 {
    // send GET request to AngelList to fetch the messages
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=5dacdd84bb605a030fdaee148b0574c4",_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
     

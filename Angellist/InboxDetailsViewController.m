@@ -175,7 +175,7 @@ NSMutableArray *displayImage;
     
   
     // URL request
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_currAccessToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=5dacdd84bb605a030fdaee148b0574c4",threadValue,_currAccessToken]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"GET"];

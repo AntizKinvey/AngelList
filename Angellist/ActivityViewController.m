@@ -116,8 +116,8 @@ BOOL _allImagesDowloaded=FALSE;
     
     loadingView.hidden = YES;
     filtersContainer.enabled = YES;
-   
 
+    
     
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
@@ -355,8 +355,7 @@ BOOL _allImagesDowloaded=FALSE;
     [filterView setAlpha:0.4f];
     filterView.tag = 1000;
     [self.view addSubview:filterView];
-    
-    
+        
 //    StartUpViewController *start;
 //    [start viewDidLoad];
     notReachable = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
@@ -626,7 +625,7 @@ BOOL _allImagesDowloaded=FALSE;
                  
                  for(int z=0; z<[feedDescArray count]; z++)
                  {
-                     NSLog(@"\n \n count of feeds = %d",[feedDescArray count]);
+                    
                      NSString *desc = [feedDescArray objectAtIndex:z]; 
                      NSArray *str = [desc componentsSeparatedByString:@">"];
                      
@@ -1049,7 +1048,7 @@ BOOL _allImagesDowloaded=FALSE;
             [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:15];
             [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-            filterButtons.frame = CGRectMake(_xPos, _yPos, 271, 41);
+            filterButtons.frame = CGRectMake(_xPos, _yPos, 271, 51);
             filterButtons.tag = index+1;
             _yPos = _yPos + 53;
             [_view1 addSubview:filterButtons];
@@ -1094,6 +1093,7 @@ BOOL _allImagesDowloaded=FALSE;
     
 }
 
+
 - (void)filterButtonSelected:(id)sender 
 {
     // whatever needs to happen when button is tapped    
@@ -1125,7 +1125,7 @@ BOOL _allImagesDowloaded=FALSE;
             filtersList.tag = 1001;
             [self.view addSubview:filtersList];
             
-            UIImage* image = [UIImage imageNamed:@"navigationbar.png"];
+            UIImage* image = [UIImage imageNamed:@"navigationbarNf.png"];
             
             int _yPos = ((1024*5)/480);
             

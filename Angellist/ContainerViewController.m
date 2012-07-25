@@ -11,6 +11,7 @@
 #import "StartUpViewController.h"
 #import "InboxViewController.h"
 #import "CustomTabBar.h"
+#import "UserProfileViewController.h"
 
 @implementation ContainerViewController
 
@@ -19,6 +20,9 @@
 extern NSString *_angelUserId;//Angel user Id
 extern NSString *_angelUserName;// Angel User name
 extern NSString *access_token;// Access token of user
+extern NSString *_angelUserEmailId;//Angel user Id
+extern NSString *_angelUserImage;// Angel User name
+extern NSString *_angelUserFollows;// Access token of user
 
 extern NSString *_angelUserIdFromDB;
 extern NSString *_angelUserNameFromDB;
@@ -56,7 +60,25 @@ NSString *_currAccessToken;
     {
         _totalNoOfRowsInUserTable++;
         //Insert Angel userId,username and access token of user into User table
-        [_dbmanager insertRecordIntoUserTable:@"User" withField1:@"UID" field1Value:[NSString stringWithFormat:@"%d",_totalNoOfRowsInUserTable] andField2:@"username" field2Value:[NSString stringWithFormat:@"%@",_angelUserName] andField3:@"angelUserId" field3Value:[NSString stringWithFormat:@"%@",_angelUserId] andField4:@"access_token" field4Value:[NSString stringWithFormat:@"%@",access_token]];
+        
+//  [_dbmanager insertRecordIntoUserTable:@"User" withField1:@"UID" field1Value:[NSString             stringWithFormat:@"%d",_totalNoOfRowsInUserTable] andField2:@"username" field2Value:[NSString stringWithFormat:@"%@",_angelUserName] andField3:@"angelUserId" field3Value:[NSString stringWithFormat:@"%@",_angelUserId] andField4:@"access_token" field4Value:[NSString stringWithFormat:@"%@",access_token]];
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *savedImagePath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"me.png"]];
+        
+        NSLog(@"\n\nSaved Image Path = %@",access_token);
+        
+        NSString *strImage = [[NSString alloc] initWithFormat:@"%@",_angelUserImage];
+        UIImage *image = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",strImage]]]];
+        NSData *imageData = UIImagePNGRepresentation(image);
+        [imageData writeToFile:savedImagePath atomically:NO];
+        
+        [image release];
+        [strImage release];
+        
+        
+        [_dbmanager insertRecordIntoUserTable:@"User" withField1:@"UID" field1Value:[NSString stringWithFormat:@"%d",_totalNoOfRowsInUserTable] andField2:@"username" field2Value:[NSString stringWithFormat:@"%@",_angelUserName] andField3:@"angelUserId" field3Value:[NSString stringWithFormat:@"%@",_angelUserId] andField4:@"access_token" field4Value:[NSString stringWithFormat:@"%@",access_token] andField5:@"email" field5Value:[NSString stringWithFormat:@"%@",_angelUserEmailId] andField6:@"image" field6Value:savedImagePath andField7:@"follows" field7Value:[NSString stringWithFormat:@"%@",_angelUserFollows]];
     }
     
     [_dbmanager retrieveUserDetails];
@@ -67,8 +89,8 @@ NSString *_currAccessToken;
     _currAccessToken = [[NSString alloc] initWithFormat:@"%@",access_tokenFromDB];
 
     //Create tab bar elements and navigation controllers
-    UIViewController *viewController2, *viewController3, *viewController4;
-    UINavigationController *navigationcontroller2,*navigationcontroller3,*navigationcontroller4;
+    UIViewController *viewController2, *viewController3, *viewController4, *viewController5;
+    UINavigationController *navigationcontroller2,*navigationcontroller3,*navigationcontroller4 ,*navigationcontroller5;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
         viewController2 = [[[ActivityViewController alloc] initWithNibName:@"ActivityViewController_iPhone" bundle:nil] autorelease];
@@ -79,6 +101,9 @@ NSString *_currAccessToken;
         
         viewController4 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPhone" bundle:nil] autorelease];
         navigationcontroller4 = [[[UINavigationController alloc] initWithRootViewController:viewController4] autorelease];
+        
+        viewController5 = [[[UserProfileViewController alloc] initWithNibName:@"UserProfileViewController" bundle:nil] autorelease];
+        navigationcontroller5 = [[[UINavigationController alloc] initWithRootViewController:viewController5] autorelease];
     }
     else
     {
@@ -90,11 +115,14 @@ NSString *_currAccessToken;
         
         viewController4 = [[[InboxViewController alloc] initWithNibName:@"InboxViewController_iPad" bundle:nil] autorelease];
         navigationcontroller4 = [[[UINavigationController alloc] initWithRootViewController:viewController4] autorelease];
+        
+        viewController5 = [[[UserProfileViewController alloc] initWithNibName:@"UserProfileViewController" bundle:nil] autorelease];
+        navigationcontroller5 = [[[UINavigationController alloc] initWithRootViewController:viewController5] autorelease];
     }
     
     //Use custom tab bar
     self.tabBarController = [[[CustomTabBar alloc] init] autorelease];
-    self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller2, navigationcontroller3, navigationcontroller4, nil];
+    self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller2, navigationcontroller3, navigationcontroller4, navigationcontroller5, nil];
     [self.view addSubview:self.tabBarController.view];
     
     [super viewDidLoad];

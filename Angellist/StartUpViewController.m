@@ -427,14 +427,14 @@ BOOL _allImagesDownloadDone = FALSE;
 -(void)startLoadingImagesConcurrently
 {
     
-    NSOperationQueue *tShopQueue = [NSOperationQueue new];
+    tShopQueueStartups = [NSOperationQueue new];
     NSInvocationOperation *tPerformOperation = [[NSInvocationOperation alloc] 
                                                 initWithTarget:self
                                                 selector:@selector(loadImage) 
                                                 object:nil];
-    [tShopQueue addOperation:tPerformOperation]; 
+    [tShopQueueStartups addOperation:tPerformOperation]; 
     [tPerformOperation release];
-    [tShopQueue release];
+    //[tShopQueueStartups release];
     
 }
 
@@ -708,10 +708,7 @@ BOOL _allImagesDownloadDone = FALSE;
             
             }
 
-               
-                 
-                 
-                 [table reloadData];
+                [table reloadData];
         
                 [self startLoadingImagesConcurrently];
 
@@ -863,7 +860,7 @@ BOOL _allImagesDownloadDone = FALSE;
             [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:15];
             [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
-            filterButtons.frame = CGRectMake(_xPosSp, _yPosSp, 271, 41);
+            filterButtons.frame = CGRectMake(_xPosSp, _yPosSp, 271, 51);
             filterButtons.tag = index+1;
             _yPosSp = _yPosSp + 53;
             [_view2 addSubview:filterButtons];
@@ -923,6 +920,8 @@ BOOL _allImagesDownloadDone = FALSE;
     [displayStartUpLogoImageInDirectory removeAllObjects];
     [saveImageInDirectory removeAllObjects];
     _allImagesDownloadDone = FALSE;
+    [displayStartUpLogoUrlArray removeAllObjects];
+    [tShopQueueStartups cancelAllOperations];
     
     int _tagID = [sender tag];
     

@@ -19,4 +19,6 @@
 -(IBAction) loginFromAngellist:(id) sender;
 -(IBAction) loginWithTwitter:(id) sender;
 
+-(void)loginFromAngel;
+
 @end
