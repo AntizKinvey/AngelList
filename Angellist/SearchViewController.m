@@ -223,6 +223,18 @@ int _xPosS = 0;
     
     searchString = [[NSString alloc] init];
     
+    [searchNamesStartup removeAllObjects];
+    [searchIdStartup removeAllObjects];
+    [searchImageStartup removeAllObjects];
+    [searchtypeStartup removeAllObjects];
+    [searchUrlStartup removeAllObjects];
+    
+    [searchNamesUser removeAllObjects];
+    [searchIdUser removeAllObjects];
+    [searchImageUser removeAllObjects];
+    [searchtypeUser removeAllObjects];
+    [searchUrlUser removeAllObjects];
+    
     searchString = searchBar.text;
     [self searchOption:searchString];
 }

@@ -86,7 +86,9 @@ NSString *_currAccessToken;
     //Assign angel User Id to global variable
     _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserIdFromDB];
     //Assign angel User access token to global variable
-    _currAccessToken = [[NSString alloc] initWithFormat:@"%@",access_tokenFromDB];
+    _currAccessToken = [[NSString alloc] initWithFormat:@"%@",[_dbmanager.userDetailsArray objectAtIndex:4]];
+    
+    NSLog(@"\n \n access token = %@ ", _currAccessToken);
 
     //Create tab bar elements and navigation controllers
     UIViewController *viewController2, *viewController3, *viewController4, *viewController5;

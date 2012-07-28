@@ -14,7 +14,12 @@
 // array from feed details
 extern NSMutableArray *actorNameArray;
 extern NSMutableArray *actorUrlArray;
+
+extern NSMutableArray *targetNameArray;
+extern NSMutableArray *targetUrlArray;
 extern int _rowNumberInActivity;
+
+extern int _rowIndexPathNumber;
 
 UIButton* backButton;
 
@@ -23,7 +28,15 @@ UIButton* backButton;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = [actorNameArray objectAtIndex:_rowNumberInActivity];
+       
+        if (_rowIndexPathNumber == 0) {
+            self.title = [actorNameArray objectAtIndex:_rowNumberInActivity];
+            
+        }
+        else if(_rowIndexPathNumber == 2){
+             self.title = [targetNameArray objectAtIndex:_rowNumberInActivity];
+            
+        }
     }
     return self;
 }
@@ -59,7 +72,15 @@ UIButton* backButton;
     [backButton release];
      self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
     // load angellist URL
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
+    NSURL *url;
+    if (_rowIndexPathNumber == 0) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
+       
+    }
+    else if(_rowIndexPathNumber == 2){
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[targetUrlArray objectAtIndex:_rowNumberInActivity]]];
+        
+    }
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
     

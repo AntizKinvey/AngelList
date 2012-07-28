@@ -94,8 +94,7 @@ KCSCollection *_detailsCollection;
             CGSize constraint1 = CGSizeMake(270, 20000.0f);
             CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
             
-           
-            
+
             //startup locations to be displayed
             UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+120, 270, 30)];
             startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
@@ -230,7 +229,7 @@ KCSCollection *_detailsCollection;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"\n\nNo Internet Connection");
+        NSLog(@"\n\n No Internet Connection");
     }
     else
     {
@@ -398,7 +397,7 @@ KCSCollection *_detailsCollection;
 /*                                          Kinvey Delegate Methods                                         */
 /************************************************************************************************************/
 
-//Persistable Delegate Methods
+// Persistable Delegate Methods
 // Right now just pop-up an alert about what we got back from Kinvey during
 // the save. Normally you would want to implement more code here
 // This is called when the save completes successfully

@@ -8,18 +8,21 @@
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
-
+#import "SearchViewController.h"
 
 @interface StartUpViewController : UIViewController <UITableViewDataSource>
 {
     IBOutlet UITableView *table;
     IBOutlet UIView *loadingView;
     IBOutlet UIButton *moreButton;
+    UIButton *buttonSearch;
     DBManager *_dbmanager;
     UIView *filterView;
     UIView *_view2;
     UILabel *labels;
     NSOperationQueue *tShopQueueStartups;
+    SearchViewController *_searchViewController;
+    
 }
 
 @property(nonatomic,retain) UIView *filterView;

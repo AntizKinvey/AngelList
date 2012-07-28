@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
 #import "StartUpViewController.h"
+#import "SearchViewController.h"
 
 
 @interface ActivityViewController : UIViewController <UITableViewDataSource>
@@ -18,6 +19,7 @@
     UIView *loadOlderFeeds;
     UIView *_view1;
     UILabel *label;
+    UIButton *buttonSearch;
     
     UIImageView *kinvey;
     UIImageView *angelLogo;
@@ -25,6 +27,7 @@
     UIView *filterView;
     UIActivityIndicatorView *labelLoading;
     StartUpViewController *startUpView;
+    SearchViewController *_searchViewController;
 }
 
 @property(nonatomic, retain)UIView *filterView;

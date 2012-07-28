@@ -151,7 +151,6 @@ extern NSString *_angelUserNameFromDB;
     //[self presentModalViewController:_searchViewController animated:YES];
     [self.navigationController pushViewController:_searchViewController animated:YES];
     
-    
 }
 
 

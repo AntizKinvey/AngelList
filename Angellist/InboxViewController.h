@@ -8,15 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
+#import "SearchViewController.h"
 
 @interface InboxViewController : UIViewController<UITableViewDataSource, UITableViewDelegate>
 {
     IBOutlet UITableView *tableview;
     UILabel *label;
     IBOutlet UIView *loading;
-    
+    UIButton *buttonSearch;
     DBManager *_dbmanager;
-    
+    SearchViewController *_searchViewController;
     
 }
 

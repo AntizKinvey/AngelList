@@ -38,7 +38,6 @@ UIButton *backButton;
     
     [loading.layer setCornerRadius:18.0f];
    
-    
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     

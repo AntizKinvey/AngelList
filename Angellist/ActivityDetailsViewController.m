@@ -22,16 +22,31 @@ extern NSMutableArray *actorUrlArray;
 extern NSMutableArray *actorTaglineArray;
 extern NSMutableArray *feedImageArray;
 
+extern NSMutableArray *targetTypeArray; 
+extern NSMutableArray *targetIdArray;
+extern NSMutableArray *targetNameArray;
+extern NSMutableArray *targetUrlArray;
+extern NSMutableArray *targetTaglineArray;
+extern NSMutableArray *targetImageArray;
+
 extern NSMutableArray *feedImagesArrayFromDirectory;
 
 extern NSMutableArray *userFollowingIds;
+
+extern NSMutableArray *feedType;
 
 extern int _rowNumberInActivity;
 extern NSString *_currAccessToken;
 extern NSString *_globalSessionId;
 UIButton* backButton;
 
+NSString *feedTypeString;
+
+int _rowIndexPathNumber;
+
 NSMutableArray *displayFeedsInCells;
+
+NSMutableArray *displayTargetInCells;
 
 KCSCollection *_detailsCollection;
 
@@ -48,6 +63,7 @@ KCSCollection *_detailsCollection;
 //---insert individual row into the table view---
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
+    
     static NSString *CellIdentifier = @"Cell";
     
     //---try to get a reusable cell--- 
@@ -101,27 +117,61 @@ KCSCollection *_detailsCollection;
             actorDesclabel.text = text;
             [cell.contentView addSubview:actorDesclabel];
             [actorDesclabel release];
-                
-            // for displaying follow / unfollow button
-            if([userFollowingIds containsObject:[actorIdArray objectAtIndex:_rowNumberInActivity]])
-            {
-                unfollowButton.hidden = NO;
-                followButton.hidden = YES;
-                
-                unfollowButton.frame = CGRectMake(170, 180+size.height, 52, 36);
-                [cell.contentView addSubview:unfollowButton];
-            }
-            else
-            {
-                followButton.hidden = NO;
-                unfollowButton.hidden = YES;
-                
-                followButton.frame = CGRectMake(170, 180+size.height, 52, 36);
-                [cell.contentView addSubview:followButton];
-            }
             
-            moreButton.frame = CGRectMake(230, 180+size.height, 52, 36);
-            [[cell contentView] addSubview:moreButton];
+                
+        }
+        
+        if (indexPath.row == 1) 
+        {
+            
+            UILabel *actorNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(00, 05, 320, 30)];
+            actorNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:16];
+            actorNamelabel.lineBreakMode = UILineBreakModeWordWrap;
+            actorNamelabel.backgroundColor = [UIColor clearColor];
+            actorNamelabel.textAlignment = UITextAlignmentCenter;
+            actorNamelabel.text = feedTypeString;
+            actorNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
+            [cell.contentView addSubview:actorNamelabel];
+            [actorNamelabel release];        
+        }
+    
+    
+        if (indexPath.row == 2 && ![[displayTargetInCells objectAtIndex:1] isEqual:(NSString*)[NSNull null]]) 
+        {
+        
+            // image view to display image of user/startup
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
+            cellImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[displayTargetInCells objectAtIndex:0]]]];
+            cellImageView.layer.cornerRadius = 3.5f;
+            cellImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+            
+            // label to display name of the user/startup
+            UILabel *actorNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
+            actorNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+            actorNamelabel.lineBreakMode = UILineBreakModeWordWrap;
+            actorNamelabel.backgroundColor = [UIColor clearColor];
+            actorNamelabel.text = [NSString stringWithFormat:@"%@",[displayTargetInCells objectAtIndex:1]];
+            actorNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
+            [cell.contentView addSubview:actorNamelabel];
+            [actorNamelabel release];
+            
+            // label to display description
+            NSString *text = [displayTargetInCells objectAtIndex:2];
+            CGSize constraint = CGSizeMake(270, 20000.0f);
+            CGSize size = [[NSString stringWithFormat:@"%@",text] sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+            
+            
+            UILabel *actorDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 160, 270, size.height)];
+            actorDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            actorDesclabel.numberOfLines = 10;
+            actorDesclabel.backgroundColor = [UIColor clearColor];
+            actorDesclabel.lineBreakMode = UILineBreakModeWordWrap;
+            actorDesclabel.text = [NSString stringWithFormat:@"%@",text];
+            [cell.contentView addSubview:actorDesclabel];
+            [actorDesclabel release];
+            
         }
     }
     else
@@ -132,21 +182,62 @@ KCSCollection *_detailsCollection;
     return cell; 
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    
+    NSIndexPath *selection = [table indexPathForSelectedRow];
+    if (selection)
+    {
+        
+        [table deselectRowAtIndexPath:selection animated:YES];
+        
+    }
+    [displayFeedsInCells retain];
+    [super viewWillAppear:animated];
+    
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *text = [displayFeedsInCells objectAtIndex:2];
-    CGSize constraint = CGSizeMake(270, 20000.0f);
-    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    int heightOfRow;
+    if (indexPath.row == 1) {
+        heightOfRow = 50;
+    }
+    else {
+        NSString *text = [displayFeedsInCells objectAtIndex:2];
+        CGSize constraint = CGSizeMake(270, 20000.0f);
+        CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+        heightOfRow = size.height + 200;
+    }
+   
 
-    return size.height + 230; //160    
+    return heightOfRow; //160    
 }
 
 
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
+    if (![[displayTargetInCells objectAtIndex:1] isEqual:(NSString*)[NSNull null]]) {
+        return 3;
+    }
+    else {
+        return 1;
+    }
     
-    return 1;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    
+    if (indexPath.row !=1) {
+        
+        _rowIndexPathNumber = indexPath.row;
+        [self actorDetails];
+    }
+    
+    
 }
 
 
@@ -226,6 +317,14 @@ KCSCollection *_detailsCollection;
     [displayFeedsInCells addObject:[actorNameArray objectAtIndex:_rowNumberInActivity]];
     [displayFeedsInCells addObject:[actorTaglineArray objectAtIndex:_rowNumberInActivity]];
     
+    displayTargetInCells = [[NSMutableArray alloc] init];
+    
+    [displayTargetInCells addObject:[targetImageArray objectAtIndex:_rowNumberInActivity]];
+    [displayTargetInCells addObject:[targetNameArray objectAtIndex:_rowNumberInActivity]];
+    [displayTargetInCells addObject:[targetTaglineArray objectAtIndex:_rowNumberInActivity]];
+    
+    feedTypeString = [feedType objectAtIndex:_rowNumberInActivity];
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 }
@@ -237,6 +336,7 @@ KCSCollection *_detailsCollection;
 
 -(void)actorDetails
 {
+    
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -318,11 +418,6 @@ KCSCollection *_detailsCollection;
     
 }
 
--(void) viewWillAppear:(BOOL)animated
-{
-    [displayFeedsInCells retain];
-    [super viewWillAppear:animated];
-}
 
 
 - (void)viewDidUnload

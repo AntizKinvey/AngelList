@@ -172,10 +172,12 @@ NSMutableArray *displayImage;
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
+    _dbmanager = [[DBManager alloc] init];
+    [_dbmanager openDB];
     
-  
+  [_dbmanager retrieveUserDetails];
     // URL request
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=5dacdd84bb605a030fdaee148b0574c4",threadValue,_currAccessToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_dbmanager.access_tokenFromDB]];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"GET"];

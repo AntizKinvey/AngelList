@@ -7,12 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DBManager.h"
 
 @interface InboxDetailsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UITextViewDelegate>
 {
     
     IBOutlet UITableView *tableMsgDetails;
     IBOutlet UITextView *textViewReply;
+    DBManager *_dbmanager;
     
     
 }

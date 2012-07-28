@@ -32,6 +32,13 @@ NSMutableArray *actorNameArray;
 NSMutableArray *actorUrlArray;
 NSMutableArray *actorTaglineArray;
 
+NSMutableArray *targetTypeArray;
+NSMutableArray *targetIdArray;
+NSMutableArray *targetNameArray;
+NSMutableArray *targetUrlArray;
+NSMutableArray *targetTaglineArray;
+NSMutableArray *targetImageArray;
+
 // arrays to display the feeds
 NSMutableArray *completeActorTypeArray;
 NSMutableArray *completeActorIdArray;
@@ -39,8 +46,21 @@ NSMutableArray *completeActorNameArray;
 NSMutableArray *completeActorUrlArray;
 NSMutableArray *completeActorTaglineArray;
 
+
+// arrays to display the feeds
+NSMutableArray *completeTargetTypeArray;
+NSMutableArray *completeTargetIdArray;
+NSMutableArray *completeTargetNameArray;
+NSMutableArray *completeTargetUrlArray;
+NSMutableArray *completeTargetTaglineArray;
+NSMutableArray *completeTargetImageArray;
+
 NSMutableArray *completeFeedDescDisplayArray;
 NSMutableArray *completeFeedImageArray;
+
+NSMutableArray *completeFeedType;
+NSMutableArray *feedType;
+NSMutableArray *filterFeedType;
 
 // arrays for filter details
 NSMutableArray *filterDescArray;
@@ -54,12 +74,22 @@ NSMutableArray *filterNameArray;
 NSMutableArray *filterUrlArray;
 NSMutableArray *filterTaglineArray;
 
+NSMutableArray *filterTypeArrayTarget;
+NSMutableArray *filterIdArrayTarget;
+NSMutableArray *filterNameArrayTarget;
+NSMutableArray *filterUrlArrayTarget;
+NSMutableArray *filterTaglineArrayTarget;
+NSMutableArray *filterImageArrayTarget;
+
+
 NSMutableArray *directoryImagesArray;
 // array of filter names
 NSArray *_filterNames;
 int _rowNumberInActivity = 0;
 BOOL _showFilterMenu = FALSE;
 BOOL _imagesSaved = FALSE;
+
+int _tagID = 0;
 
 // array of ids of the people/startup user is following
 NSMutableArray *userFollowingIds;
@@ -406,7 +436,7 @@ BOOL _allImagesDowloaded=FALSE;
     
     //self.tabBarItem.title = @"Activity";
     UINavigationBar *bar = [self.navigationController navigationBar];
-    label = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 320, 20)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(30, 10, 260, 20)];
     label.textAlignment = UITextAlignmentCenter;
     label.textColor = [UIColor whiteColor];
     label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
@@ -417,7 +447,15 @@ BOOL _allImagesDowloaded=FALSE;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelected:)];
     [bar addGestureRecognizer:tap];
     
+    buttonSearch = [[UIButton alloc] init];
+    buttonSearch.frame = CGRectMake(0, 0, 40, 40);
+    [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
+    [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
+    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
+    buttonSearch.enabled = YES;
     
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:buttonSearch]autorelease];
+
     
     feedDescArray = [[NSMutableArray alloc] init];
     feedDescDisplayArray = [[NSMutableArray alloc] init];
@@ -436,11 +474,25 @@ BOOL _allImagesDowloaded=FALSE;
     completeActorUrlArray = [[NSMutableArray alloc] init];
     completeActorTaglineArray = [[NSMutableArray alloc] init];
     
+    completeTargetTypeArray = [[NSMutableArray alloc] init];
+    completeTargetIdArray = [[NSMutableArray alloc] init];
+    completeTargetNameArray = [[NSMutableArray alloc] init];
+    completeTargetUrlArray = [[NSMutableArray alloc] init];
+    completeTargetTaglineArray = [[NSMutableArray alloc] init];
+    completeTargetImageArray = [[NSMutableArray alloc] init];
+    
     actorTypeArray = [[NSMutableArray alloc] init];
     actorIdArray = [[NSMutableArray alloc] init];
     actorNameArray = [[NSMutableArray alloc] init];
     actorUrlArray = [[NSMutableArray alloc] init];
     actorTaglineArray = [[NSMutableArray alloc] init];
+    
+    targetTypeArray = [[NSMutableArray alloc] init];
+    targetIdArray = [[NSMutableArray alloc] init];
+    targetNameArray = [[NSMutableArray alloc] init];
+    targetUrlArray = [[NSMutableArray alloc] init];
+    targetTaglineArray = [[NSMutableArray alloc] init];
+    targetImageArray = [[NSMutableArray alloc] init];
     
     filterDescArray = [[NSMutableArray alloc] init];
     filterImageArray = [[NSMutableArray alloc] init];
@@ -450,6 +502,19 @@ BOOL _allImagesDowloaded=FALSE;
     filterNameArray = [[NSMutableArray alloc] init];
     filterUrlArray = [[NSMutableArray alloc] init];
     filterTaglineArray = [[NSMutableArray alloc] init];
+    
+    
+    filterImageArrayTarget = [[NSMutableArray alloc] init];
+    filterTypeArrayTarget = [[NSMutableArray alloc] init];
+    filterIdArrayTarget = [[NSMutableArray alloc] init];
+    filterNameArrayTarget = [[NSMutableArray alloc] init];
+    filterUrlArrayTarget = [[NSMutableArray alloc] init];
+    filterTaglineArrayTarget = [[NSMutableArray alloc] init];
+    
+    
+    completeFeedType = [[NSMutableArray alloc] init];
+    feedType = [[NSMutableArray alloc] init];
+    filterFeedType = [[NSMutableArray alloc] init];
     
     filterFeedImagesArrayFromDirectory = [[NSMutableArray alloc] init];
     directoryImagesArray = [[NSMutableArray alloc] init];
@@ -471,6 +536,17 @@ BOOL _allImagesDowloaded=FALSE;
     [super viewDidLoad];
     
 }
+
+-(void)goToSearch
+{
+    label.hidden = YES;
+    _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
+    [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    //[self presentModalViewController:_searchViewController animated:YES];
+    [self.navigationController pushViewController:_searchViewController animated:YES];
+    
+}
+
 
 
 
@@ -514,6 +590,10 @@ BOOL _allImagesDowloaded=FALSE;
                      NSDictionary *feedDict = [feeds objectAtIndex:i];
                      NSString *description = [feedDict objectForKey:@"description"];
                      [feedDescArray addObject:description];
+                     
+                    
+                     
+                     
                      
                      NSString *actorType = [[feedDict objectForKey:@"actor"] valueForKey:@"type"];
                      if(actorType == (NSString *)[NSNull null])
@@ -749,6 +829,12 @@ BOOL _allImagesDowloaded=FALSE;
                 NSString *description = [feedDict objectForKey:@"description"];
                 [feedDescArray addObject:description];
                 
+                NSString *feedTypeString = [[feedDict valueForKey:@"item"] valueForKey:@"type"];
+                [feedType addObject:feedTypeString];
+                [completeFeedType addObject:feedTypeString];
+                
+                NSLog(@"\n \n FEED TYPE = %@ \n \n ", feedTypeString);
+                
                 NSString *actorType = [[feedDict objectForKey:@"actor"] valueForKey:@"type"];
                 if(actorType == (NSString *)[NSNull null])
                 {
@@ -856,6 +942,73 @@ BOOL _allImagesDowloaded=FALSE;
                 
                 [theMutableString release];
             }
+        
+            for(int i=0; i<[feeds count]; i++)
+            {
+                NSLog(@"\n \n \n feeds count = %d \n \n \n *********", i);
+
+                NSDictionary *feedDict = [feeds objectAtIndex:i];
+            
+                NSString *actorType = [[feedDict objectForKey:@"target"] valueForKey:@"type"];
+//                if(actorType != (NSString *)[NSNull null])
+//                {
+                    [targetTypeArray addObject:actorType];
+                    [completeTargetTypeArray addObject:actorType];
+                
+               // }
+                        
+                NSString *actorId = [[feedDict objectForKey:@"target"] valueForKey:@"id"];
+//                if(actorId != (NSString *)[NSNull null])
+//                {
+                    [targetIdArray addObject:actorId];
+                    [completeTargetIdArray addObject:actorId];
+               // }
+            
+                NSString *feedImages = [[feedDict objectForKey:@"target"] valueForKey:@"image"];
+//                if(feedImages != (NSString *)[NSNull null])
+//                {
+                    [targetImageArray addObject:feedImages];
+                    [completeTargetImageArray addObject:feedImages];
+             //   }
+            
+            
+            
+                NSString *targetNames = [[feedDict objectForKey:@"target"] valueForKey:@"name"];
+//                if (targetNames == (NSString *)[NSNull null]) 
+//                {
+//                    [targetNameArray addObject:@"Name not found!"];
+//                    [completeTargetNameArray addObject:@"Name not found!"];
+//                } 
+//                else 
+//                {
+                    [targetNameArray addObject:targetNames];
+                    [completeTargetNameArray addObject:targetNames];
+               // }
+                
+                       
+                NSString *actorUrl = [[feedDict objectForKey:@"target"] valueForKey:@"angellist_url"];
+                //if(actorUrl != (NSString *)[NSNull null])
+                //{
+                    [targetUrlArray addObject:actorUrl];
+                    [completeTargetUrlArray addObject:actorUrl];
+               // }
+            
+           
+                NSString *targetTagline = [[feedDict objectForKey:@"target"] valueForKey:@"tagline"];
+//                if (targetTagline == (NSString *)[NSNull null]) 
+//                {
+//                    [targetTaglineArray addObject:@"Information not available!"];
+//                    [completeTargetTaglineArray addObject:@"Information not available!"];
+//                } 
+//                else 
+//                {
+                    [targetTaglineArray addObject:targetTagline];
+                    [completeTargetTaglineArray addObject:targetTagline];
+               // }
+                
+            
+        }
+
             
             for(int z=0; z<[feedDescArray count]; z++)
             {
@@ -1075,7 +1228,6 @@ BOOL _allImagesDowloaded=FALSE;
         for (int index = 1; index<[_filterNames count]+1; index++) {
         
             [[self.view viewWithTag:index] removeFromSuperview];
-            
         }
         i++;
         [filterView setFrame:CGRectMake(0, 0, 320, 400)];
@@ -1153,7 +1305,6 @@ BOOL _allImagesDowloaded=FALSE;
     else
     {
         [filtersContainer setSelected:FALSE];
-      
         [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.07];
         _showFilterMenu = FALSE;
     }
@@ -1176,6 +1327,14 @@ BOOL _allImagesDowloaded=FALSE;
     [filterUrlArray removeAllObjects];
     [filterTaglineArray removeAllObjects];
     
+    [filterTypeArrayTarget removeAllObjects];
+    [filterIdArrayTarget removeAllObjects];
+    [filterImageArrayTarget removeAllObjects];
+    [filterNameArrayTarget removeAllObjects];
+    [filterUrlArrayTarget removeAllObjects];
+    [filterTaglineArrayTarget removeAllObjects];
+    [filterFeedType removeAllObjects];
+    
     [feedDescDisplayArray removeAllObjects];
     [feedDescDisplayArray addObjectsFromArray:completeFeedDescDisplayArray];
     [feedImageArray removeAllObjects];
@@ -1197,7 +1356,26 @@ BOOL _allImagesDowloaded=FALSE;
     [actorTaglineArray removeAllObjects];
     [actorTaglineArray addObjectsFromArray:completeActorTaglineArray];
     
-    int _tagID = [sender tag];
+    
+    
+    [targetTypeArray removeAllObjects];
+    [targetTypeArray addObjectsFromArray:completeTargetTypeArray];
+    
+    [targetIdArray removeAllObjects];
+    [targetIdArray addObjectsFromArray:completeTargetIdArray];
+    [targetImageArray removeAllObjects];
+    [targetImageArray addObjectsFromArray:completeTargetImageArray];
+    [targetNameArray removeAllObjects];
+    [targetNameArray addObjectsFromArray:completeTargetNameArray];
+    [targetUrlArray removeAllObjects];
+    [targetUrlArray addObjectsFromArray:completeTargetUrlArray];
+    [targetTaglineArray removeAllObjects];
+    [targetTaglineArray addObjectsFromArray:completeTargetTaglineArray];
+    
+    [feedType removeAllObjects];
+    [feedType addObjectsFromArray:completeFeedType];
+    
+    _tagID = [sender tag];
     
     switch(_tagID)
     {
@@ -1216,12 +1394,22 @@ BOOL _allImagesDowloaded=FALSE;
                          [filterNameArray addObject:[actorNameArray objectAtIndex:k]];
                          [filterUrlArray addObject:[actorUrlArray objectAtIndex:k]];
                          [filterTaglineArray addObject:[actorTaglineArray objectAtIndex:k]];
+                         
+                         
+                         [filterTypeArrayTarget addObject:[targetTypeArray objectAtIndex:k]];
+                         [filterIdArrayTarget addObject:[targetIdArray objectAtIndex:k]];
+                         [filterImageArrayTarget addObject:[targetImageArray objectAtIndex:k]];
+                         [filterNameArrayTarget addObject:[targetNameArray objectAtIndex:k]];
+                         [filterUrlArrayTarget addObject:[targetUrlArray objectAtIndex:k]];
+                         [filterTaglineArrayTarget addObject:[targetTaglineArray objectAtIndex:k]];
+                       
+                         [filterFeedType addObject:[feedType objectAtIndex:k]];
                      }
                  }
                 
                  label.text = @"Activity - Followed";
                  self.tabBarItem.title = @"Activity";
-            
+
                  [feedDescDisplayArray removeAllObjects];
                  [feedDescDisplayArray addObjectsFromArray:filterDescArray];
                  [feedImageArray removeAllObjects];
@@ -1232,7 +1420,6 @@ BOOL _allImagesDowloaded=FALSE;
                  [actorTypeArray addObjectsFromArray:filterTypeArray];
                  [actorIdArray removeAllObjects];
                  [actorIdArray addObjectsFromArray:filterIdArray];
-            
                  [actorNameArray removeAllObjects];
                  [actorNameArray addObjectsFromArray:filterNameArray];
                  [actorUrlArray removeAllObjects];
@@ -1240,12 +1427,30 @@ BOOL _allImagesDowloaded=FALSE;
                  [actorTaglineArray removeAllObjects];
                  [actorTaglineArray addObjectsFromArray:filterTaglineArray];
             
+            [targetTypeArray removeAllObjects];
+            [targetTypeArray addObjectsFromArray:filterTypeArrayTarget];            
+            [targetIdArray removeAllObjects];
+            [targetIdArray addObjectsFromArray:filterIdArrayTarget];
+            [targetImageArray removeAllObjects];
+            [targetImageArray addObjectsFromArray:filterImageArrayTarget];
+            [targetNameArray removeAllObjects];
+            [targetNameArray addObjectsFromArray:filterNameArrayTarget];
+            [targetUrlArray removeAllObjects];
+            [targetUrlArray addObjectsFromArray:filterUrlArrayTarget];
+            [targetTaglineArray removeAllObjects];
+            [targetTaglineArray addObjectsFromArray:filterTaglineArrayTarget];
+            
+            [feedType removeAllObjects];
+            [feedType addObjectsFromArray:filterFeedType];
+
+
+            
                  _showFilterMenu = FALSE;
             [filtersContainer setSelected:FALSE];
                 
             [[self.view viewWithTag:i] removeFromSuperview];
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
-                 [table reloadData];
+            [table reloadData];
             [self startLoadingImagesConcurrently];
                 break;
             
@@ -1267,6 +1472,16 @@ BOOL _allImagesDowloaded=FALSE;
                          [filterNameArray addObject:[actorNameArray objectAtIndex:k]];
                          [filterUrlArray addObject:[actorUrlArray objectAtIndex:k]];
                          [filterTaglineArray addObject:[actorTaglineArray objectAtIndex:k]];
+                         
+                         
+                         [filterTypeArrayTarget addObject:[targetTypeArray objectAtIndex:k]];
+                         [filterIdArrayTarget addObject:[targetIdArray objectAtIndex:k]];
+                         [filterImageArrayTarget addObject:[targetImageArray objectAtIndex:k]];
+                         [filterNameArrayTarget addObject:[targetNameArray objectAtIndex:k]];
+                         [filterUrlArrayTarget addObject:[targetUrlArray objectAtIndex:k]];
+                         [filterTaglineArrayTarget addObject:[targetTaglineArray objectAtIndex:k]];
+                         
+                         [filterFeedType addObject:[feedType objectAtIndex:k]];
                      }
                  } 
 
@@ -1293,10 +1508,27 @@ BOOL _allImagesDowloaded=FALSE;
                  [actorTaglineArray removeAllObjects];
                  [actorTaglineArray addObjectsFromArray:filterTaglineArray];
             
+            [targetTypeArray removeAllObjects];
+            [targetTypeArray addObjectsFromArray:filterTypeArrayTarget];            
+            [targetIdArray removeAllObjects];
+            [targetIdArray addObjectsFromArray:filterIdArrayTarget];
+            [targetImageArray removeAllObjects];
+            [targetImageArray addObjectsFromArray:filterImageArrayTarget];
+            [targetNameArray removeAllObjects];
+            [targetNameArray addObjectsFromArray:filterNameArrayTarget];
+            [targetUrlArray removeAllObjects];
+            [targetUrlArray addObjectsFromArray:filterUrlArrayTarget];
+            [targetTaglineArray removeAllObjects];
+            [targetTaglineArray addObjectsFromArray:filterTaglineArrayTarget];
+            
+            [feedType removeAllObjects];
+            [feedType addObjectsFromArray:filterFeedType];
+
+            
                  [table reloadData];
-            [self startLoadingImagesConcurrently];
+                [self startLoadingImagesConcurrently];
                  _showFilterMenu = FALSE;
-            [filtersContainer setSelected:FALSE];
+                [filtersContainer setSelected:FALSE];
           
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
                  break;
@@ -1319,6 +1551,15 @@ BOOL _allImagesDowloaded=FALSE;
                          [filterNameArray addObject:[actorNameArray objectAtIndex:k]];
                          [filterUrlArray addObject:[actorUrlArray objectAtIndex:k]];
                          [filterTaglineArray addObject:[actorTaglineArray objectAtIndex:k]];
+                         
+                         [filterTypeArrayTarget addObject:[targetTypeArray objectAtIndex:k]];
+                         [filterIdArrayTarget addObject:[targetIdArray objectAtIndex:k]];
+                         [filterImageArrayTarget addObject:[targetImageArray objectAtIndex:k]];
+                         [filterNameArrayTarget addObject:[targetNameArray objectAtIndex:k]];
+                         [filterUrlArrayTarget addObject:[targetUrlArray objectAtIndex:k]];
+                         [filterTaglineArrayTarget addObject:[targetTaglineArray objectAtIndex:k]];                         
+                         [filterFeedType addObject:[feedType objectAtIndex:k]];
+
                      }
                  } 
 
@@ -1345,12 +1586,28 @@ BOOL _allImagesDowloaded=FALSE;
                  [actorTaglineArray removeAllObjects];
                  [actorTaglineArray addObjectsFromArray:filterTaglineArray];
             
-                 [table reloadData];
-            [self startLoadingImagesConcurrently];
-                 _showFilterMenu = FALSE;
-            [filtersContainer setSelected:FALSE];
+            [targetTypeArray removeAllObjects];
+            [targetTypeArray addObjectsFromArray:filterTypeArrayTarget];            
+            [targetIdArray removeAllObjects];
+            [targetIdArray addObjectsFromArray:filterIdArrayTarget];
+            [targetImageArray removeAllObjects];
+            [targetImageArray addObjectsFromArray:filterImageArrayTarget];
+            [targetNameArray removeAllObjects];
+            [targetNameArray addObjectsFromArray:filterNameArrayTarget];
+            [targetUrlArray removeAllObjects];
+            [targetUrlArray addObjectsFromArray:filterUrlArrayTarget];
+            [targetTaglineArray removeAllObjects];
+            [targetTaglineArray addObjectsFromArray:filterTaglineArrayTarget];
             
-            [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
+            [feedType removeAllObjects];
+            [feedType addObjectsFromArray:filterFeedType];
+            
+                 [table reloadData];
+                 [self startLoadingImagesConcurrently];
+                 _showFilterMenu = FALSE;
+                 [filtersContainer setSelected:FALSE];
+            
+                 [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
                  break; 
             
             //Implement All    
@@ -1359,14 +1616,14 @@ BOOL _allImagesDowloaded=FALSE;
                  _filterUpdated = FALSE;
                  _filterIntroduced = FALSE;
                  [table reloadData];
-            [self startLoadingImagesConcurrently];
+                 [self startLoadingImagesConcurrently];
                  label.text = @"Activity";
                  self.tabBarItem.title = @"Activity";
             
                  _showFilterMenu = FALSE;
-            [filtersContainer setSelected:FALSE];
+                 [filtersContainer setSelected:FALSE];
          
-            [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
+                 [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
                  break;    
     }
 }
@@ -1397,6 +1654,12 @@ BOOL _allImagesDowloaded=FALSE;
     [actorNameArray release];
     [actorUrlArray release];
     [actorTaglineArray release];
+    
+    [targetTypeArray release];
+    [targetIdArray release];
+    [targetNameArray release];
+    [targetUrlArray release];
+    [targetTaglineArray release];
     
     [completeFeedDescDisplayArray release];
     [completeFeedImageArray release];

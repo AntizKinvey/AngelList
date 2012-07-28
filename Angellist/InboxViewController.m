@@ -176,6 +176,10 @@ UIView *noInternetView;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    // image for the navigation bar background
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -259,6 +263,17 @@ UIView *noInternetView;
         self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
     }
     
+    
+    buttonSearch = [[UIButton alloc] init];
+    buttonSearch.frame = CGRectMake(0, 0, 40, 40);
+    [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
+    [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
+    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
+    buttonSearch.enabled = YES;
+    
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:buttonSearch]autorelease];
+
+    
     // image for the navigation bar background
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
@@ -295,11 +310,22 @@ UIView *noInternetView;
     
 }
 
+-(void)goToSearch
+{
+    _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
+    [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    //[self presentModalViewController:_searchViewController animated:YES];
+    [self.navigationController pushViewController:_searchViewController animated:YES];
+    
+}
+
+
 // to fetch request from AngelList
 -(void)sendRequestToFetch
 {
+    [_dbmanager retrieveUserDetails];
    // send GET request to AngelList to fetch the messages
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=5dacdd84bb605a030fdaee148b0574c4",_currAccessToken]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_dbmanager.access_tokenFromDB]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
     
@@ -307,7 +333,7 @@ UIView *noInternetView;
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
     NSArray *_messageThreads = [json valueForKey:@"messages"];
-    
+    NSLog(@"\n \n json messages response = %@ ", json);
     if ([_messageThreads count] == 0) {
         UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
         labelError.text = @"No messages to display!";
@@ -319,7 +345,6 @@ UIView *noInternetView;
     }
     else {
          
-       
         _senderName = [[NSMutableArray alloc] init];
         _imageOfSender = [[NSMutableArray alloc] init];
         _imageOfRecepient = [[NSMutableArray alloc] init];

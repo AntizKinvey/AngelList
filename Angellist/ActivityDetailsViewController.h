@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <KinveyKit/KinveyKit.h>
 
-@interface ActivityDetailsViewController : UIViewController <KCSPersistableDelegate>
+@interface ActivityDetailsViewController : UIViewController <KCSPersistableDelegate,UITableViewDataSource,UITableViewDelegate>
 {
     IBOutlet UITableView *table;
     // follow button

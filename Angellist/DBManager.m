@@ -361,20 +361,20 @@ NSString *_angelUserEmailFromDB;
 // retrieve User details
 -(void) retrieveUserDetails
 {
-    userDetailsArray = [[NSMutableArray alloc] init];
+    //userDetailsArray = [[NSMutableArray alloc] init];
     NSString *sql = @"SELECT username,angelUserId,access_token,email,image,follows FROM User";
     
     sqlite3_stmt *statement;
        
     if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
     {
-        if(sqlite3_step(statement) == SQLITE_ROW)
+        while(sqlite3_step(statement) == SQLITE_ROW)
         {
             char *field1 = (char *) sqlite3_column_text(statement,0);
             NSString *field1Str = [[NSString alloc] initWithUTF8String:field1];
             NSString *str1 = [[NSString alloc] initWithFormat:@"%@", field1Str];
             _angelUserNameFromDB = str1;
-            
+           
             char *field2 = (char *) sqlite3_column_text(statement,1);
             NSString *field2Str = [[NSString alloc] initWithUTF8String:field2];
             NSString *str2 = [[NSString alloc] initWithFormat:@"%@", field2Str];
@@ -400,9 +400,10 @@ NSString *_angelUserEmailFromDB;
             NSString *str6 = [[NSString alloc] initWithFormat:@"%@", field6Str];
             _angelUserFollowsFromDB = [NSString stringWithFormat:@"%@",str6];
             
-            [userDetailsArray addObjectsFromArray:[NSArray arrayWithObjects: _angelUserNameFromDB,_angelUserEmailFromDB, _angelUserFollowsFromDB, _angelUserImageFromDB, nil]];
+            [userDetailsArray addObjectsFromArray:[NSArray arrayWithObjects: _angelUserNameFromDB,_angelUserEmailFromDB, _angelUserFollowsFromDB, _angelUserImageFromDB, access_tokenFromDB, _angelUserIdFromDB, nil]];
             
-             NSLog(@"\n \n step 1 = %@ \n \n ",_angelUserNameFromDB);
+            NSLog(@"\n \n access token in db = %@ ", _angelUserIdFromDB);
+             NSLog(@"\n \n step 1 = %@ \n \n ",_angelUserIdFromDB);
             
             [field1Str release];
             [field2Str release];
