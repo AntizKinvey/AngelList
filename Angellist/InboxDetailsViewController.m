@@ -1,4 +1,4 @@
-//
+ //
 //  InboxDetailsViewController.m
 //  Angellist
 //
@@ -27,7 +27,7 @@ NSMutableArray *_messBody; //
 NSMutableArray *_sen_id;
 NSMutableArray *_rec_id;
 NSMutableArray *_time;
-NSMutableArray *_displayTime;
+NSMutableArray *_displayTimeDetails;
 
 NSMutableArray *displayImage;
 
@@ -86,7 +86,7 @@ NSMutableArray *displayImage;
   
     // label to display time
     UILabel *msgLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
-    msgLabel1.text = [_displayTime objectAtIndex:indexPath.row]; 
+    msgLabel1.text = [_displayTimeDetails objectAtIndex:indexPath.row]; 
     msgLabel1.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
     msgLabel1.lineBreakMode = UILineBreakModeWordWrap;
     msgLabel1.numberOfLines = 0;
@@ -101,7 +101,7 @@ NSMutableArray *displayImage;
     // labels to conform to the dynamic cell height with respect to text
     NSString *strContent1 = [_messBody objectAtIndex:[indexPath row]];
     NSString *strContent2 = [_msgUser objectAtIndex:indexPath.row]; 
-    NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
+    NSString *strContent3 = [_displayTimeDetails objectAtIndex:[indexPath row]];
     CGSize constrainedSize = CGSizeMake(310, 20000);
     CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
     if (!msgLabel)
@@ -160,7 +160,7 @@ NSMutableArray *displayImage;
     _msgUser = [[NSMutableArray alloc] init];
     _otherUser = [[NSMutableArray alloc] init];
     displayImage = [[NSMutableArray alloc] init];
-    _displayTime = [[NSMutableArray alloc] init];
+    _displayTimeDetails = [[NSMutableArray alloc] init];
     
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
@@ -221,9 +221,9 @@ NSMutableArray *displayImage;
         user++;
         
     }
-    
-    [self startLoadingImagesConcurrently];
     [self getTime];
+    [self startLoadingImagesConcurrently];
+    
 
 }
 
@@ -445,7 +445,7 @@ NSMutableArray *displayImage;
             displayTime = [NSString stringWithFormat:@"about %d months ago",year];
         }
         
-        [_displayTime addObject:displayTime];
+        [_displayTimeDetails addObject:displayTime];
         [cal release];
         [dateForm release];
         

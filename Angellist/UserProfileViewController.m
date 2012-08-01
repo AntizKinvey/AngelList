@@ -11,6 +11,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <Foundation/NSHTTPCookie.h>
 #import "AppDelegate.h"
+#import "Reachability.h"
 
 @implementation UserProfileViewController
 
@@ -46,6 +47,7 @@ extern NSString *_angelUserNameFromDB;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
+    
     UIImage *image = [UIImage imageWithContentsOfFile:_dbmanager._angelUserImageFromDB];
     UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(80, 20, 150, 150)];
     cellImageView.image = image;
@@ -73,6 +75,17 @@ extern NSString *_angelUserNameFromDB;
     [cell.contentView addSubview:cellHighConceptLabel];
     
     [cell.contentView addSubview:_logoutButton];
+    
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        _logoutButton.enabled = NO;
+    }
+    else {
+        _logoutButton.enabled = YES;
+    }
     
     return cell; 
 }
@@ -171,9 +184,7 @@ extern NSString *_angelUserNameFromDB;
         [mainDelegate loginToAngelList];
     }
     
-    
-    
-    
+   
 }
 
 

@@ -21,8 +21,19 @@
     UILabel *label;
     UIButton *buttonSearch;
     
-    UIImageView *kinvey;
-    UIImageView *angelLogo;
+    UIView *viewPullToRefresh;
+    UIImageView *imageAngelLogo;
+    UIImageView *imageRefresh;
+    UILabel *labelrefresh;
+    
+    UIView *viewPullUpOlder;
+    UIImageView *imageKinveyLogo;
+    UIImageView *imagePullUp;
+    UILabel *labelPullUp;
+    
+    
+//    UIImageView *kinvey;
+//    UIImageView *angelLogo;
     DBManager *_dbmanager;
     UIView *filterView;
     UIActivityIndicatorView *labelLoading;

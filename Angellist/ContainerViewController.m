@@ -83,14 +83,14 @@ NSString *_currAccessToken;
     
     [_dbmanager retrieveUserDetails];
     self.tabBarController.delegate=self;
-    //Assign angel User Id to global variable
+    // Assign angel User Id to global variable
     _currUserId = [[NSString alloc] initWithFormat:@"%@",_angelUserIdFromDB];
-    //Assign angel User access token to global variable
+    // Assign angel User access token to global variable
     _currAccessToken = [[NSString alloc] initWithFormat:@"%@",[_dbmanager.userDetailsArray objectAtIndex:4]];
     
     NSLog(@"\n \n access token = %@ ", _currAccessToken);
 
-    //Create tab bar elements and navigation controllers
+    // Create tab bar elements and navigation controllers
     UIViewController *viewController2, *viewController3, *viewController4, *viewController5;
     UINavigationController *navigationcontroller2,*navigationcontroller3,*navigationcontroller4 ,*navigationcontroller5;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
@@ -122,7 +122,7 @@ NSString *_currAccessToken;
         navigationcontroller5 = [[[UINavigationController alloc] initWithRootViewController:viewController5] autorelease];
     }
     
-    //Use custom tab bar
+    // Use custom tab bar
     self.tabBarController = [[[CustomTabBar alloc] init] autorelease];
     self.tabBarController.viewControllers = [NSArray arrayWithObjects:navigationcontroller2, navigationcontroller3, navigationcontroller4, navigationcontroller5, nil];
     [self.view addSubview:self.tabBarController.view];

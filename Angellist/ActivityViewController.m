@@ -4,7 +4,7 @@
 //
 //  Created by Ram Charan on 5/16/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
-//
+
 
 #import <QuartzCore/QuartzCore.h>
 #import "ActivityViewController.h"
@@ -89,6 +89,8 @@ int _rowNumberInActivity = 0;
 BOOL _showFilterMenu = FALSE;
 BOOL _imagesSaved = FALSE;
 
+BOOL imageTransform = FALSE;
+BOOL finishedLoading = FALSE;
 int _tagID = 0;
 
 // array of ids of the people/startup user is following
@@ -118,6 +120,7 @@ BOOL _filterIntroduced = FALSE;
 BOOL _startupLoad = FALSE;
 
 BOOL _allImagesDowloaded=FALSE;
+BOOL _olderFeeds = FALSE , _newFeeds = FALSE, _viewPresentPtoR = FALSE;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -162,43 +165,85 @@ BOOL _allImagesDowloaded=FALSE;
     // detect for an iphone view 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
-        // label to display the feed
-        UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 75)] autorelease];
-        cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
-        cellTextLabel.numberOfLines = 50;
-        cellTextLabel.backgroundColor = [UIColor clearColor];
-        cellTextLabel.text = cellValue;
-        cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
-        [cell.contentView addSubview:cellTextLabel];
+               
+        Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
         
-     
-        
-        UIImage *image;
-        if(_allImagesDowloaded == FALSE)
+        NetworkStatus internetStatus = [r currentReachabilityStatus];
+        if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
         {
-            image = [feedImagesArrayFromDirectory objectAtIndex:indexPath.row];
+            // label to display the feed
+            UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 75)] autorelease];
+            cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
+            cellTextLabel.numberOfLines = 50;
+            cellTextLabel.backgroundColor = [UIColor clearColor];
+            cellTextLabel.text = cellValue;
+            cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            [cell.contentView addSubview:cellTextLabel];
+            
+             UIImage *image = [UIImage imageWithContentsOfFile:[feedImagesArrayFromDirectory objectAtIndex:indexPath.row]];
+            NSLog(@"\n \n IMAGE PATH = %@ \n \n ", [feedImagesArrayFromDirectory objectAtIndex:indexPath.row]);
+            
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = image;
+            cellImageView.layer.cornerRadius = 3.5f;
+            cellImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+            
+            // label to confor to the cell height
+            NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
+            CGSize constrainedSize = CGSizeMake(210, 20000);
+            CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+            
+            if (!cellTextLabel)
+                cellTextLabel = (UILabel*)[cell viewWithTag:1];
+            [cellTextLabel setText:strContent1];
+            [cellTextLabel setFrame:CGRectMake(70, 9, 210, MAX(exactSize.height, 20.0f))];
+            
         }
-        else 
-        {
-            image = [UIImage imageWithContentsOfFile:[directoryImagesArray objectAtIndex:indexPath.row]];
+        
+        else {
+            
+            // label to display the feed
+            UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 75)] autorelease];
+            cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
+            cellTextLabel.numberOfLines = 50;
+            cellTextLabel.backgroundColor = [UIColor clearColor];
+            cellTextLabel.text = cellValue;
+            cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            [cell.contentView addSubview:cellTextLabel];
+
+            
+            
+            UIImage *image;
+            if(_allImagesDowloaded == FALSE)
+            {
+                image = [feedImagesArrayFromDirectory objectAtIndex:indexPath.row];
+            }
+            else 
+            {
+                image = [UIImage imageWithContentsOfFile:[directoryImagesArray objectAtIndex:indexPath.row]];
+            }
+            
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = image;
+            cellImageView.layer.cornerRadius = 3.5f;
+            cellImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+            
+            // label to confor to the cell height
+            NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
+            CGSize constrainedSize = CGSizeMake(210, 20000);
+            CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+            
+            if (!cellTextLabel)
+                cellTextLabel = (UILabel*)[cell viewWithTag:1];
+            [cellTextLabel setText:strContent1];
+             [cellTextLabel setFrame:CGRectMake(70, 9, 210, MAX(exactSize.height, 20.0f))];
+
         }
         
-        UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
-        cellImageView.image = image;
-        cellImageView.layer.cornerRadius = 3.5f;
-        cellImageView.layer.masksToBounds = YES;
-        [cell.contentView addSubview:cellImageView];
-        [cellImageView release];
-        
-        // label to confor to the cell height
-        NSString *strContent1 = [feedDescDisplayArray objectAtIndex:[indexPath row]];
-        CGSize constrainedSize = CGSizeMake(210, 20000);
-        CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
-        
-        if (!cellTextLabel)
-            cellTextLabel = (UILabel*)[cell viewWithTag:1];
-        [cellTextLabel setText:strContent1];
-        [cellTextLabel setFrame:CGRectMake(70, 9, 210, MAX(exactSize.height, 20.0f))];
 
     }
     else
@@ -256,6 +301,8 @@ BOOL _allImagesDowloaded=FALSE;
     { 
         [[self.view viewWithTag:404] removeFromSuperview];
     }
+    
+    
     
     return [feedDescDisplayArray count];
 }
@@ -503,14 +550,12 @@ BOOL _allImagesDowloaded=FALSE;
     filterUrlArray = [[NSMutableArray alloc] init];
     filterTaglineArray = [[NSMutableArray alloc] init];
     
-    
     filterImageArrayTarget = [[NSMutableArray alloc] init];
     filterTypeArrayTarget = [[NSMutableArray alloc] init];
     filterIdArrayTarget = [[NSMutableArray alloc] init];
     filterNameArrayTarget = [[NSMutableArray alloc] init];
     filterUrlArrayTarget = [[NSMutableArray alloc] init];
     filterTaglineArrayTarget = [[NSMutableArray alloc] init];
-    
     
     completeFeedType = [[NSMutableArray alloc] init];
     feedType = [[NSMutableArray alloc] init];
@@ -532,7 +577,7 @@ BOOL _allImagesDowloaded=FALSE;
     [self performSelectorInBackground:@selector(getUserFollowingDetails) withObject:nil];
     [self performSelectorInBackground:@selector(getStartUpFollowingDetails) withObject:nil];
     
-    [self getFeeds];
+    [self getFeeds:1];
     [super viewDidLoad];
     
 }
@@ -548,11 +593,13 @@ BOOL _allImagesDowloaded=FALSE;
 }
 
 
-
-
 -(void)loadOldFeeds:(int)pageNo
 {
     _arrayCountForOlderFeeds = [feedDescDisplayArray count];
+    
+    finishedLoading = FALSE;
+    [table reloadData];
+
     // Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -571,12 +618,13 @@ BOOL _allImagesDowloaded=FALSE;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
         
+        NSLog(@"\n \n \n page number = %d \n \n ", pageNo);
+        
         NSError *error;                                    
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:&error];
         
-             if ([data length] >0 && error == nil)
-             {
-                 NSError* error;
+             
+                // NSError* error;
                  NSDictionary* json = [NSJSONSerialization 
                                        JSONObjectWithData:data //1
                                        options:kNilOptions 
@@ -592,8 +640,14 @@ BOOL _allImagesDowloaded=FALSE;
                      [feedDescArray addObject:description];
                      
                     
+                     NSString *feedId = [feedDict objectForKey:@"id"];
+                     [feedIdArray insertObject:feedId atIndex:i];
                      
+                     NSString *feedTypeString = [[feedDict valueForKey:@"item"] valueForKey:@"type"];
+                     [feedType addObject:feedTypeString];
+                     [completeFeedType addObject:feedTypeString];
                      
+                     NSLog(@"\n \n FEED TYPE = %@ count %d \n \n ", feedTypeString, i);
                      
                      NSString *actorType = [[feedDict objectForKey:@"actor"] valueForKey:@"type"];
                      if(actorType == (NSString *)[NSNull null])
@@ -690,8 +744,73 @@ BOOL _allImagesDowloaded=FALSE;
                          [completeActorTaglineArray addObject:actorTagline];
                      }
                  }
+        for(int i=0; i<[feeds count]; i++)
+        {
+            NSLog(@"\n \n \n feeds count = %d \n \n \n *********", i);
+            
+            NSDictionary *feedDict = [feeds objectAtIndex:i];
+            
+            NSString *actorType = [[feedDict objectForKey:@"target"] valueForKey:@"type"];
+            //                if(actorType != (NSString *)[NSNull null])
+            //                {
+            [targetTypeArray addObject:actorType];
+            [completeTargetTypeArray addObject:actorType];
+            
+            // }
+            
+            NSString *actorId = [[feedDict objectForKey:@"target"] valueForKey:@"id"];
+            //                if(actorId != (NSString *)[NSNull null])
+            //                {
+            [targetIdArray addObject:actorId];
+            [completeTargetIdArray addObject:actorId];
+            // }
+            
+            NSString *feedImages = [[feedDict objectForKey:@"target"] valueForKey:@"image"];
+            //                if(feedImages != (NSString *)[NSNull null])
+            //                {
+            [targetImageArray addObject:feedImages];
+            [completeTargetImageArray addObject:feedImages];
+            //   }
+            
+            
+            
+            NSString *targetNames = [[feedDict objectForKey:@"target"] valueForKey:@"name"];
+            //                if (targetNames == (NSString *)[NSNull null]) 
+            //                {
+            //                    [targetNameArray addObject:@"Name not found!"];
+            //                    [completeTargetNameArray addObject:@"Name not found!"];
+            //                } 
+            //                else 
+            //                {
+            [targetNameArray addObject:targetNames];
+            [completeTargetNameArray addObject:targetNames];
+            // }
+            
+            
+            NSString *actorUrl = [[feedDict objectForKey:@"target"] valueForKey:@"angellist_url"];
+            //if(actorUrl != (NSString *)[NSNull null])
+            //{
+            [targetUrlArray addObject:actorUrl];
+            [completeTargetUrlArray addObject:actorUrl];
+            // }
+            
+            
+            NSString *targetTagline = [[feedDict objectForKey:@"target"] valueForKey:@"tagline"];
+            //                if (targetTagline == (NSString *)[NSNull null]) 
+            //                {
+            //                    [targetTaglineArray addObject:@"Information not available!"];
+            //                    [completeTargetTaglineArray addObject:@"Information not available!"];
+            //                } 
+            //                else 
+            //                {
+            [targetTaglineArray addObject:targetTagline];
+            [completeTargetTaglineArray addObject:targetTagline];
+            // }
+            
+            
+        }
                  
-                 for(int k=0; k<[completeActorTaglineArray count]; k++)
+                 for(int k=_arrayCountForOlderFeeds-1; k<[completeActorTaglineArray count]; k++)
                  {
                      NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[completeActorTaglineArray objectAtIndex:k]]];
                      
@@ -703,8 +822,9 @@ BOOL _allImagesDowloaded=FALSE;
                      [theMutableString release];
                  }
                  
-                 for(int z=0; z<[feedDescArray count]; z++)
+                 for(int z=_arrayCountForOlderFeeds; z<[feedDescArray count]; z++)
                  {
+                      NSLog(@"\n \n \n desc. = %d \n \n ",[feedDescArray count]);
                     
                      NSString *desc = [feedDescArray objectAtIndex:z]; 
                      NSArray *str = [desc componentsSeparatedByString:@">"];
@@ -739,34 +859,27 @@ BOOL _allImagesDowloaded=FALSE;
                      [theMutableString release];
                  }
                 
-                 for(int imageNumber=1; imageNumber<=[feedDescArray count]; imageNumber++)
+                 for(int imageNumber=_arrayCountForOlderFeeds; imageNumber<=[feedDescArray count]; imageNumber++)
                  {
                      UIImage *image = [UIImage imageNamed:@"placeholder.png"];
                      [feedImagesArrayFromDirectory addObject:image];
                      [completeFeedImagesArrayFromDirectory addObject:image];
                      
                      
-                      NSLog(@"\n \n \n Nothing was downloaded.");
+                     
                  }
 
                  [table reloadData];
+        [self startLoadingImagesConcurrently];
                  
-             }
-             else if ([data length] == 0 && error == nil)
-             {
-                 NSLog(@"Nothing was downloaded.");
-             }
-             else if (error != nil)
-             {
-                 NSLog(@"Error = %@", error);
-             } 
     }
  
 }
 
 
--(void)getFeeds
+-(void)getFeeds:(int)pageNo
 {
+    
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -805,8 +918,10 @@ BOOL _allImagesDowloaded=FALSE;
     else
     {
         filtersContainer.enabled = NO;
+        _arrayCountForOlderFeeds = 1;
+    
         //Get feeds
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/feed"]];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/feed?page=%d",pageNo]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
         
@@ -822,12 +937,13 @@ BOOL _allImagesDowloaded=FALSE;
             
             NSArray* feeds = [json objectForKey:@"feed"]; //2
             
-            
             for(int i=0; i<[feeds count]; i++)
             {
                 NSDictionary *feedDict = [feeds objectAtIndex:i];
                 NSString *description = [feedDict objectForKey:@"description"];
                 [feedDescArray addObject:description];
+                NSString *feedId = [feedDict objectForKey:@"id"];
+                [feedIdArray insertObject:feedId atIndex:i];
                 
                 NSString *feedTypeString = [[feedDict valueForKey:@"item"] valueForKey:@"type"];
                 [feedType addObject:feedTypeString];
@@ -1080,7 +1196,7 @@ BOOL _allImagesDowloaded=FALSE;
 
 - (void)loadImage 
 {
-    for (int asyncCount = 0; asyncCount < [feedImageArray count] ; asyncCount++) {
+    for (int asyncCount = _arrayCountForOlderFeeds; asyncCount < [feedImageArray count] ; asyncCount++) {
         
         NSString *picLoad = [NSString stringWithFormat:@"%@",[feedImageArray objectAtIndex:asyncCount]];
         NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
@@ -1093,8 +1209,10 @@ BOOL _allImagesDowloaded=FALSE;
         [imageData release];
        
     }
-    
-    [self saveImagesOfFeeds]; 
+    if (_pageNo == 1) {
+         [self saveImagesOfFeeds]; 
+    }
+   
 }
 
 -(void)displayImage:(NSNumber*)presentCount
@@ -1117,17 +1235,565 @@ BOOL _allImagesDowloaded=FALSE;
 
 -(void)refreshFeeds
 {
-    [self getFeeds];
+//    [filterDescArray removeAllObjects];
+//    [filterImageArray removeAllObjects];
+//    
+//    [filterFeedImagesArrayFromDirectory removeAllObjects];
+//    
+//    [filterTypeArray removeAllObjects];
+//    [filterIdArray removeAllObjects];
+//    
+//    [filterNameArray removeAllObjects];
+//    [filterUrlArray removeAllObjects];
+//    [filterTaglineArray removeAllObjects];
+//    
+//    [filterTypeArrayTarget removeAllObjects];
+//    [filterIdArrayTarget removeAllObjects];
+//    [filterImageArrayTarget removeAllObjects];
+//    [filterNameArrayTarget removeAllObjects];
+//    [filterUrlArrayTarget removeAllObjects];
+//    [filterTaglineArrayTarget removeAllObjects];
+//    [filterFeedType removeAllObjects];
+//    [feedDescDisplayArray removeAllObjects];
+//    [feedImageArray removeAllObjects];
+//    [feedImagesArrayFromDirectory removeAllObjects];
+//    [actorTypeArray removeAllObjects];
+//    [actorIdArray removeAllObjects];
+//    [actorNameArray removeAllObjects];
+//    [actorUrlArray removeAllObjects];
+//    [actorTaglineArray removeAllObjects];
+//    [targetTypeArray removeAllObjects];
+//    [targetIdArray removeAllObjects];
+//    [targetImageArray removeAllObjects];
+//    [targetNameArray removeAllObjects];
+//    [targetUrlArray removeAllObjects];
+//    [targetTaglineArray removeAllObjects];
+//    [feedType removeAllObjects];
+//    [feedImagesArrayFromDirectory removeAllObjects];
+//    
+//    [completeActorTaglineArray removeAllObjects];
+//    [completeFeedType removeAllObjects];
+//    [completeFeedImagesArrayFromDirectory removeAllObjects];
+//    [completeActorIdArray removeAllObjects];
+//    [completeActorNameArray removeAllObjects];
+//    [completeActorTypeArray removeAllObjects];
+//    [completeActorUrlArray removeAllObjects];
+//    [completeFeedDescDisplayArray removeAllObjects];
+//    [completeFeedImageArray removeAllObjects];
+//    
+//    [completeFeedImagesArrayFromDirectory removeAllObjects];
+//    [completeTargetIdArray removeAllObjects];
+//    [completeTargetImageArray removeAllObjects];
+//    [completeTargetNameArray removeAllObjects];
+//    [completeTargetTaglineArray removeAllObjects];
+//    [completeTargetTypeArray removeAllObjects];
+//    [completeTargetUrlArray removeAllObjects];
+    
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        loadingView.hidden = YES;
+        [_dbmanager retrieveActivityDetails];
+        
+        [feedDescDisplayArray addObjectsFromArray:_dbmanager.feedDescDisplayArrayFromDB];
+        [completeFeedDescDisplayArray addObjectsFromArray:_dbmanager.feedDescDisplayArrayFromDB];
+        
+        [feedImageArray addObjectsFromArray:_dbmanager.feedImageArrayFromDB];
+        [completeFeedImageArray addObjectsFromArray:_dbmanager.feedImageArrayFromDB];
+        
+        [feedImagesArrayFromDirectory addObjectsFromArray:_dbmanager.feedImagesArrayFromDirectoryFromDB];
+        [completeFeedImagesArrayFromDirectory addObjectsFromArray:_dbmanager.feedImagesArrayFromDirectoryFromDB];
+        
+        [actorIdArray addObjectsFromArray:_dbmanager.actorIdArrayFromDB];
+        [completeActorIdArray addObjectsFromArray:_dbmanager.actorIdArrayFromDB];
+        
+        [actorTypeArray addObjectsFromArray:_dbmanager.actorTypeArrayFromDB];
+        [completeActorTypeArray addObjectsFromArray:_dbmanager.actorTypeArrayFromDB];
+        
+        [actorNameArray addObjectsFromArray:_dbmanager.actorNameArrayFromDB];
+        [completeActorNameArray addObjectsFromArray:_dbmanager.actorNameArrayFromDB];
+        
+        [actorUrlArray addObjectsFromArray:_dbmanager.actorUrlArrayFromDB];
+        [completeActorUrlArray addObjectsFromArray:_dbmanager.actorUrlArrayFromDB];
+        
+        [actorTaglineArray addObjectsFromArray:_dbmanager.actorTaglineArrayFromDB];
+        [completeActorTaglineArray addObjectsFromArray:_dbmanager.actorTaglineArrayFromDB];
+        
+        [table reloadData];
+    }
+    else
+    {
+        filtersContainer.enabled = NO;
+        //Get feeds
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/feed"]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod: @"GET"];
+        
+        
+        NSError *error;                                  
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:&error];
+        
+        
+        NSDictionary* json = [NSJSONSerialization 
+                              JSONObjectWithData:data //1
+                              options:kNilOptions 
+                              error:&error];
+        
+        NSArray* feeds = [json objectForKey:@"feed"]; //2
+        
+        for (int i = 0; i < [feeds count]; i++) 
+        {
+            NSDictionary *feed = [feeds objectAtIndex:i];
+            NSString *feedId = [feed objectForKey:@"id"];
+            
+            if (![feedIdArray containsObject:feedId]) 
+            {
+                [feedIdArray insertObject:feedId atIndex:i];
+                
+                NSString *description = [feed objectForKey:@"description"];
+                [feedDescArray insertObject:description atIndex:i];
+                
+                NSString *feedTypeString = [[feed valueForKey:@"item"] valueForKey:@"type"];
+                [feedType addObject:feedTypeString];
+                [completeFeedType insertObject:feedTypeString atIndex:i];
+                
+                NSLog(@"\n \n FEED TYPE = %@ \n \n ", feedTypeString);
+                
+                NSString *actorType = [[feed objectForKey:@"actor"] valueForKey:@"type"];
+                if(actorType == (NSString *)[NSNull null])
+                {
+                    NSString *targetActorType = [[feed objectForKey:@"target"] valueForKey:@"type"];
+                    [actorTypeArray insertObject:targetActorType atIndex:i];
+                    [completeActorTypeArray insertObject:targetActorType atIndex:i];
+                }
+                else
+                {
+                    [actorTypeArray insertObject:actorType atIndex:i];
+                    [completeActorTypeArray insertObject:actorType atIndex:i];
+                }
+                
+                NSString *actorId = [[feed objectForKey:@"actor"] valueForKey:@"id"];
+                if(actorId == (NSString *)[NSNull null])
+                {
+                    NSString *targetActorId = [[feed objectForKey:@"target"] valueForKey:@"id"];
+                    [actorIdArray insertObject:targetActorId atIndex:i];
+                    [completeActorIdArray insertObject:targetActorId atIndex:i];
+                }
+                else
+                {
+                    [actorIdArray insertObject:actorId atIndex:i];
+                    [completeActorIdArray insertObject:actorId atIndex:i];
+                }
+                
+                NSString *feedImages = [[feed objectForKey:@"actor"] valueForKey:@"image"];
+                if(feedImages == (NSString *)[NSNull null])
+                {
+                    NSString *targetFeedImages = [[feed objectForKey:@"target"] valueForKey:@"image"];
+                    if (targetFeedImages == (NSString *)[NSNull null]) 
+                    {
+                        [feedImageArray insertObject:@"nopic.png" atIndex:i];
+                        [completeFeedImageArray insertObject:@"nopic.png" atIndex:i];
+                    } 
+                    else 
+                    {
+                        [feedImageArray insertObject:targetFeedImages atIndex:i];
+                        [completeFeedImageArray insertObject:targetFeedImages atIndex:i];
+                    }
+                }
+                else
+                {
+                    [feedImageArray insertObject:feedImages atIndex:i];
+                    [completeFeedImageArray insertObject:feedImages atIndex:i];
+                }
+                
+                NSString *actorNames = [[feed objectForKey:@"actor"] valueForKey:@"name"];
+                if(actorNames == (NSString *)[NSNull null])
+                {
+                    NSString *targetNames = [[feed objectForKey:@"target"] valueForKey:@"name"];
+                    if (targetNames == (NSString *)[NSNull null]) 
+                    {
+                        [actorNameArray insertObject:@"Name not found!" atIndex:i];
+                        [completeActorNameArray insertObject:@"Name not found!" atIndex:i];
+                    } 
+                    else 
+                    {
+                        [actorNameArray insertObject:targetNames atIndex:i];
+                        [completeActorNameArray insertObject:targetNames atIndex:i];
+                    }
+                    
+                }
+                else
+                {
+                    [actorNameArray insertObject:actorNames atIndex:i];
+                    [completeActorNameArray insertObject:actorNames atIndex:i];
+                }
+                
+                NSString *actorUrl = [[feed objectForKey:@"actor"] valueForKey:@"angellist_url"];
+                [actorUrlArray insertObject:actorUrl atIndex:i];
+                [completeActorUrlArray insertObject:actorUrl atIndex:i];
+                
+                NSString *actorTagline = [[feed objectForKey:@"actor"] valueForKey:@"tagline"];
+                if(actorTagline == (NSString *)[NSNull null])
+                {
+                    NSString *targetTagline = [[feed objectForKey:@"target"] valueForKey:@"tagline"];
+                    if (targetTagline == (NSString *)[NSNull null]) 
+                    {
+                        [actorTaglineArray insertObject:@"Information not available!" atIndex:i];
+                        [completeActorTaglineArray insertObject:@"Information not available!" atIndex:i];
+                    } 
+                    else 
+                    {
+                        [actorTaglineArray insertObject:targetTagline atIndex:i];
+                        [completeActorTaglineArray insertObject:targetTagline atIndex:i];
+                    }
+                    
+                }
+                else
+                {
+                    [actorTaglineArray insertObject:actorTagline atIndex:i];
+                    [completeActorTaglineArray insertObject:actorTagline atIndex:i];
+                }
+
+                
+                    NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[completeActorTaglineArray objectAtIndex:i]]];
+                    
+                    [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                    
+                    [actorTaglineArray replaceObjectAtIndex:i withObject:theMutableString];
+                    [completeActorTaglineArray replaceObjectAtIndex:i withObject:theMutableString];
+                    
+                    [theMutableString release];
+                               
+                
+                    
+                    NSDictionary *feedDict = [feeds objectAtIndex:i];
+                    
+                    NSString *targetType = [[feedDict objectForKey:@"target"] valueForKey:@"type"];
+                    //                if(actorType != (NSString *)[NSNull null])
+                    //                {
+                    [targetTypeArray insertObject:targetType atIndex:i];
+                    [completeTargetTypeArray insertObject:targetType atIndex:i];
+                    
+                    // }
+                    
+                    NSString *targetId = [[feedDict objectForKey:@"target"] valueForKey:@"id"];
+                    //                if(actorId != (NSString *)[NSNull null])
+                    //                {
+                    [targetIdArray insertObject:targetId atIndex:i];
+                    [completeTargetIdArray insertObject:targetId atIndex:i];
+                    // }
+                    
+                    NSString *feedtargetImages = [[feedDict objectForKey:@"target"] valueForKey:@"image"];
+                    //                if(feedImages != (NSString *)[NSNull null])
+                    //                {
+                    [targetImageArray insertObject:feedtargetImages atIndex:i];
+                    [completeTargetImageArray insertObject:feedtargetImages atIndex:i];
+                    //   }
+                    
+                    
+                    
+                    NSString *targetNames = [[feedDict objectForKey:@"target"] valueForKey:@"name"];
+                    //                if (targetNames == (NSString *)[NSNull null]) 
+                    //                {
+                    //                    [targetNameArray addObject:@"Name not found!"];
+                    //                    [completeTargetNameArray addObject:@"Name not found!"];
+                    //                } 
+                    //                else 
+                    //                {
+                    [targetNameArray insertObject:targetNames atIndex:i];
+                    [completeTargetNameArray insertObject:targetNames atIndex:i];
+                    // }
+                    
+                    
+                    NSString *targetUrl = [[feedDict objectForKey:@"target"] valueForKey:@"angellist_url"];
+                    //if(actorUrl != (NSString *)[NSNull null])
+                    //{
+                    [targetUrlArray insertObject:targetUrl atIndex:i];
+                    [completeTargetUrlArray insertObject:targetUrl atIndex:i];
+                    // }
+                    
+                    
+                    NSString *targetTagline = [[feedDict objectForKey:@"target"] valueForKey:@"tagline"];
+                    //                if (targetTagline == (NSString *)[NSNull null]) 
+                    //                {
+                    //                    [targetTaglineArray addObject:@"Information not available!"];
+                    //                    [completeTargetTaglineArray addObject:@"Information not available!"];
+                    //                } 
+                    //                else 
+                    //                {
+                    [targetTaglineArray insertObject:targetTagline atIndex:i];
+                    [completeTargetTaglineArray insertObject:targetTagline atIndex:i];
+                    // }
+                    
+                    NSLog(@"\n \n count of feeds = %d",[feedDescArray count]);
+                    NSString *desc = [feedDescArray objectAtIndex:i]; 
+                    NSArray *str = [desc componentsSeparatedByString:@">"];
+                    
+                    int k=0;
+                    NSString *concatStr = @"";
+                    for(int j=0; j<[str count]; j++)
+                    {
+                        if(k%2 == 1)
+                        {
+                            NSString *strName1 = [str objectAtIndex:j];
+                            NSArray *str1 = [strName1 componentsSeparatedByString:@"</a"];
+                            concatStr = [concatStr stringByAppendingFormat:@"%@",[str1 objectAtIndex:0]];
+                            k++;
+                        }
+                        else
+                        {
+                            NSString *strName2 = [str objectAtIndex:j];
+                            NSArray *str2 = [strName2 componentsSeparatedByString:@"<"];
+                            concatStr = [concatStr stringByAppendingFormat:@"%@",[str2 objectAtIndex:0]];
+                            k++;
+                        }
+                    }
+                    
+                    NSMutableString * theMutableString1 = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",concatStr]];
+                    
+                    [theMutableString1 replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
+                    
+                    [feedDescDisplayArray insertObject:theMutableString atIndex:i];
+                    [completeFeedDescDisplayArray insertObject:theMutableString atIndex:i];
+                    
+                    [theMutableString1 release];
+                
+                
+                
+                    UIImage *image = [UIImage imageNamed:@"placeholder.png"];
+                    [feedImagesArrayFromDirectory insertObject:image atIndex:i];
+                    [completeFeedImagesArrayFromDirectory insertObject:image atIndex:i];
+                       
+                
+            }
+        }
+        
+    }
     [table reloadData];
+    //[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkPage:) userInfo:nil repeats:NO];
+     [self performSelector:@selector(checkPage:) withObject:nil afterDelay:1.0];
+    
+     NSLog(@"\n \n  PULL DOWN  \n \n ");
   
     
 }
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{  
+    
+    
+    CGPoint offset = scrollView.contentOffset;
+    CGRect bounds = scrollView.bounds;
+    CGSize size = scrollView.contentSize;
+    UIEdgeInsets inset = scrollView.contentInset;
+    float y = offset.y + bounds.size.height - inset.bottom;
+    float h = size.height;
+    
+    if(table.contentOffset.y >= (table.contentSize.height - table.frame.size.height) + 80) {
+        //user has scrolled to the bottom
+        
+         
+        NSLog(@"\n pos: %f of %f", y, h);
+        
+               [table reloadData];
+        _pageNo++;
+        table.sectionFooterHeight = 52;
+        [self loadOldFeeds:_pageNo];
+        
+        table.sectionFooterHeight = 17;
+        // [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkPage:) userInfo:nil repeats:NO];
+        [self performSelector:@selector(checkPage:) withObject:nil afterDelay:1.0];
+        
+    }
+  
+    //  float reload_distance = 10;
+    if(scrollView.contentOffset.y < 0.0f && scrollView.contentOffset.y > -80.0f) 
+    {
+        
+        NSLog(@"\n \n \n DISPLAY NEW FEEDS AT THIS POINT \n \n \n ");   
+//  CGRect frame = CGRectMake(table.frame.origin.x,table.frame.origin.y+10, table.frame.size.width, table.frame.size.height);
+//        table.frame = frame;
+        [table reloadData];
+        table.sectionHeaderHeight = 52;
+        [self refreshFeeds];
+       
+//    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkPage:) userInfo:nil repeats:NO];
+       
+    }    
+    
+    
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section 
+{
+    viewPullToRefresh = [[UIView alloc] initWithFrame:CGRectMake(0, 05, 320, 50)];
+   // [table.tableHeaderView addSubview:viewPullToRefresh];
+    
+    imageAngelLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"angel_logo.png"]];
+    imageAngelLogo.frame = CGRectMake(220, 0, 100, 40);
+    
+    imageRefresh = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_arrow.png"]];
+    imageRefresh.frame = CGRectMake(20, 0, 30, 40);
+    
+    labelrefresh = [[UILabel alloc] initWithFrame:CGRectMake(70, 10, 180, 30)];
+    labelrefresh.text = @"Loading New Feeds..";
+    labelrefresh.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:13];
+    labelrefresh.textColor = [UIColor lightGrayColor];
+    labelrefresh.backgroundColor = [UIColor clearColor];
+    if (table.sectionHeaderHeight >= 52) 
+    {
+        [viewPullToRefresh addSubview:labelrefresh];
+        [viewPullToRefresh addSubview:imageAngelLogo];
+        [viewPullToRefresh addSubview:imageRefresh];
+        
+    }
+    
+
+       // [labelrefresh release];
+        _newFeeds = TRUE;
+        _olderFeeds = FALSE;
+        //NSLog(@"\n \n \n DISPLAY NEW FEEDS AT THIS POINT \n \n \n ");
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.8];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
+        [UIView setAnimationBeginsFromCurrentState:YES];
+        
+        // The transform matrix
+        CGAffineTransform transform = 
+        CGAffineTransformMakeRotation(0.1745*90);
+        imageRefresh.transform = transform;
+        
+        // Commit the changes
+        [UIView commitAnimations];
+        
+         //[self refreshFeeds];
+   // }
+    
+    
+//    imageTransform = TRUE;
+//    imageRefresh.transform = CGAffineTransformMakeRotation(0.1745*90);
+//    [UIView beginAnimations:nil context:NULL];
+//    [UIView setAnimationDuration:0.4];
+    return [viewPullToRefresh autorelease];
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section 
+{
+    
+    
+   // if(table.contentOffset.y >= (table.contentSize.height - table.frame.size.height) + 80)  {
+        
+        
+        viewPullUpOlder= [[UIView alloc] initWithFrame:CGRectMake(0, ((table.contentSize.height - table.frame.size.height) + 70), 320, 70)];
+        
+        imageKinveyLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"kinvey_logo.png"]];
+        imageKinveyLogo.frame = CGRectMake(200, ((table.contentSize.height - table.frame.size.height) + 70), 100, 30);
+        
+        imagePullUp = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_arrow.png"]];
+        imagePullUp.frame = CGRectMake(20,((table.contentSize.height - table.frame.size.height) + 50), 30, 40);
+        
+             
+        labelPullUp = [[UILabel alloc] initWithFrame:CGRectMake(70, ((table.contentSize.height - table.frame.size.height) + 10), 180, 30)];
+        labelPullUp.text = @"Pull up for older feeds...";
+        labelPullUp.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:13];
+        labelPullUp.textColor = [UIColor whiteColor];
+        labelPullUp.backgroundColor = [UIColor clearColor];
+        
+        //if (table.sectionFooterHeight >= 52) {
+            [viewPullUpOlder addSubview:labelPullUp];
+            [viewPullUpOlder addSubview:imageAngelLogo];
+            [viewPullUpOlder addSubview:imageRefresh];
+        //}
+        
+        
+ 
+        _newFeeds = FALSE;
+        _olderFeeds = TRUE;
+        
+        //[self refreshFeeds];
+  //  }
+
+
+    
+    return viewPullUpOlder;
+    
+    
+}
+
+- (CGFloat)tableViewHeight
+{
+    [table layoutIfNeeded];
+    return [table contentSize].height;
+}
+
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView 
+{
+    
+    
+    
+    
+    
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    
+    NSLog(@"lol");
+     
+    if (_newFeeds == TRUE) {
+//        CGAffineTransform transform = 
+//        CGAffineTransformMakeRotation(0.1745*90);
+//        imageRefresh.transform = transform;
+        
+        labelrefresh.text = @"Loading New Feeds..";
+    }
+    else if (_olderFeeds == TRUE)  {
+        
+        
+       // labelPullUp.text = @"Loading New Feeds..";
+    }
+   
+       
+}
+
+
+-(void)checkPage:(UIScrollView*)scrollView
+{
+    //_pageNo = 1;
+    table.sectionHeaderHeight = 22;
+    table.sectionFooterHeight = 17;
+    for(UIView *view in table.subviews)
+    {
+       
+        if ([view isKindOfClass:[UILabel class]]) {
+            
+            [view removeFromSuperview];
+        }
+        if ([view isKindOfClass:[UIImageView class]]) 
+        {
+            [view removeFromSuperview];
+        }
+        
+    }
+    
+    if (_newFeeds == TRUE) {
+    [viewPullToRefresh removeFromSuperview];
+    table.sectionHeaderHeight = 22;
+    }
+    
+    table.sectionFooterHeight = 17;
+    NSLog(@"\n \n \n STOP DISPLAY NEW FEEDS AT THIS POINT \n \n \n ");
+    
+}
+
 
 // save images to the documents directory
 
 -(void) saveImagesOfFeeds
 {
-    for(int imageNumber=1; imageNumber<=[completeFeedImageArray count]; imageNumber++)
+    for(int imageNumber=_arrayCountForOlderFeeds; imageNumber<=[completeFeedImageArray count]; imageNumber++)
     {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -1164,7 +1830,7 @@ BOOL _allImagesDowloaded=FALSE;
         NSString *actorUrl = [NSString stringWithFormat:@"%@",[completeActorUrlArray objectAtIndex:k]];
         NSString *actorTagline = [NSString stringWithFormat:@"%@",[completeActorTaglineArray objectAtIndex:k]];
         
-        NSString *feedImagePath = [NSString stringWithFormat:@"%@",[completeFeedImagesArrayFromDirectory objectAtIndex:k]];
+        NSString *feedImagePath = [NSString stringWithFormat:@"%@",[directoryImagesArray objectAtIndex:k]];
         
         [_dbmanager insertRecordIntoActivityTable:@"Activity" withField1:@"activityId" field1Value:activityId andField2:@"feedDescription" field2Value:feedDescription andField3:@"feedImageUrl" field3Value:feedImageUrl andField4:@"actorType" field4Value:actorType andField5:@"actorId" field5Value:actorId andField6:@"actorName" field6Value:actorName andField7:@"actorUrl" field7Value:actorUrl andField8:@"actorTagline" field8Value:actorTagline andField9:@"feedImagePath" field9Value:feedImagePath];
    }
@@ -1220,7 +1886,8 @@ BOOL _allImagesDowloaded=FALSE;
 
     }
     
-    else {
+    else 
+    {
         
        
         [filtersContainer setUserInteractionEnabled:YES];

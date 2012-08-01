@@ -117,6 +117,71 @@ BOOL _allImagesDownloadDone = FALSE;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
     {
+        
+        Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+        
+        NetworkStatus internetStatus = [r currentReachabilityStatus];
+        if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+        {
+            
+            UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 8, 210, 20)] autorelease];
+            cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
+            cellNameLabel.text = cellNameValue;
+            cellNameLabel.backgroundColor = [UIColor clearColor];
+            cellNameLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
+            cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+            [cell.contentView addSubview:cellNameLabel];
+            
+            UILabel *cellFollowsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(235, 25, 50, 10)] autorelease];
+            cellFollowsLabel.text = cellFollowsValue;
+            cellFollowsLabel.backgroundColor = [UIColor clearColor];
+            cellFollowsLabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+            cellFollowsLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:10];
+            [cell.contentView addSubview:cellFollowsLabel];
+            
+            
+            NSString *text1 = cellHighConceptValue;
+            CGSize constraint1 = CGSizeMake(270, 20000.0f);
+            CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
+            
+            UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 35, 210, size1.height)] autorelease];//26
+            cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
+            cellHighConceptLabel.numberOfLines = 5;
+            cellHighConceptLabel.text = cellHighConceptValue;
+            cellHighConceptLabel.backgroundColor = [UIColor clearColor];
+            cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+            [cell.contentView addSubview:cellHighConceptLabel];
+            
+            UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(68, cellHighConceptLabel.frame.size.height + 35, 210, 30)] autorelease];//61
+            cellLocationLabel.lineBreakMode = UILineBreakModeWordWrap;
+            cellLocationLabel.text = cellLocationValue;
+            cellLocationLabel.backgroundColor = [UIColor clearColor];
+            cellLocationLabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+            cellLocationLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:10];
+            [cell.contentView addSubview:cellLocationLabel];
+            
+            UILabel *cellMarketLabel = [[[UILabel alloc] initWithFrame:CGRectMake(66, cellHighConceptLabel.frame.size.height + 50, 210, 30)] autorelease];//61
+            
+            cellMarketLabel.text = cellMarketValue;
+            cellMarketLabel.backgroundColor = [UIColor clearColor];
+            cellMarketLabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+            cellMarketLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:10];
+            [cell.contentView addSubview:cellMarketLabel];
+            
+        
+                UIImage *image = [UIImage imageWithContentsOfFile:[displayStartUpLogoImageInDirectory objectAtIndex:indexPath.row]];
+    
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = image;
+            cellImageView.layer.cornerRadius = 3.5f;
+            cellImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+
+            
+            
+        }
+        else {
         UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 8, 210, 20)] autorelease];
         cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellNameLabel.text = cellNameValue;
@@ -176,6 +241,7 @@ BOOL _allImagesDownloadDone = FALSE;
         cellImageView.layer.masksToBounds = YES;
         [cell.contentView addSubview:cellImageView];
         [cellImageView release];
+        }
 
     }
     else
@@ -1329,7 +1395,7 @@ BOOL _allImagesDownloadDone = FALSE;
         NSString *startUpFollowerCount= [NSString stringWithFormat:@"%@",[displayStartUpFollowerCountArray objectAtIndex:k]];
         NSString *startUpLocations= [NSString stringWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
-        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
+        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[saveImageInDirectory objectAtIndex:k]];
         
         //Insert records of startUps to Folowing table
         [_dbmanager insertRecordIntoStartUpsFollowingTable:@"Following" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
@@ -1483,8 +1549,7 @@ BOOL _allImagesDownloadDone = FALSE;
         
                             [startUpLogoImageInDirectory addObject:image];
                             [displayStartUpLogoImageInDirectory addObject:image];
-        
-        
+                        
                     }
                 
                 _requestLoadComplete = TRUE;
@@ -1531,7 +1596,7 @@ BOOL _allImagesDownloadDone = FALSE;
         NSString *startUpFollowerCount= [NSString stringWithFormat:@"%@",[displayStartUpFollowerCountArray objectAtIndex:k]];
         NSString *startUpLocations= [NSString stringWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
-        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
+        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[saveImageInDirectory objectAtIndex:k]];
         
         //Insert records
         [_dbmanager insertRecordIntoStartUpsPortfolioTable:@"Portfolio" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
@@ -1555,6 +1620,7 @@ BOOL _allImagesDownloadDone = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
+        NSLog(@"\n\nINSIDE TRENDING API");
         [_dbmanager.startUpIdsArrayFromDB removeAllObjects];
         [_dbmanager.startUpNameArrayFromDB removeAllObjects];
         [_dbmanager.startUpAngelUrlArrayFromDB removeAllObjects];
@@ -1566,7 +1632,7 @@ BOOL _allImagesDownloadDone = FALSE;
         [_dbmanager.startUpMarketArrayFromDB removeAllObjects];
         [_dbmanager.startUpLogoImageInDirectoryFromDB removeAllObjects];
         
-        [_dbmanager retrieveStartUpsPortfolioDetails];
+        [_dbmanager retrieveStartUpstrendingDetails];
         
         [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
         
@@ -1587,6 +1653,8 @@ BOOL _allImagesDownloadDone = FALSE;
         [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
         
         [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
+        
+        NSLog(@"\n\nINSIDE TRENDING API");
         
         [table reloadData];
     }
@@ -1788,7 +1856,7 @@ BOOL _allImagesDownloadDone = FALSE;
         NSString *startUpFollowerCount= [NSString stringWithFormat:@"%@",[displayStartUpFollowerCountArray objectAtIndex:k]];
         NSString *startUpLocations= [NSString stringWithFormat:@"%@",[displayStartUpLocationArray objectAtIndex:k]];
         NSString *startUpMarkets= [NSString stringWithFormat:@"%@",[displayStartUpMarketArray objectAtIndex:k]];
-        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[displayStartUpLogoImageInDirectory objectAtIndex:k]];
+        NSString *startUpLogoImage= [NSString stringWithFormat:@"%@",[saveImageInDirectory objectAtIndex:k]];
         
         //Insert records of startUps to Folowing table
         [_dbmanager insertRecordIntoStartUpsFollowingTable:@"Trending" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];

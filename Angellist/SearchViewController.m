@@ -117,8 +117,6 @@ int _xPosS = 0;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
     
-    
-    
     return [searchIdDisplay count];
 }
 

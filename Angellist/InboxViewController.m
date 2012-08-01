@@ -79,6 +79,12 @@ UIView *noInternetView;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
+//    UIButton *buttonDisclosure = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+//     //[buttonDisclosure addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
+//    buttonDisclosure.frame = CGRectMake(260, 5, 30, 30);
+//    [cell.contentView addSubview:buttonDisclosure];
+    
+    
     // label to display sender name
     label = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 50)];
     label.text = [_senderName objectAtIndex:indexPath.row];
@@ -104,11 +110,29 @@ UIView *noInternetView;
     
     // label to display message
     UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
-    msgLabel.text = [_displayTime objectAtIndex:indexPath.row]; 
+    msgLabel.text = [_displayTime objectAtIndex:indexPath.row];
     msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
     [cell.contentView addSubview:msgLabel];
     msgLabel.backgroundColor = [UIColor clearColor];
     [msgLabel release];
+    
+       
+    UIImageView *imageViewDot = [[UIImageView alloc] initWithFrame:CGRectMake(260, 5, 20, 20)];
+    imageViewDot.image = [UIImage imageNamed:@"dot.png"];
+//    imageViewDot.layer.cornerRadius = 3.5f;
+//    imageViewDot.layer.masksToBounds = YES;
+    [cell.contentView addSubview:imageViewDot];
+    [imageViewDot release];
+    
+    UILabel *msgCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(260, 5, 20, 20)];
+    msgCountLabel.text = [NSString stringWithFormat:@"%@",[_totalMsgCount objectAtIndex:indexPath.row]]; 
+    msgCountLabel.textAlignment = UITextAlignmentCenter;
+    msgCountLabel.textColor = [UIColor whiteColor];
+    msgCountLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:10];
+    [cell.contentView addSubview:msgCountLabel];
+    msgCountLabel.backgroundColor = [UIColor clearColor];
+    [msgCountLabel release];
+
     
     // label to display time  
     UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 40, 210, 30)];
@@ -132,7 +156,7 @@ UIView *noInternetView;
     NSString *strContent1 = [_msgbody objectAtIndex:[indexPath row]];
     NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
      NSString *strContent4 = [_senderName objectAtIndex:indexPath.row];
-    CGSize constrainedSize = CGSizeMake(310, 20000);
+    CGSize constrainedSize = CGSizeMake(310, 200);
     CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
     if (!timeLabel)
         timeLabel = (UILabel*)[cell viewWithTag:1];
@@ -167,7 +191,7 @@ UIView *noInternetView;
 {
     
     NSString *text = [_msgbody objectAtIndex:[indexPath row]];
-    CGSize constraint = CGSizeMake(310, 300000.0f);
+    CGSize constraint = CGSizeMake(310, 200.0f);
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     CGFloat height = MAX(size.height, 44.0f);
     return height + (30 * 2);
@@ -333,7 +357,7 @@ UIView *noInternetView;
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
     NSArray *_messageThreads = [json valueForKey:@"messages"];
-    NSLog(@"\n \n json messages response = %@ ", json);
+   
     if ([_messageThreads count] == 0) {
         UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
         labelError.text = @"No messages to display!";

@@ -156,6 +156,9 @@
 // Retrieve startups portfolio details
 -(void) retrieveStartUpsPortfolioDetails;
 
+// retrieve startups following details
+-(void) retrieveStartUpstrendingDetails;
+
 // Retrieve inbox details
 -(void) retrieveInboxDetails;
 
