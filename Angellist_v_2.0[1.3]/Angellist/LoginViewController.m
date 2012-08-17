@@ -1,0 +1,268 @@
+//
+//  WebViewController.m
+//  SampleRest
+//
+//  Created by Ram Charan on 5/9/12.
+//  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
+//
+
+#import "LoginViewController.h"
+#import <QuartzCore/QuartzCore.h>
+
+@implementation LoginViewController
+
+NSString *baseString;//Base URL
+NSString *queryString;//Query string in URL
+NSString *access_token;//Access token of Angellist user
+BOOL access_token_received = FALSE;//Flag to be set when access token is received
+
+extern BOOL loginFromAL;
+extern BOOL loginWithTW;
+extern BOOL _loggedIn;
+
+NSString *_angelUserId;//Angellist User Id
+NSString *_angelUserName;//Angellist User name
+NSString *_angelUserImage;//Angellist User Image
+NSString *_angelUserEmailId;//Angellist User email id
+NSString *_angelUserFollows;//Angellist User followers
+
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Release any cached data, images, etc that aren't in use.
+}
+
+#pragma mark - View lifecycle
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    _angelUserId = [[NSString alloc] init];
+    _angelUserName = [[NSString alloc] init];
+    _angelUserFollows = [[NSString alloc] init];
+    _angelUserEmailId = [[NSString alloc] init];
+    _angelUserImage = [[NSString alloc] init];
+    
+    webView.delegate = self;
+    webView.scrollView.bounces = NO;
+
+    [loading.layer setCornerRadius:18.0f];
+    
+    
+    if(loginFromAL)
+    {
+        //Send request to get authenticated user
+        NSURL *url = [NSURL URLWithString:@"https://angel.co/api/oauth/authorize?client_id=f91c04a55243218eb588f329ae8bbbb9&scope=message%20email&response_type=code"];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        [webView loadRequest:request];
+    }
+    else if(loginWithTW)
+    {
+        NSURL *url = [NSURL URLWithString:@"http://angel.co/auth/twitter/with_callback?callback=%2Fsessions%2Fcontinue_after_social_login%3Fprovider%3Dtwitter&sr=login"];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        [webView loadRequest:request];
+    }
+}
+
+- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType 
+{
+    
+    return YES;   
+}
+
+
+- (void)webViewDidStartLoad:(UIWebView *)webViewC
+{
+    loading.hidden = NO;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webViewC
+{
+    [webView stopLoading];
+    loading.hidden = YES;
+    if(loginFromAL)
+    {
+        NSURLRequest *currentrequest = [webViewC request];
+        NSURL *currentURL = [currentrequest URL];
+        NSString *strFromURL = currentURL.absoluteString;
+        
+        //Get base string from Url
+        baseString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:0];
+        
+        if([strFromURL isEqualToString:@"http://antiztech.com/angellist/?error=access_denied&error_description=The+resource+owner+denied+your+request."])
+        {
+            [self closeAction];
+        }
+        
+        if([baseString isEqualToString:@"http://antiztech.com/angellist/?code"])
+        {
+            //Get the query string which provides response code and link with the URL request and POST the URL
+            queryString = [[strFromURL componentsSeparatedByString:@"="] objectAtIndex:1];
+            NSString *urlString = [NSString stringWithFormat:@"https://angel.co/api/oauth/token?client_id=f91c04a55243218eb588f329ae8bbbb9&client_secret=80b56220b6fb722bcb8c85aa6f4996f3&code=%@&grant_type=authorization_code",queryString];
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+            [request setHTTPMethod:@"POST"];
+            [webView loadRequest:request];
+            
+            //Process json respons and get access token
+            NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+            NSError* error;
+            NSDictionary* json = [NSJSONSerialization 
+                                  JSONObjectWithData:response
+                                  options:kNilOptions 
+                                  error:&error];
+            
+            access_token = [json objectForKey:@"access_token"];
+            
+            access_token_received = TRUE;
+        }
+        
+        if(access_token_received)
+        {
+            //Get details of User after getting access token
+            NSString *urlString = [NSString stringWithFormat:@"https://api.angel.co/1/me?access_token=%@",access_token];
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSURLRequest *request = [NSURLRequest requestWithURL:url];
+            [webView loadRequest:request]; 
+            
+            
+            NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+            //Process json respons and get user details
+            NSError* error;
+            NSDictionary* json = [NSJSONSerialization 
+                                  JSONObjectWithData:response
+                                  options:kNilOptions 
+                                  error:&error];
+           
+            
+            _angelUserId = [json objectForKey:@"id"];
+            _angelUserName = [json objectForKey:@"name"];
+            _angelUserFollows = [json objectForKey:@"follower_count"];
+            _angelUserEmailId = [json objectForKey:@"email"];
+            _angelUserImage = [json objectForKey:@"image"];
+            
+            NSString *fbUrl = [json objectForKey:@"facebook_url"];
+            NSString *twUrl = [json objectForKey:@"twitter_url"];
+            
+             NSLog(@"\n \n id = %@ \n \n", _angelUserId);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserName);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserFollows);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserEmailId);
+             NSLog(@"\n \n id = %@ \n \n", _angelUserImage);
+            
+            if((fbUrl == (NSString *)[NSNull null]) || [fbUrl isEqualToString:@""] )
+            {
+                fbUrl = @"NA";
+            }
+            if((twUrl == (NSString *)[NSNull null]) || [twUrl isEqualToString:@""] )
+            {
+                twUrl = @"NA";
+            }
+            //Set the User collection attributes in Kinvey with user's access token, facebook url(if any), twitter url(if any)
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",fbUrl] forAttribute:@"facebookUrl"];
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",twUrl] forAttribute:@"twitterUrl"];
+            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",access_token] forAttribute:@"access_token"];
+            [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
+            
+            access_token_received = FALSE;
+            _loggedIn = TRUE;
+            [self closeAction];
+        }
+    }
+    
+    if(loginWithTW)
+    {
+        
+    }
+}
+
+-(void) viewDidAppear:(BOOL)animated
+{
+    
+    
+    
+}
+
+-(IBAction)dismissView:(id)sender
+{
+    
+    
+    [self closeAction];
+}
+//Close login Page
+-(void) closeAction
+{
+    loginFromAL = FALSE;
+    loginWithTW = FALSE;
+    [webView stopLoading];
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
+
+/************************************************************************************************************/
+/*                                          Kinvey Delegate Methods                                         */
+/************************************************************************************************************/
+
+//Persistable Delegate Methods
+// Right now just pop-up an alert about what we got back from Kinvey during
+// the save. Normally you would want to implement more code here
+// This is called when the save completes successfully
+- (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
+{
+    NSLog(@"\n\n%@",[result description]);
+}
+
+// Right now just pop-up an alert about the error we got back from Kinvey during
+// the save attempt. Normally you would want to implement more code here
+// This is called when a save fails
+- (void)entity:(id)entity operationDidFailWithError:(NSError *)error
+{
+    NSLog(@"\n\n%@",[error localizedDescription]);
+    NSLog(@"\n\n%@",[error localizedFailureReason]);
+    [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
+}
+
+-(void)dealloc
+{
+    [_angelUserId release];
+    [_angelUserName release];
+    [_angelUserFollows release];
+    [_angelUserEmailId release];
+    [_angelUserImage release];
+    
+    [super dealloc];
+}
+
+@end
