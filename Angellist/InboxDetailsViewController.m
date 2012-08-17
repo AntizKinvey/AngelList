@@ -23,11 +23,11 @@ BOOL stayup1, fromInboxDetails;
 NSMutableArray *_msgUser; // array for message user
 NSMutableArray *_otherUser; // array for the other user in the conversation
 
-NSMutableArray *_messBody; // 
-NSMutableArray *_sen_id;
-NSMutableArray *_rec_id;
-NSMutableArray *_time;
-NSMutableArray *_displayTimeDetails;
+NSMutableArray *_messBody; // array for message body
+NSMutableArray *_sen_id; // sender Id array
+NSMutableArray *_rec_id; // recipient Id array
+NSMutableArray *_time; // time array
+NSMutableArray *_displayTimeDetails; //array for displaying time in table view
 
 NSMutableArray *displayImage;
 
@@ -175,7 +175,8 @@ NSMutableArray *displayImage;
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
     
-  [_dbmanager retrieveUserDetails];
+    [_dbmanager retrieveUserDetails];
+    
     // URL request
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_dbmanager.access_tokenFromDB]];
     
@@ -312,9 +313,10 @@ NSMutableArray *displayImage;
 // post a reply from the user
 -(IBAction)postReply:(id)sender
 {
+    [_dbmanager retrieveUserDetails];
     
     NSString *postMsg = [NSString stringWithFormat:@"%@",textViewReply.text];
-    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=%@",threadValue,postMsg,_currAccessToken]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=%@",threadValue,postMsg,_dbmanager.access_tokenFromDB]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
@@ -453,10 +455,16 @@ NSMutableArray *displayImage;
     
 }
 
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    // Release any cached data, images, etc that aren't in use.
+}
+
 
 -(void)dealloc
 {
-
     [super dealloc];
 }
 

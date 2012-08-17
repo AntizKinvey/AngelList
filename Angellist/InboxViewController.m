@@ -79,11 +79,6 @@ UIView *noInternetView;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
-//    UIButton *buttonDisclosure = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-//     //[buttonDisclosure addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
-//    buttonDisclosure.frame = CGRectMake(260, 5, 30, 30);
-//    [cell.contentView addSubview:buttonDisclosure];
-    
     
     // label to display sender name
     label = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 50)];
@@ -119,8 +114,6 @@ UIView *noInternetView;
        
     UIImageView *imageViewDot = [[UIImageView alloc] initWithFrame:CGRectMake(260, 5, 20, 20)];
     imageViewDot.image = [UIImage imageNamed:@"dot.png"];
-//    imageViewDot.layer.cornerRadius = 3.5f;
-//    imageViewDot.layer.masksToBounds = YES;
     [cell.contentView addSubview:imageViewDot];
     [imageViewDot release];
     
@@ -158,6 +151,7 @@ UIView *noInternetView;
      NSString *strContent4 = [_senderName objectAtIndex:indexPath.row];
     CGSize constrainedSize = CGSizeMake(310, 200);
     CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+    
     if (!timeLabel)
         timeLabel = (UILabel*)[cell viewWithTag:1];
     [timeLabel setText:strContent1];
@@ -190,7 +184,7 @@ UIView *noInternetView;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    NSString *text = [_msgbody objectAtIndex:[indexPath row]];
+    NSString *text = [_msgbody objectAtIndex:indexPath.row];
     CGSize constraint = CGSizeMake(310, 200.0f);
     CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     CGFloat height = MAX(size.height, 44.0f);
@@ -227,7 +221,7 @@ UIView *noInternetView;
             [self sendRequestToFetch];
             [_dbmanager retrieveInboxDetails];
             [tableview reloadData];
-            [self startLoadingImagesConcurrently];
+            [self startLoadingImagesConcurrently]; // to load the images concurrently
         }
     }
     
@@ -236,8 +230,6 @@ UIView *noInternetView;
 
 -(void)viewDidAppear:(BOOL)animated
 {
-   
-//  [tableview reloadData];
     [super viewDidAppear:animated];
 }
 
@@ -287,12 +279,12 @@ UIView *noInternetView;
         self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
     }
     
-    
+    // for search button
     buttonSearch = [[UIButton alloc] init];
-    buttonSearch.frame = CGRectMake(0, 0, 40, 40);
+    buttonSearch.frame = CGRectMake(0, 0, 49, 42);
     [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
     [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
-    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
+    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted]; // action for search button
     buttonSearch.enabled = YES;
     
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:buttonSearch]autorelease];
@@ -338,7 +330,6 @@ UIView *noInternetView;
 {
     _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
     [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    //[self presentModalViewController:_searchViewController animated:YES];
     [self.navigationController pushViewController:_searchViewController animated:YES];
     
 }
@@ -348,12 +339,14 @@ UIView *noInternetView;
 -(void)sendRequestToFetch
 {
     [_dbmanager retrieveUserDetails];
+    
    // send GET request to AngelList to fetch the messages
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_dbmanager.access_tokenFromDB]];//0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_dbmanager.access_tokenFromDB]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
     
     NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+
     NSError* error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
     NSArray *_messageThreads = [json valueForKey:@"messages"];
@@ -368,7 +361,6 @@ UIView *noInternetView;
         [labelError release];
     }
     else {
-         
         _senderName = [[NSMutableArray alloc] init];
         _imageOfSender = [[NSMutableArray alloc] init];
         _imageOfRecepient = [[NSMutableArray alloc] init];
@@ -435,7 +427,6 @@ UIView *noInternetView;
             }
             
             [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
-            // NSString *dateString = [NSString stringWithFormat:@"%@"
         }
         
         [self getTime]; 
@@ -501,6 +492,7 @@ UIView *noInternetView;
         if ([_dbmanager.inboxThreadIdFromDB count] != 0) {
 
             if ([_dbmanager.inboxThreadIdFromDB count] !=[_threadId count]) {  
+                // checks whether the thread ids are same in both db and the retrieved data
                 
                 
                 NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
@@ -549,6 +541,8 @@ UIView *noInternetView;
     NSDate *date1 = [dateForm dateFromString:timeStamp];
     NSDate *date2 = [NSDate date];
     unsigned int unitFlags = NSDayCalendarUnit|NSYearCalendarUnit|NSMonthCalendarUnit|NSHourCalendarUnit|NSMinuteCalendarUnit|NSSecondCalendarUnit; 
+        
+    // gets the difference between the current date and also the date and time in the timestamp of the data
     NSDateComponents *diffComps = [cal components:unitFlags fromDate:date2 toDate:date1 options:0];
         
         int year = ABS([diffComps year]);

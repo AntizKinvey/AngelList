@@ -87,7 +87,20 @@ KCSCollection *_detailsCollection;
         {
             // image view to display image of user/startup
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
-            cellImageView.image = [displayFeedsInCells objectAtIndex:0];
+            
+            //Check for the availability of Internet
+            Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+            
+            NetworkStatus internetStatus = [r currentReachabilityStatus];
+            if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+            {
+                cellImageView.image = [UIImage imageWithContentsOfFile:[displayFeedsInCells objectAtIndex:0]];
+            }
+            else 
+            {
+                cellImageView.image = [displayFeedsInCells objectAtIndex:0];
+            }
+            
             cellImageView.layer.cornerRadius = 3.5f;
             cellImageView.layer.masksToBounds = YES;
             [cell.contentView addSubview:cellImageView];
@@ -140,6 +153,7 @@ KCSCollection *_detailsCollection;
         {
         
             // image view to display image of user/startup
+            NSLog(@"\n\n%@",[displayTargetInCells objectAtIndex:0]);
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
             cellImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[displayTargetInCells objectAtIndex:0]]]];
             cellImageView.layer.cornerRadius = 3.5f;
@@ -193,6 +207,7 @@ KCSCollection *_detailsCollection;
         
     }
     [displayFeedsInCells retain];
+    //[displayTargetInCells retain];
     [super viewWillAppear:animated];
     
 }
@@ -253,7 +268,11 @@ KCSCollection *_detailsCollection;
 
 - (void)viewDidLoad
 {
-    
+//    NSLog(@"\n\n%@",[targetTaglineArray objectAtIndex:_rowNumberInActivity]);
+//    NSLog(@"\n\n%@",[targetNameArray objectAtIndex:_rowNumberInActivity]);
+//    NSLog(@"\n\n%@",[targetImageArray objectAtIndex:_rowNumberInActivity]);
+    NSLog(@"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+    NSLog(@"\n\n%@",[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]);
     // back button 
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
@@ -314,16 +333,24 @@ KCSCollection *_detailsCollection;
     displayFeedsInCells = [[NSMutableArray alloc] init];
     [displayFeedsInCells addObject:[feedImagesArrayFromDirectory objectAtIndex:_rowNumberInActivity]];
     
+//    [displayFeedsInCells addObject:@"/Users/iAntiz/Library/Application Support/iPhone Simulator/5.1/Applications/64486B2D-3F01-4D1A-B48D-84987AD9096E/Documents/feeduser1.png"];
+     
     [displayFeedsInCells addObject:[actorNameArray objectAtIndex:_rowNumberInActivity]];
     [displayFeedsInCells addObject:[actorTaglineArray objectAtIndex:_rowNumberInActivity]];
-    
+    NSLog(@"************************************** Step 1");
     displayTargetInCells = [[NSMutableArray alloc] init];
     
     [displayTargetInCells addObject:[targetImageArray objectAtIndex:_rowNumberInActivity]];
+    NSLog(@"************************************** Step 2");
     [displayTargetInCells addObject:[targetNameArray objectAtIndex:_rowNumberInActivity]];
+    NSLog(@"************************************** Step 3");
     [displayTargetInCells addObject:[targetTaglineArray objectAtIndex:_rowNumberInActivity]];
+    NSLog(@"************************************** Step 4");
     
+    NSLog(@"\n\n%@",[feedType objectAtIndex:_rowNumberInActivity]);
     feedTypeString = [feedType objectAtIndex:_rowNumberInActivity];
+    NSLog(@"************************************** Step 5");
+
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -443,6 +470,7 @@ KCSCollection *_detailsCollection;
 -(void) dealloc
 {
     [displayFeedsInCells release];
+    //[displayTargetInCells release];
     [followButton release];
     [unfollowButton release];
     [moreButton release];

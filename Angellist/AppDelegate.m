@@ -58,7 +58,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     
     //Create tables to do database operations
     //Create table Activity to store details of feeds
-    [_dbmanager createTableActivity:@"Activity" withField1:@"activityId" withField2:@"feedDescription" withField3:@"feedImageUrl" withField4:@"actorType" withField5:@"actorId" withField6:@"actorName" withField7:@"actorUrl" withField8:@"actorTagline" withField9:@"feedImagePath"];
+    [_dbmanager createTableActivity:@"Activity" withField1:@"activityId" withField2:@"feedDescription" withField3:@"feedImageUrl" withField4:@"actorType" withField5:@"actorId" withField6:@"actorName" withField7:@"actorUrl" withField8:@"actorTagline" withField9:@"feedImagePath" withField10:@"targetType" withField11:@"targetId" withField12:@"targetName" withField13:@"targetURL" withField14:@"targetTagline" withField15:@"targetImagePath" withField16:@"feedType"];
     
     //Create table StartUps that contains all startUps 
     [_dbmanager createTableStartUps:@"StartUps" withField1:@"Id" withField2:@"startUpId" withField3:@"startUpName" withField4:@"startUpAngelUrl" withField5:@"startUpLogoUrl" withField6:@"startUpProdDesc" withField7:@"startUpHighConcept" withField8:@"startUpFollowerCount" withField9:@"startUpLocations" withField10:@"startUpMarkets" withField11:@"startUpImagePath"];
@@ -111,7 +111,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
-    
+    NSLog(@"\n\naaaaaaaaaaa -- 1 \n");
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
@@ -122,6 +122,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     }
     else
     {
+        NSLog(@"\n KK applicationWillResignActive\n");
         if(_kinveyPingSuccess)
         {
             NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
@@ -144,6 +145,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+     NSLog(@"\n\naaaaaaaaaaa -- 2 \n");
     /*
      Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
      If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
@@ -152,6 +154,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
+     NSLog(@"\n\naaaaaaaaaaa -- 3 \n");
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
@@ -159,6 +162,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+     NSLog(@"\n\naaaaaaaaaaa -- 4 \n");
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
@@ -168,10 +172,12 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"\n\nNo Internet Connection");
+        NSLog(@"\n\nNo Internet Connection ------ 4");
     }
     else
     {
+        
+        NSLog(@"\n KK DidBecomeActive\n");
         //Ping to Kinvey using app key and app secret 
         [[KCSClient sharedClient] initializeKinveyServiceForAppKey:@"kid1945"
                                                      withAppSecret:@"8f0b10ceba3c4bfa8f4ea03e42093231"
@@ -210,6 +216,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+     NSLog(@"\n\naaaaaaaaaaa -- 5 \n");
     /*
      Called when the application is about to terminate.
      Save data if appropriate.
@@ -228,6 +235,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 // This is called when the save completes successfully
 - (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
 {
+    NSLog(@"\n\naaaaaaaaaaa -- 6 \n");
     NSLog(@"%@",[result description]);
 }
 
@@ -236,6 +244,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 // This is called when a save fails
 - (void)entity:(id)entity operationDidFailWithError:(NSError *)error
 {
+    NSLog(@"\n\naaaaaaaaaaa -- 7 \n");
     NSLog(@"\n%@",[error localizedDescription]);
     NSLog(@"\n%@",[error localizedFailureReason]);
     
@@ -252,6 +261,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 
 //Collection Delegate Methods
 - (void)collection:(KCSCollection *)collection didCompleteWithResult:(NSArray *)result{
+    NSLog(@"\n\naaaaaaaaaaa -- 8 \n");
     
     NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
     [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
@@ -278,6 +288,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 }
 
 - (void)collection:(KCSCollection *)collection didFailWithError:(NSError *)error{
+    NSLog(@"\n\naaaaaaaaaaa -- 9 \n");
     NSLog(@"\n%@",[error localizedDescription]);
     NSLog(@"\n%@",[error localizedFailureReason]);
 }
@@ -286,6 +297,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 // This is called when the load completes successfully
 - (void)entity:(id<KCSPersistable>)entity fetchDidCompleteWithResult:(NSUserDefaults *)result
 {
+    NSLog(@"\n\naaaaaaaaaaa -- 10 \n");
     _kinveyUserId = [NSString stringWithString:[result objectForKey:@"username"]];
     if(_kinveyPingSuccess)
     {
@@ -298,6 +310,7 @@ int _totalNoOfRowsInUserTable = 0;//No. of rows in User table
 // This is called when a load fails
 - (void)entity:(id<KCSPersistable>)entity fetchDidFailWithError:(NSError *)error
 {
+    NSLog(@"\n\naaaaaaaaaaa -- 11 \n");
     NSLog(@"\n%@",[error localizedDescription]);
     NSLog(@"\n%@",[error localizedFailureReason]);
     [[[KCSClient sharedClient] currentUser] loadWithDelegate:self];

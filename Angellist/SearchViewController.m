@@ -8,39 +8,46 @@
 
 #import "SearchViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "CustomTabBar.h"
+#import "Reachability.h"
 
 @implementation SearchViewController
+
+extern bool _tabBarSelected;
 
 @synthesize searchBar;
 
 
-NSMutableArray *searchNamesStartup;
-NSMutableArray *searchIdStartup;
-NSMutableArray *searchImageStartup;
-NSMutableArray *searchtypeStartup;
-NSMutableArray *searchUrlStartup;
+NSMutableArray *searchNamesStartup;// array of names of startups
+NSMutableArray *searchIdStartup;// array of Ids of startups
+NSMutableArray *searchImageStartup;// array of images of startups
+NSMutableArray *searchtypeStartup;// array of types of startups
+NSMutableArray *searchUrlStartup;// array of urls of startups
 
-NSMutableArray *searchNamesUser;
-NSMutableArray *searchIdUser;
-NSMutableArray *searchImageUser;
-NSMutableArray *searchtypeUser;
-NSMutableArray *searchUrlUser;
+NSMutableArray *searchNamesUser;// array of names of user
+NSMutableArray *searchIdUser;// array of Ids of user
+NSMutableArray *searchImageUser;// array of images of user
+NSMutableArray *searchtypeUser;// array of types of user
+NSMutableArray *searchUrlUser;// array of urls of user
 
-NSMutableArray *searchNamesDisplay;
-NSMutableArray *searchIdDisplay;
-NSMutableArray *searchImageDisplay;
-NSMutableArray *searchtypeDisplay;
-NSMutableArray *searchUrlDisplay;
+NSMutableArray *searchNamesDisplay;// array of names of displayed in tableview
+NSMutableArray *searchIdDisplay;// array of Ids of displayed in tableview
+NSMutableArray *searchImageDisplay;// array of images of displayed in tableview
+NSMutableArray *searchtypeDisplay;// array of types of displayed in tableview
+NSMutableArray *searchUrlDisplay;// array of urls of displayed in tableview
 
-NSMutableArray *searchDisplayInTableImage;
+NSMutableArray *searchDisplayInTableImage;// array of images of displayed in tableview
 
-NSArray *_filterOptions;
+NSArray *_filterOptions;//filter options array
 NSString *searchString;
 int _rowSelected = 0;
 
 int ifilter=0;
 int _yPosS = 0;
 int _xPosS = 0;
+
+UINavigationBar *barSearch;
+UITapGestureRecognizer *tap;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -74,15 +81,17 @@ int _xPosS = 0;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
+    // image 
     UIImage *image = [searchDisplayInTableImage objectAtIndex:indexPath.row];
     UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
     cellImageView.image = image;
     cellImageView.layer.cornerRadius = 3.5f;
     cellImageView.layer.masksToBounds = YES;
     [cell.contentView addSubview:cellImageView];
+    [cellImageView release];
     
-    // label to display the feed
-    UILabel *cellTextLabel = [[[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 25)] autorelease];
+    // label to display the the name
+    UILabel *cellTextLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 25)];
     cellTextLabel.lineBreakMode = UILineBreakModeWordWrap;
     cellTextLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
     cellTextLabel.numberOfLines = 50;
@@ -90,7 +99,10 @@ int _xPosS = 0;
     cellTextLabel.text = [searchNamesDisplay objectAtIndex:indexPath.row];
     cellTextLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
     [cell.contentView addSubview:cellTextLabel];
+    [cellTextLabel release];
     
+    
+    // label to display the type
     UILabel *cellTextLabelType = [[[UILabel alloc] initWithFrame:CGRectMake(70, 28, 210, 15)] autorelease];
     cellTextLabelType.lineBreakMode = UILineBreakModeWordWrap;
     cellTextLabelType.numberOfLines = 50;
@@ -98,7 +110,7 @@ int _xPosS = 0;
     cellTextLabelType.text = [searchtypeDisplay objectAtIndex:indexPath.row];
     cellTextLabelType.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
     [cell.contentView addSubview:cellTextLabelType];
-
+    
     
     
     return cell; 
@@ -116,7 +128,6 @@ int _xPosS = 0;
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-    
     return [searchIdDisplay count];
 }
 
@@ -127,10 +138,10 @@ int _xPosS = 0;
 
     labelSearch.hidden = YES;
     _rowSelected = indexPath.row;
+    // navigate to the webview 
     searchDetails = [[SearchDetailsViewController alloc] initWithNibName:@"SearchDetailsViewController" bundle:nil];
     [self.navigationController pushViewController:searchDetails animated:YES];
-    
-    
+   
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -139,11 +150,26 @@ int _xPosS = 0;
      labelSearch.hidden = NO;
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarfil.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
 }
-
+ 
+- (void)viewDidDisappear:(BOOL)animated {    
+    if(_tabBarSelected == true )
+    {
+        [super viewDidDisappear:YES];
+        [self.navigationController popViewControllerAnimated:YES];
+        
+    }
+    
+    labelSearch.hidden = YES;
+}
 
 - (void)viewDidLoad
 {
+    
+    _tabBarSelected = false; 
+    
+    //Filter view
     filterView = [[UIView alloc] initWithFrame:CGRectMake(0, -480, 320, 480)];
     [filterView  setBackgroundColor: [UIColor blackColor]];
     [filterView setAlpha:0.4f];
@@ -151,6 +177,7 @@ int _xPosS = 0;
     [self.view addSubview:filterView];
     searchBar.delegate =self;
     
+    //back button 
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
     backButton = [[UIButton alloc] initWithFrame:frame];
@@ -161,20 +188,25 @@ int _xPosS = 0;
     [backButtonItem release];
     [backButton release];
     
+    //Navigations bar Image
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarfil.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
-    UINavigationBar *bar = [self.navigationController navigationBar];
+    // add the label to the navigation bar
+    barSearch = [self.navigationController navigationBar];
     labelSearch = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 320, 20)];
     labelSearch.textAlignment = UITextAlignmentCenter;
     labelSearch.textColor = [UIColor whiteColor];
     labelSearch.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
     labelSearch.backgroundColor = [UIColor clearColor];
     labelSearch.text = @"Search";
-    [bar addSubview:labelSearch];
+    [barSearch addSubview:labelSearch];
     
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelected:)];
-    [bar addGestureRecognizer:tap];
+    // add tap for the label
+    tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelected:)];
+    [barSearch addGestureRecognizer:tap];
+    
+    [tap release];
     
     searchNamesStartup = [[NSMutableArray alloc] init];
     searchIdStartup = [[NSMutableArray alloc] init];
@@ -206,17 +238,31 @@ int _xPosS = 0;
 
 }
 
+// whatever needs to happen when button is tapped 
 - (void)filterButtonSelected:(id)sender 
-{
-    // whatever needs to happen when button is tapped    
+{   
     // Check for the availability of Internet
-    [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05]; 
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];        
+        
+    }
+    else
+    {
+        [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05]; 
+    }
 }
 
 
+//Method is called when search button is clicked
 -(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar1
 {
+    
     [searchBar resignFirstResponder];
     
     searchString = [[NSString alloc] init];
@@ -226,20 +272,32 @@ int _xPosS = 0;
     [searchImageStartup removeAllObjects];
     [searchtypeStartup removeAllObjects];
     [searchUrlStartup removeAllObjects];
-    
     [searchNamesUser removeAllObjects];
     [searchIdUser removeAllObjects];
     [searchImageUser removeAllObjects];
     [searchtypeUser removeAllObjects];
     [searchUrlUser removeAllObjects];
-    
     searchString = searchBar.text;
-    [self searchOption:searchString];
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];        
+        
+    }
+    else
+    {
+        [self searchOption:searchString];
+    }
+    
 }
 
+// search the string typed
 -(void)searchOption:(NSString*)query
 {
-    
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/search?query=%@",query]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
@@ -263,9 +321,8 @@ int _xPosS = 0;
         NSString *typeString = [NSString stringWithFormat:@"%@",[typeSearch objectAtIndex:countOfSearch]];
         
         
-        if ([typeString isEqualToString:@"Startup"]) 
+        if ([typeString isEqualToString:@"Startup"]) // results of startup
         {
-            
             [searchNamesStartup addObject:[nameSearch objectAtIndex:countOfSearch]];
             [searchIdStartup addObject:[allIdSearch objectAtIndex:countOfSearch]];
             [searchImageStartup addObject:[imageSearch objectAtIndex:countOfSearch]];
@@ -279,7 +336,7 @@ int _xPosS = 0;
             [searchUrlDisplay addObject:[urlSearch objectAtIndex:countOfSearch]];
         
         }
-        else if ([typeString isEqualToString:@"User"]) 
+        else if ([typeString isEqualToString:@"User"]) // results of user
         {
             
             [searchNamesUser addObject:[nameSearch objectAtIndex:countOfSearch]];
@@ -295,7 +352,7 @@ int _xPosS = 0;
             [searchUrlDisplay addObject:[urlSearch objectAtIndex:countOfSearch]];
         }
         
-        UIImage *image = [UIImage imageNamed:@"placeholder.png"];
+        UIImage *image = [UIImage imageNamed:@"placeholder.png"]; // placeholder image
         [searchDisplayInTableImage addObject:image];
                     
     }
@@ -305,7 +362,8 @@ int _xPosS = 0;
     
 }
 
--(void)startLoadingImagesConcurrently
+// load images concurrently after the data is loaded in the table
+-(void)startLoadingImagesConcurrently 
 {
     
     NSOperationQueue *tShopQueue = [NSOperationQueue new];
@@ -354,13 +412,37 @@ int _xPosS = 0;
     
 }
 
-
+//Method called when back button is tapped
 -(void) backAction:(id)sender
 {
+    [barSearch removeGestureRecognizer:tap];
     labelSearch.hidden = YES;
     [self.navigationController popViewControllerAnimated:YES];
+    
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];        
+        
+    }
+    
+    [super viewWillAppear:YES];
+}
+
+-(void) viewWillDisappear:(BOOL)animated
+{
+    ifilter = 0;
+    [super viewWillDisappear:YES];
+}
+
+//function to animate filter
 -(void)animateFilter
 {
     _yPosS = 0;
@@ -391,7 +473,6 @@ int _xPosS = 0;
             
         }
         
-        //[filtersContainer setUserInteractionEnabled:YES];
         [_view1 setFrame:CGRectMake(25, -250, 271, 51*3)];
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration:0.2];
@@ -404,11 +485,8 @@ int _xPosS = 0;
     }
     
     else {
-        
-        
-        //[filtersContainer setUserInteractionEnabled:YES];
-        
-        for (int index = 1; index<[_filterOptions count]+1; index++) {
+        for (int index = 1; index<[_filterOptions count]+1; index++) 
+        {
             
             [[self.view viewWithTag:index] removeFromSuperview];
             
@@ -429,7 +507,7 @@ int _xPosS = 0;
     
 }
 
-
+//Method called when filters are choosen by user
 -(void)getFilteredListSearch:(id)sender
 {
     [searchNamesDisplay removeAllObjects];
@@ -442,7 +520,7 @@ int _xPosS = 0;
     
     switch(_tagID)
     {
-            //Implement Following
+            //Implement User
         case 1 : 
             
             [searchNamesDisplay addObjectsFromArray:searchNamesUser];
@@ -462,7 +540,7 @@ int _xPosS = 0;
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
             break;
             
-            //Implement Portfolio    
+            //Implement StartUYUp    
         case 2 : 
             [searchNamesDisplay addObjectsFromArray:searchNamesStartup];
             [searchIdDisplay addObjectsFromArray:searchIdStartup];
@@ -480,7 +558,7 @@ int _xPosS = 0;
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
             break;
             
-            //Implement Trending 
+            //Implement All 
         case 3 : 
             
             [searchNamesStartup removeAllObjects];
@@ -509,6 +587,8 @@ int _xPosS = 0;
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+    
+    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

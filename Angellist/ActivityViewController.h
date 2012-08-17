@@ -12,7 +12,7 @@
 #import "SearchViewController.h"
 
 
-@interface ActivityViewController : UIViewController <UITableViewDataSource>
+@interface ActivityViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
     IBOutlet UITableView *table;
     IBOutlet UIView *loadingView;
@@ -31,9 +31,8 @@
     UIImageView *imagePullUp;
     UILabel *labelPullUp;
     
-    
-//    UIImageView *kinvey;
-//    UIImageView *angelLogo;
+    UIImageView *kinvey;
+    UIImageView *angelLogo;
     DBManager *_dbmanager;
     UIView *filterView;
     UIActivityIndicatorView *labelLoading;
@@ -48,5 +47,16 @@
 
 // to save the details of all feeds to the database
 -(void) saveFeedsDataToDB;
--(void)getFeeds;
+
+
+-(void)getFeeds:(int)pageNo;
+
+-(void) newFeedLoad;
+
+-(void)startLoadingImagesConcurrently;
+
+-(void) startLoadingAtBottom;
+
+-(void) startLoadingAtTop;
+
 @end

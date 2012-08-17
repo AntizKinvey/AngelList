@@ -36,7 +36,7 @@ UIButton *backButton;
     webView.delegate = self;
     webView.scrollView.bounces = NO;
     
-    [loading.layer setCornerRadius:18.0f];
+    [loading.layer setCornerRadius:18.0f]; 
    
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
@@ -48,6 +48,7 @@ UIButton *backButton;
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
+    // back button item
     UIBarButtonItem* backButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
@@ -56,12 +57,13 @@ UIButton *backButton;
     // load angellist URL
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[searchUrlDisplay objectAtIndex:_rowSelected]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    [webView loadRequest:request];
+    [webView loadRequest:request]; // load the url in the webview
     
     self.navigationItem.title = [searchNamesDisplay objectAtIndex:_rowSelected];
 
 }
 
+//Method called when back button is tapped
 -(void) backAction:(id)sender
 {
     labelSearchDetails.hidden = YES;
@@ -73,6 +75,17 @@ UIButton *backButton;
 {
     [webView setDelegate:nil];
     
+    
+}
+-(void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:YES];
+}
+- (void)viewDidAppear:(BOOL)animated {    
+    [super viewDidAppear:YES];
+}
+- (void)viewDidDisappear:(BOOL)animated {    
+    [super viewDidDisappear:animated];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (void)viewDidUnload
@@ -82,23 +95,30 @@ UIButton *backButton;
     // e.g. self.myOutlet = nil;
 }
 
-- (BOOL)webView:(UIWebView*)webView1 shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType {
-    
+/**********************************************************************************************************/
+/*                                      Delegate methods of UIWebview                                     */
+/**********************************************************************************************************/
+
+//Called when webView starts loading request
+- (BOOL)webView:(UIWebView*)webView1 shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType 
+{
     webView.scalesPageToFit=YES;
     return YES;   
 }
 
-
+//Invoked when webView started loading request
 - (void)webViewDidStartLoad:(UIWebView *)webViewC
 {
     loading.hidden = NO;
 }
 
+//Called when webView completes loading request
 - (void)webViewDidFinishLoad:(UIWebView *)webViewC
 {
     [webView stopLoading];
     loading.hidden = YES;
 }
+
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

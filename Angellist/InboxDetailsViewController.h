@@ -11,12 +11,9 @@
 
 @interface InboxDetailsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UITextViewDelegate>
 {
-    
     IBOutlet UITableView *tableMsgDetails;
     IBOutlet UITextView *textViewReply;
-    DBManager *_dbmanager;
-    
-    
+    DBManager *_dbmanager; 
 }
 
 // table view

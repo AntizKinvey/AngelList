@@ -13,13 +13,11 @@
 
 @interface UserProfileViewController : UIViewController<UITableViewDelegate,UITableViewDataSource, UIAlertViewDelegate>
 {
-    
     SearchViewController *_searchViewController;
     IBOutlet UITableView *tableViewUser;
     DBManager *_dbmanager;
     UIButton *_logoutButton;
     UIButton *buttonSearch;
-   
 }
 
 

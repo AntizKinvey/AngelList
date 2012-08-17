@@ -23,6 +23,16 @@
     NSOperationQueue *tShopQueueStartups;
     SearchViewController *_searchViewController;
     
+    UIView *viewPullToRefreshS;
+    UIImageView *imageAngelLogoS;
+    UIImageView *imageRefreshS;
+    UILabel *labelrefreshS;
+    
+    UIView *viewPullUpOlderS;
+    UIImageView *imageKinveyLogoS;
+    UIImageView *imagePullUpS;
+    UILabel *labelPullUpS;
+    
 }
 
 @property(nonatomic,retain) UIView *filterView;

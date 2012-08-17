@@ -68,6 +68,17 @@ int startUpsLoadCount = 10;
 
 BOOL _allImagesDownloadDone = FALSE;
 
+UINavigationBar *bars;
+
+//////////////////////////
+UIView *refreshViewTopTrending;
+UIImageView *imageViewTopTrending;
+UIImageView *imageViewLogoTopTrending;
+UILabel *refreshLabelTopTrending;
+BOOL isLoadingTopTrending = FALSE;
+UIActivityIndicatorView *refreshSpinnerTopTrending;
+//////////////////////////
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -103,16 +114,16 @@ BOOL _allImagesDownloadDone = FALSE;
     }
 
     //---set the text to display for the cell---
-    //Set the name of startUp
+    // Set the name of startUp
     NSString *cellNameValue = [displayStartUpNameArray objectAtIndex:indexPath.row]; 
-    //Set the name of startUp
+    // Set the name of startUp
     NSString *cellFollowsValue = [NSString stringWithFormat:@"%@ follows",[displayStartUpFollowerCountArray objectAtIndex:indexPath.row]]; 
     NSLog(@"\n \n \n followers count = %@ \n \n ", cellFollowsValue);
-    //Set the high concept of startUp
+    // Set the high concept of startUp
     NSString *cellHighConceptValue = [displayStartUpHighConceptArray objectAtIndex:indexPath.row]; 
-    //Set the locations of startUp
+    // Set the locations of startUp
     NSString *cellLocationValue = [displayStartUpLocationArray objectAtIndex:indexPath.row]; 
-    //Set the market of startUp
+    // Set the market of startUp
     NSString *cellMarketValue = [displayStartUpMarketArray objectAtIndex:indexPath.row]; 
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
@@ -254,6 +265,7 @@ BOOL _allImagesDownloadDone = FALSE;
         cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:26];
         [cell.contentView addSubview:cellNameLabel];
         
+        
         UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(((768*85)/320), ((1024*39)/480), ((768*240)/320), ((1024*30)/480))] autorelease];
         cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
         cellHighConceptLabel.numberOfLines = 5;
@@ -261,6 +273,7 @@ BOOL _allImagesDownloadDone = FALSE;
         cellHighConceptLabel.backgroundColor = [UIColor clearColor];
         cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:26];
         [cell.contentView addSubview:cellHighConceptLabel];
+        
         
         UILabel *cellLocationLabel = [[[UILabel alloc] initWithFrame:CGRectMake(((768*85)/320), ((1024*71)/480), ((768*240)/320), ((1024*30)/480))] autorelease];
         cellLocationLabel.lineBreakMode = UILineBreakModeWordWrap;
@@ -354,6 +367,10 @@ BOOL _allImagesDownloadDone = FALSE;
 }
 
 
+
+
+
+
 //This method is called when a row in table is selected
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -380,6 +397,11 @@ BOOL _allImagesDownloadDone = FALSE;
         [table deselectRowAtIndexPath:selection animated:YES];
     }
     [super viewWillAppear:animated];
+    
+    UITapGestureRecognizer *taps = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelectedStartUp:)];
+    [bars addGestureRecognizer:taps];
+    [taps release];
+    
     [self performSelector:@selector(hideLabels) withObject:nil afterDelay:0.2];
 }
 
@@ -442,21 +464,21 @@ BOOL _allImagesDownloadDone = FALSE;
     //Add background image to navigation title bar
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarfil.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-    UINavigationBar *bars = [self.navigationController navigationBar];
+    bars = [self.navigationController navigationBar];
     labels = [[UILabel alloc] initWithFrame:CGRectMake(30, 10, 260, 20)];
     labels.textAlignment = UITextAlignmentCenter;
     labels.textColor = [UIColor whiteColor];
     labels.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
     labels.backgroundColor = [UIColor clearColor];
-    labels.text = @"Startups";
+    labels.text = @"Startups - Trending";
     [bars addSubview:labels];
     
-    UITapGestureRecognizer *taps = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelectedStartUp:)];
-    [bars addGestureRecognizer:taps];
-    
-    
-    buttonSearch = [[UIButton alloc] init];
-    buttonSearch.frame = CGRectMake(0, 0, 40, 40);
+//    UITapGestureRecognizer *taps = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(filterButtonSelectedStartUp:)];
+//    [bars addGestureRecognizer:taps];
+//    [taps release];
+     
+    buttonSearch = [[[UIButton alloc] init] autorelease];
+    buttonSearch.frame = CGRectMake(0, 0, 49, 42);
     [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
     [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
     [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
@@ -464,8 +486,7 @@ BOOL _allImagesDownloadDone = FALSE;
     
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:buttonSearch]autorelease];
     
-    
-    
+
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
     
@@ -504,11 +525,34 @@ BOOL _allImagesDownloadDone = FALSE;
     _dbmanager.startUpMarketArrayFromDB = [[[NSMutableArray alloc] init] autorelease];
     _dbmanager.startUpLogoImageInDirectoryFromDB = [[[NSMutableArray alloc] init] autorelease];
     
-    //[self getDetailsOfTrending];
-    //loadingView.hidden = NO;
-    
-    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(getDetailsOfTrending) userInfo:nil repeats:NO];
+    _dbmanager.userDetailsArray = [[[NSMutableArray alloc] init] autorelease];
+
+    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(getDetailsOfTrending) userInfo:nil repeats:NO];
     _filterTrending = TRUE;
+    
+    ////////////////////////////// PULL TO REFRESH //////////////////////////////
+    
+    refreshViewTopTrending = [[UIView alloc] initWithFrame:CGRectMake(0, -52, 320, 52)];
+    
+    imageViewTopTrending = [[UIImageView alloc] initWithFrame:CGRectMake(50, 5, 20, 45)];
+    imageViewTopTrending.image = [UIImage imageNamed:@"refresh_arrow.png"];
+    imageViewTopTrending.transform = CGAffineTransformMakeRotation(3.142);
+    [refreshViewTopTrending addSubview:imageViewTopTrending];
+    [imageViewTopTrending release];
+    
+    imageViewLogoTopTrending = [[UIImageView alloc] initWithFrame:CGRectMake(200, 5, 86, 36)];
+    imageViewLogoTopTrending.image = [UIImage imageNamed:@"angel_logo.png"];
+    [refreshViewTopTrending addSubview:imageViewLogoTopTrending];
+    [imageViewLogoTopTrending release];
+    
+    refreshSpinnerTopTrending = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(50, 15, 20, 20)];
+    refreshSpinnerTopTrending.hidden = YES;
+    [refreshViewTopTrending addSubview:refreshSpinnerTopTrending];
+    [refreshSpinnerTopTrending release];
+    
+    [table addSubview:refreshViewTopTrending];
+    [refreshViewTopTrending release];
+    
     [super viewDidLoad];
     
 
@@ -520,15 +564,12 @@ BOOL _allImagesDownloadDone = FALSE;
     labels.hidden = YES;
     _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
     [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    //[self presentModalViewController:_searchViewController animated:YES];
     [self.navigationController pushViewController:_searchViewController animated:YES];
     
 }
 
 
-
 // Functions to display images concurrently 
-
 -(void)startLoadingImagesConcurrently
 {
     loadingView.hidden = YES;
@@ -558,13 +599,16 @@ BOOL _allImagesDownloadDone = FALSE;
         [imageData release];
         
     }
-    if (_filterFollow == TRUE) {
+    if (_filterFollow == TRUE) 
+    {
         [self saveImagesOfStartUpsFollowing];
     }
-    else if(_filterPortfolio == TRUE){
+    else if(_filterPortfolio == TRUE)
+    {
         [self saveImagesOfStartUpsPortfolio];
     }
-    else if(_filterTrending == TRUE){
+    else if(_filterTrending == TRUE)
+    {
         [self saveImagesOfStartUpsTrending];
     }
     else {
@@ -577,10 +621,10 @@ BOOL _allImagesDownloadDone = FALSE;
 {
     if([[table indexPathsForVisibleRows]count] > 0)
     {
-        NSIndexPath *firstRowShown = [[table indexPathsForVisibleRows]objectAtIndex:0];
-        NSIndexPath *lastRowShown = [[table indexPathsForVisibleRows]objectAtIndex:[[table indexPathsForVisibleRows]count]-1];
+        NSIndexPath *firstRowShown = [[table indexPathsForVisibleRows] objectAtIndex:0];
+        NSIndexPath *lastRowShown = [[table indexPathsForVisibleRows] objectAtIndex:[[table indexPathsForVisibleRows]count]-1];
         NSInteger count = [presentCount integerValue];
-        if((count > firstRowShown.row)&&(count < lastRowShown.row))
+        if((count > firstRowShown.row) && (count < lastRowShown.row))
             [table reloadData];
     }
     else
@@ -595,7 +639,6 @@ BOOL _allImagesDownloadDone = FALSE;
 -(void)sendRequestForLoad
 {
     _requestLoadComplete = FALSE;
-    //loadingView.hidden = NO;
           
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -657,7 +700,7 @@ BOOL _allImagesDownloadDone = FALSE;
                                        options:kNilOptions 
                                        error:&error];
                  
-                 NSArray *startUpIds = [json valueForKey:@"id"];
+                 NSArray* startUpIds = [json valueForKey:@"id"];
                  NSArray* startUpNames = [json valueForKey:@"name"]; //2
                  NSArray* startUpAngelUrl = [json valueForKey:@"angellist_url"]; //2
                  NSArray* startUpLogoUrl = [json valueForKey:@"thumb_url"]; //2
@@ -744,6 +787,7 @@ BOOL _allImagesDownloadDone = FALSE;
                          [theMutableString replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
                          
                      }
+                     
                      [startUpMarketArray addObject:theMutableString];
                      [displayStartUpMarketArray addObject:theMutableString];
                      [theMutableString release];
@@ -811,7 +855,6 @@ BOOL _allImagesDownloadDone = FALSE;
                 [startUpLogoImageInDirectory addObject:image];
                 [displayStartUpLogoImageInDirectory addObject:image];
             
-            
             }
                 _requestLoadComplete = TRUE;
                 [table reloadData];
@@ -862,7 +905,8 @@ BOOL _allImagesDownloadDone = FALSE;
         [_dbmanager insertRecordIntoStartUpsTable:@"StartUps" field1Value:strtid field2Value:startUpId field3Value:startUpName field4Value:startUpAngelUrl field5Value:startUpLogoUrl field6Value:startUpProductDesc field7Value:startUpHighConcept field8Value:startUpFollowerCount field9Value:startUpLocations field10Value:startUpMarkets field11Value:startUpLogoImage];
     } 
     
-    if ([saveImageInDirectory count] == [displayStartUpLogoImageInDirectory count]) {
+    if ([saveImageInDirectory count] == [displayStartUpLogoImageInDirectory count]) 
+    {
         _allImagesDownloadDone = TRUE;
         [table reloadData];
     }
@@ -941,13 +985,12 @@ BOOL _allImagesDownloadDone = FALSE;
 
 
 //Methods to animate filter options
-
 -(void)animateFilter
 {
     _yPosSp = 0;
     _xPosSp = 0;
     NSLog(@"\n \n i value = %d \n \n ",_addFilter);
-    if (_addFilter%2 == 0) {
+    if (_addFilter%2 == 0) { // every alternate time the label is tapped the filter view is added
         _addFilter++;
         
         _showFilterMenuInStartUps = TRUE;
@@ -965,9 +1008,9 @@ BOOL _allImagesDownloadDone = FALSE;
             [filterButtons setBackgroundColor:[UIColor darkGrayColor]];
             [filterButtons setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             filterButtons.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:15];
-            [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted];
+            [filterButtons addTarget:self action:@selector(getFilteredList:) forControlEvents:UIControlStateHighlighted]; // action for each button 
             filterButtons.frame = CGRectMake(_xPosSp, _yPosSp, 271, 51);
-            filterButtons.tag = index+1;
+            filterButtons.tag = index+1; // tag for the button
             _yPosSp = _yPosSp + 53;
             [_view2 addSubview:filterButtons];
             
@@ -985,9 +1028,8 @@ BOOL _allImagesDownloadDone = FALSE;
         
     }
     
-    else {
+    else { // every alternate time the label is tapped the filter view is removed
         
-        //[[self.view viewWithTag:1000] removeFromSuperview];
         [filterContainer setUserInteractionEnabled:YES];
         
         for (int index = 1; index<[_filterStartUpNames count]+1; index++) {
@@ -1038,8 +1080,11 @@ BOOL _allImagesDownloadDone = FALSE;
             //Implement Following
         case 2 : [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(getDetailsOfFollowing) userInfo:nil repeats:NO];
             
-            
                 _filterFollow = TRUE;
+                _filterPortfolio = FALSE;
+                _filterTrending = FALSE;
+            
+                [refreshViewTopTrending setHidden:YES];
                  _showFilterMenuInStartUps = FALSE;
                 
                
@@ -1047,14 +1092,17 @@ BOOL _allImagesDownloadDone = FALSE;
                   filterContainer.selected = FALSE;
                  labels.text = @"Startups - Following";
                  self.navigationController.title = @"Startups";
-                
-                // [self getDetailsOfFollowing];   
                  break;
             
             //Implement Portfolio    
         case 3 : 
             [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(getDetailsOfPortfolio) userInfo:nil repeats:NO];
+            
             _filterPortfolio = TRUE;
+            _filterTrending = FALSE;
+            _filterFollow = FALSE;
+            
+            [refreshViewTopTrending setHidden:YES];
             _showFilterMenuInStartUps = FALSE;
             filterContainer.selected = FALSE;
             
@@ -1063,7 +1111,6 @@ BOOL _allImagesDownloadDone = FALSE;
             
             labels.text = @"Startups - Portfolio";
             self.navigationController.title = @"Startups";
-           // [self getDetailsOfPortfolio];
             
             break;
             
@@ -1071,11 +1118,12 @@ BOOL _allImagesDownloadDone = FALSE;
         case 1 :    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(getDetailsOfTrending) userInfo:nil repeats:NO];
                 filterContainer.selected = FALSE;
            
-                //[self getDetailsOfTrending];
-            _filterTrending = TRUE; 
+                _filterTrending = TRUE; 
                 [table reloadData];
             
+                [refreshViewTopTrending setHidden:NO];
                 labels.text = @"Startups - Trending";
+            
                 self.navigationController.title = @"Startups";
             
                 _showFilterMenuInStartUps = FALSE;
@@ -1094,7 +1142,6 @@ BOOL _allImagesDownloadDone = FALSE;
                  filterContainer.selected = FALSE;
             
                 [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
-                //[self sendRequestForLoad];
                 [table reloadData];
                 labels.text = @"Startups";
                 self.navigationController.title = @"Startups";
@@ -1111,7 +1158,6 @@ BOOL _allImagesDownloadDone = FALSE;
 -(void) getDetailsOfFollowing
 {
     _requestLoadComplete = FALSE;
-   // loadingView.hidden = NO;
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
@@ -1155,15 +1201,10 @@ BOOL _allImagesDownloadDone = FALSE;
     else
     {
        
-        //loadingView.hidden = NO;
         filterContainer.enabled = NO;
         [_dbmanager openDB];
         [_dbmanager retrieveUserDetails];
-        for(int k=0; k<[_dbmanager.userDetailsArray count]; k++)
-        {
-            NSLog(@"\n\nARRAY USER DETAILS AT INDEX k %d = %@",k,[_dbmanager.userDetailsArray objectAtIndex:k]);
-        }
-         NSLog(@"\n \n \n user id from db = %@ \n \n ",_dbmanager._angelUserIdFromDB);
+        
         //Send request to get startUps followed by user
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/users/%@/following?type=startup",_dbmanager._angelUserIdFromDB]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -1196,8 +1237,6 @@ BOOL _allImagesDownloadDone = FALSE;
                          {
                              [userFollowingIds addObject:startUpFollowIds];
                          }
-                         
-                         
                          
                          NSString* startUpFollowNames = [following valueForKey:@"name"];
                          [displayStartUpNameArray addObject:startUpFollowNames];
@@ -1346,10 +1385,8 @@ BOOL _allImagesDownloadDone = FALSE;
                 for(int imageNumber=1; imageNumber<=[startUpLogoUrlArray count]; imageNumber++)
                 {
                     UIImage *image = [UIImage imageNamed:@"placeholder.png"];
-        
                     [startUpLogoImageInDirectory addObject:image];
                     [displayStartUpLogoImageInDirectory addObject:image];
-        
         
                 }
                  _requestLoadComplete = TRUE;
@@ -1375,7 +1412,6 @@ BOOL _allImagesDownloadDone = FALSE;
         [image release];
         
         [saveImageInDirectory addObject:savedImagePath];
-       // [displayStartUpLogoImageInDirectory replaceObjectAtIndex:(imageNumber-1) withObject:savedImagePath];
     }
     [self saveStartUpsFollowingDetailsToDB];
 }
@@ -1412,12 +1448,12 @@ BOOL _allImagesDownloadDone = FALSE;
 -(void) getDetailsOfPortfolio
 {
     _requestLoadComplete = FALSE;
-    //loadingView.hidden = NO;
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
+        
         [_dbmanager.startUpIdsArrayFromDB removeAllObjects];
         [_dbmanager.startUpNameArrayFromDB removeAllObjects];
         [_dbmanager.startUpAngelUrlArrayFromDB removeAllObjects];
@@ -1455,14 +1491,12 @@ BOOL _allImagesDownloadDone = FALSE;
     }
     else
     {
-        //loadingView.hidden = NO;
         filterContainer.enabled = NO;
         [_dbmanager retrieveUserDetails];
         //Send request to get details of portfolio
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/startup_roles?user_id=%@",[_dbmanager.userDetailsArray objectAtIndex:5]]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"GET"];
-        
         
         NSError *error;                                   //  NSError *error) 
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:&error];
@@ -1508,7 +1542,7 @@ BOOL _allImagesDownloadDone = FALSE;
                          [displayStartUpMarketArray addObject:@""];
                          
                          UIImage *image = [UIImage imageNamed:@"placeholder.png"];
-                         
+                         // placeholder image 
                          [startUpLogoImageInDirectory addObject:image];
                          [displayStartUpLogoImageInDirectory addObject:image];
 
@@ -1528,6 +1562,7 @@ BOOL _allImagesDownloadDone = FALSE;
                  {
                      NSMutableString * theMutableString = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"%@",[displayStartUpHighConceptArray objectAtIndex:k]]];
                      
+                     
                      [theMutableString replaceOccurrencesOfString:@"'" withString:@"" options:NSCaseInsensitiveSearch range:(NSRange){0,[theMutableString length]}];
                      
                      [displayStartUpHighConceptArray replaceObjectAtIndex:k withObject:theMutableString];
@@ -1546,13 +1581,12 @@ BOOL _allImagesDownloadDone = FALSE;
                     for(int imageNumber=1; imageNumber<=[startUpLogoUrlArray count]; imageNumber++)
                     {
                             UIImage *image = [UIImage imageNamed:@"placeholder.png"];
-        
                             [startUpLogoImageInDirectory addObject:image];
                             [displayStartUpLogoImageInDirectory addObject:image];
                         
                     }
                 
-                _requestLoadComplete = TRUE;
+                 _requestLoadComplete = TRUE;
                  [table reloadData];
                  [self startLoadingImagesConcurrently];
 
@@ -1612,7 +1646,16 @@ BOOL _allImagesDownloadDone = FALSE;
 //Get details of trending startUps by user
 -(void) getDetailsOfTrending
 {
-   // loadingView.hidden = NO;
+    [displayStartUpIdsArray removeAllObjects];
+    [displayStartUpNameArray removeAllObjects];
+    [displayStartUpAngelUrlArray removeAllObjects];
+    [displayStartUpLogoUrlArray removeAllObjects];
+    [displayStartUpProductDescArray removeAllObjects];
+    [displayStartUpHighConceptArray removeAllObjects];
+    [displayStartUpFollowerCountArray removeAllObjects];
+    [displayStartUpLocationArray removeAllObjects];
+    [displayStartUpMarketArray removeAllObjects];
+    [displayStartUpLogoImageInDirectory removeAllObjects];
     
     _requestLoadComplete = FALSE;
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -1620,7 +1663,6 @@ BOOL _allImagesDownloadDone = FALSE;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"\n\nINSIDE TRENDING API");
         [_dbmanager.startUpIdsArrayFromDB removeAllObjects];
         [_dbmanager.startUpNameArrayFromDB removeAllObjects];
         [_dbmanager.startUpAngelUrlArrayFromDB removeAllObjects];
@@ -1635,32 +1677,21 @@ BOOL _allImagesDownloadDone = FALSE;
         [_dbmanager retrieveStartUpstrendingDetails];
         
         [displayStartUpIdsArray addObjectsFromArray:_dbmanager.startUpIdsArrayFromDB];
-        
         [displayStartUpNameArray addObjectsFromArray:_dbmanager.startUpNameArrayFromDB];
-        
         [displayStartUpAngelUrlArray addObjectsFromArray:_dbmanager.startUpAngelUrlArrayFromDB];
-        
         [displayStartUpLogoUrlArray addObjectsFromArray:_dbmanager.startUpLogoUrlArrayFromDB];
-        
         [displayStartUpProductDescArray addObjectsFromArray:_dbmanager.startUpProductDescArrayFromDB];
-        
         [displayStartUpHighConceptArray addObjectsFromArray:_dbmanager.startUpHighConceptArrayFromDB];
-        
         [displayStartUpFollowerCountArray addObjectsFromArray:_dbmanager.startUpFollowerCountArrayFromDB];
-        
         [displayStartUpLocationArray addObjectsFromArray:_dbmanager.startUpLocationArrayFromDB];
-        
         [displayStartUpMarketArray addObjectsFromArray:_dbmanager.startUpMarketArrayFromDB];
         
         [displayStartUpLogoImageInDirectory addObjectsFromArray:_dbmanager.startUpLogoImageInDirectoryFromDB];
-        
-        NSLog(@"\n\nINSIDE TRENDING API");
         
         [table reloadData];
     }
     else
     {
-        NSLog(@"\n\nINSIDE TRENDING API");
         _requestLoadComplete = FALSE;
       //  loadingView.hidden = NO;
         filterContainer.enabled = NO;
@@ -1812,7 +1843,6 @@ BOOL _allImagesDownloadDone = FALSE;
                      [checkStr release];
                  }
     
-    
                  _requestLoadComplete = TRUE;
                  [table reloadData];
                  [self startLoadingImagesConcurrently];
@@ -1886,7 +1916,79 @@ BOOL _allImagesDownloadDone = FALSE;
     
 }
 
+//Invoked when scroll view ends dragging
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if (scrollView.contentOffset.y <= -52) 
+    {
+        //Check for the availability of Internet
+        Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+        
+        NetworkStatus internetStatus = [r currentReachabilityStatus];
+        if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            [alert release];
+        }
+        else
+        {
+            if(_filterTrending == TRUE)
+            {
+                isLoadingTopTrending = TRUE;
+                [self startLoadingAtTop];
+            }
+        }
+    } 
+}
 
+
+-(void) startLoadingAtTop
+{
+    table.contentInset = UIEdgeInsetsMake(52, 0, 0, 0);
+    if(isLoadingTopTrending)
+    {
+        imageViewTopTrending.hidden = YES;
+        refreshSpinnerTopTrending.hidden = NO;
+        [refreshSpinnerTopTrending startAnimating];
+    }
+    [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(stopLoadingAtTop) userInfo:nil repeats:NO];
+}
+
+-(void) stopLoadingAtTop
+{
+    isLoadingTopTrending = FALSE;
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.3];
+    imageViewTopTrending.transform = CGAffineTransformMakeRotation(3.142*2);
+    [UIView commitAnimations];
+    table.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+    
+    
+    [self getDetailsOfTrending];
+    
+    imageViewTopTrending.hidden = NO;
+    refreshSpinnerTopTrending.hidden = YES;
+    [refreshSpinnerTopTrending stopAnimating];
+}
+
+//Delegate method called when scroll view is scrolling
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{  
+    if(scrollView.contentOffset.y < -52)
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.3];
+        imageViewTopTrending.transform = CGAffineTransformMakeRotation(3.142*2);
+        [UIView commitAnimations];
+    }
+    else
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.3];
+        imageViewTopTrending.transform = CGAffineTransformMakeRotation(3.142);
+        [UIView commitAnimations];
+    } 
+}
 
 - (void)viewDidUnload
 {

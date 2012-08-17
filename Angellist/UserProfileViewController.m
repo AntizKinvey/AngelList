@@ -18,6 +18,24 @@
 extern BOOL _loggedIn;
 extern NSString *_angelUserNameFromDB;
 
+////////////////////////////////////////////
+extern NSMutableArray *_msgbody;
+extern NSMutableArray *_senderName; // sender name
+extern NSMutableArray *_recepientName; // recepient name
+extern NSMutableArray *_imageOfRecepient; // image of recepient 
+extern NSMutableArray *_imageOfSender; // image of sender
+extern NSMutableArray *_userids; // user ids
+extern NSMutableArray *_sender; // sender ids
+extern NSMutableArray *_recepient; // recepient ids
+extern NSMutableArray *_read; // viewed status
+extern NSMutableArray *_threadId; // thread id
+extern NSMutableArray *_msgbody; // message body
+extern NSMutableArray *_placeHolder; // place holder images
+extern NSMutableArray *_time; // time got from response
+extern NSMutableArray *_displayTime; // display time
+extern NSMutableArray *_totalMsgCount; // total message count
+
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -47,7 +65,7 @@ extern NSString *_angelUserNameFromDB;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
-    
+    // load the image of the user from db
     UIImage *image = [UIImage imageWithContentsOfFile:_dbmanager._angelUserImageFromDB];
     UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(80, 20, 150, 150)];
     cellImageView.image = image;
@@ -57,21 +75,25 @@ extern NSString *_angelUserNameFromDB;
     [cellImageView release];
     
     
-    UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(90, 180, 290, 20)] autorelease];
+    // load the name of the user
+    UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 180, 290, 20)] autorelease];//CGRectMake(90, 180, 290, 20)] autorelease];
     
     cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
     cellNameLabel.text = _dbmanager._angelUserNameFromDB;
     cellNameLabel.backgroundColor = [UIColor clearColor];
     cellNameLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
     cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:18];
+    cellNameLabel.textAlignment = UITextAlignmentCenter;
     [cell.contentView addSubview:cellNameLabel];
     
-    UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(30, 200, 290, 20)] autorelease];//26
+    // load the email id of the user
+    UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 200, 290, 20)] autorelease];//26
     cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
     cellHighConceptLabel.numberOfLines = 2;
     cellHighConceptLabel.text = _dbmanager._angelUserEmailFromDB;
     cellHighConceptLabel.backgroundColor = [UIColor clearColor];
     cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:16];
+    cellHighConceptLabel.textAlignment = UITextAlignmentCenter;
     [cell.contentView addSubview:cellHighConceptLabel];
     
     [cell.contentView addSubview:_logoutButton];
@@ -93,8 +115,7 @@ extern NSString *_angelUserNameFromDB;
     
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-        
-    return 360; //160    
+    return 360;    
 }
 
 
@@ -109,8 +130,6 @@ extern NSString *_angelUserNameFromDB;
 {
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-   
-    
 }
 
 -(void)viewDidLoad
@@ -126,10 +145,10 @@ extern NSString *_angelUserNameFromDB;
     [_logoutButton setImage:[UIImage imageNamed:@"logout.png"] forState:UIControlStateNormal];
     [_logoutButton addTarget:self action:@selector(logoutFromApp) forControlEvents:UIControlStateHighlighted];
    
-
+    // for search options
     
      buttonSearch = [[UIButton alloc] init];
-     buttonSearch.frame = CGRectMake(0, 0, 40, 40);
+     buttonSearch.frame = CGRectMake(0, 0, 49, 42);
     [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
     [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
     [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
@@ -143,17 +162,18 @@ extern NSString *_angelUserNameFromDB;
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
      [_dbmanager retrieveUserDetails];
-     // NSLog(@"\n \n \n name = %@ \n \n \n ",_dbmanager._angelUserNameFromDB);
     self.navigationItem.title = _dbmanager._angelUserNameFromDB;
     
 }
 
 
 -(void)logoutFromApp
-{    
+{    // alert before the logout
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Are you sure to logout?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Yes",@"No", nil];
     [alert show];
     [alert release];
+    
+    
     
 }
 
@@ -171,6 +191,8 @@ extern NSString *_angelUserNameFromDB;
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0) {
+        
+        // to delete all the cookies of the webview
         NSHTTPCookie *aCookie;
         for (aCookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:aCookie];
@@ -178,8 +200,12 @@ extern NSString *_angelUserNameFromDB;
         
         _loggedIn = FALSE;
         
-        [_dbmanager deleteUserFromDB];
+        [_dbmanager deleteUserFromDB]; // delete user details from the the db
+        [_dbmanager deleteFromInbox];
         
+
+        
+        // navigate to the login screen
         AppDelegate *mainDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
         [mainDelegate loginToAngelList];
     }

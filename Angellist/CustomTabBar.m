@@ -11,6 +11,8 @@
 
 @implementation CustomTabBar
 
+bool _tabBarSelected = false;
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
@@ -31,12 +33,15 @@
             view.hidden = YES;
             break;
         }
-    }
+    } 
 }
 
 //Add custom elements required to tab bar
 -(void)addCustomElements
 {
+    //[self.view setBackgroundColor:[UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1]];
+    [self.view setFrame:CGRectMake(0, 0, 320, 486)];
+    [self.view setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:1]];
     // Initialise our two images
     UIImage *btnImage;
     UIImage *btnImageSelected;
@@ -45,7 +50,7 @@
     btnImageSelected = [UIImage imageNamed:@"peoplea.png"];
     btn2 = [UIButton buttonWithType:UIButtonTypeCustom];//Setup the button
 //    btn2.frame = CGRectMake(0, 410, 107, 50);// Set the frame (size and position) of the button)
-    btn2.frame = CGRectMake(0, 400, 80, 60);
+    btn2.frame = CGRectMake(0, 406, 80, 52); 
     [btn2 setBackgroundImage:btnImage forState:UIControlStateNormal];// Set the image for the normal state of the button
     [btn2 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];// Set the image for the selected state of the button
     [btn2 setSelected:TRUE];// Set this button as selected (we will select the others to false as we only want Tab 1 to be selected initially
@@ -55,7 +60,7 @@
     btnImage = [UIImage imageNamed:@"startupi.png"];
     btnImageSelected = [UIImage imageNamed:@"startupa.png"];
     btn3 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn3.frame = CGRectMake(80, 400, 80, 60);
+    btn3.frame = CGRectMake(80, 406, 80, 52);
     [btn3 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn3 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn3 setTag:1];
@@ -63,7 +68,7 @@
     btnImage = [UIImage imageNamed:@"inboxi.png"];
     btnImageSelected = [UIImage imageNamed:@"inboxa.png"];
     btn4 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn4.frame = CGRectMake(160, 400, 80, 60);
+    btn4.frame = CGRectMake(160, 406, 80, 52);
     [btn4 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn4 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn4 setTag:2];
@@ -71,7 +76,7 @@
     btnImage = [UIImage imageNamed:@"mei.png"];
     btnImageSelected = [UIImage imageNamed:@"mea.png"];
     btn5 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn5.frame = CGRectMake(240, 400, 80, 60);
+    btn5.frame = CGRectMake(240, 406.5f, 80, 52);
     [btn5 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn5 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn5 setTag:3];
@@ -92,27 +97,35 @@
 //Check the selected tab in tab bar
 - (void)selectTab:(int)tabID
 {
+    //kiran
+    
+    _tabBarSelected = TRUE;
+    
     switch(tabID)
     {
         case 0:
+            
             [btn2 setSelected:true];
             [btn3 setSelected:false];
             [btn4 setSelected:false];
             [btn5 setSelected:false];
             break;
         case 1:
+            
             [btn2 setSelected:false];
             [btn3 setSelected:true];
             [btn4 setSelected:false];
             [btn5 setSelected:false];
             break;
         case 2:
+            
             [btn2 setSelected:false];
             [btn3 setSelected:false];
             [btn4 setSelected:true];
             [btn5 setSelected:false];
             break;
         case 3:
+           
             [btn2 setSelected:false];
             [btn3 setSelected:false];
             [btn5 setSelected:true];

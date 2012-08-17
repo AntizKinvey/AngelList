@@ -74,7 +74,24 @@ KCSCollection *_detailsCollection;
         {
             //Image to be displayed
             UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
-            cellImageView.image = [displayInCells objectAtIndex:0];
+            
+            
+            
+            //Check for the availability of Internet
+            Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+            
+            NetworkStatus internetStatus = [r currentReachabilityStatus];
+            if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+            {
+                cellImageView.image = [UIImage imageWithContentsOfFile:[displayInCells objectAtIndex:0]];
+            }
+            else 
+            {
+                cellImageView.image = [displayInCells objectAtIndex:0];
+            }
+            
+            
+            
             cellImageView.layer.cornerRadius = 3.5f;
             cellImageView.layer.masksToBounds = YES;
             [cell.contentView addSubview:cellImageView];
@@ -370,6 +387,8 @@ KCSCollection *_detailsCollection;
     [displayInCells retain];
     [super viewWillAppear:animated];
 }
+
+
 
 - (void)viewDidUnload
 {

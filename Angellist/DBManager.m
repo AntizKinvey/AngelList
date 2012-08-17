@@ -43,7 +43,7 @@ NSString *_angelUserEmailFromDB;
 @synthesize inboxTotalFromDB;
 @synthesize inboxViewedFromDB;
 @synthesize inboxThreadIdFromDB;
-@synthesize _angelUserEmailFromDB, _angelUserIdFromDB, _angelUserNameFromDB, _angelUserImageFromDB, _angelUserFollowsFromDB,access_tokenFromDB, userDetailsArray;
+@synthesize _angelUserEmailFromDB, _angelUserIdFromDB, _angelUserNameFromDB, _angelUserImageFromDB, _angelUserFollowsFromDB,access_tokenFromDB, userDetailsArray, targetTaglineArrayFromDB, targetNameArrayFromDB, targetImageArrayFromDB, targetIdArrayFromDB, targetTypeArrayFromDB, targetUrlArrayFromDB,feedTypeArrayFromDB;
 
 ///To check filePath
 -(NSString *) filePath {
@@ -75,11 +75,12 @@ NSString *_angelUserEmailFromDB;
 }
 
 // create table for feeds
--(void) createTableActivity:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9
+-(void) createTableActivity:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11 withField12:(NSString *)field12 withField13:(NSString *)field13 withField14:(NSString *)field14 withField15:(NSString *)field15 withField16:(NSString *)field16
 {
     char *err;
     NSString *sql = [NSString stringWithFormat:
-                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT);", tableName, field1, field2, field3, field4, field5, field6, field7, field8, field9];
+                     @"CREATE TABLE IF NOT EXISTS '%@' ('%@' TEXT PRIMARY KEY, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT, '%@' TEXT);", tableName, field1, field2, field3, field4, field5, field6, field7, field8, field9 , field10 , field11, field12 , field13 , field14, field15, field16];
+    
     if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
     { 
         sqlite3_close(db);
@@ -153,7 +154,7 @@ NSString *_angelUserEmailFromDB;
 }
 
 
-//Insert Values to User Table
+//Insert Values to Inbox Table
 -(void) insertRecordIntoInbox: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value
 {
     
@@ -179,9 +180,7 @@ NSString *_angelUserEmailFromDB;
     {
         sqlite3_close(db);
         NSAssert(0, @"Error Inserting to table User."); 
-        NSLog(@" step 2 ");
     } 
-    NSLog(@" step 3 ");
 }
 
 // Update record into inbox table
@@ -212,11 +211,11 @@ NSString *_angelUserEmailFromDB;
 }
 
 // Insert record into activity table 
--(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value
+-(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value andField10: (NSString *) field10 field10Value: (NSString *) field10Value andField11: (NSString *) field11 field11Value: (NSString *) field11Value andField12: (NSString *) field12 field12Value: (NSString *) field12Value andField13: (NSString *) field13 field13Value: (NSString *) field13Value andField14: (NSString *) field14 field14Value: (NSString *) field14Value andField15: (NSString *) field15 field15Value: (NSString *) field15Value andField16: (NSString *) field16 field16Value: (NSString *) field16Value
 {
     char *err;
     NSString *sql = [NSString stringWithFormat:
-                     @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@') VALUES ('%@','%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@')", tableName, field1, field2, field3, field4, field5, field6, field7, field8, field9, field1Value, field2Value, field3Value, field4Value, field5Value, field6Value, field7Value, field8Value, field9Value];
+                     @"INSERT OR REPLACE INTO '%@' ('%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@') VALUES ('%@','%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@', '%@')", tableName, field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, field11, field12, field13, field14, field15, field16, field1Value, field2Value, field3Value, field4Value, field5Value, field6Value, field7Value, field8Value, field9Value, field10Value , field11Value , field12Value , field13Value, field14Value , field15Value, field16Value];
     if (sqlite3_exec(db, [sql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
     { 
         sqlite3_close(db);
@@ -357,6 +356,18 @@ NSString *_angelUserEmailFromDB;
     }
 }
 
+//Delete rows from Inbox
+-(void) deleteFromInbox
+{
+    NSString *ssql = @"DELETE  FROM Inbox";
+    char *err;
+    if (sqlite3_exec(db, [ssql UTF8String], NULL, NULL, &err) != SQLITE_OK) 
+    {
+        sqlite3_close(db);
+        NSAssert(0, @"Error deleting table."); 
+    }
+}
+
 
 // retrieve User details
 -(void) retrieveUserDetails
@@ -402,8 +413,6 @@ NSString *_angelUserEmailFromDB;
             
             [userDetailsArray addObjectsFromArray:[NSArray arrayWithObjects: _angelUserNameFromDB,_angelUserEmailFromDB, _angelUserFollowsFromDB, _angelUserImageFromDB, access_tokenFromDB, _angelUserIdFromDB, nil]];
             
-            NSLog(@"\n \n access token in db = %@ ", _angelUserIdFromDB);
-             NSLog(@"\n \n step 1 = %@ \n \n ",_angelUserIdFromDB);
             
             [field1Str release];
             [field2Str release];
@@ -425,13 +434,12 @@ NSString *_angelUserEmailFromDB;
 // retrieve activity details
 -(void) retrieveActivityDetails
 {
-    NSString *sql = @"SELECT feedDescription,feedImageUrl,actorType,actorId,actorName,actorUrl,actorTagline,feedImagePath FROM Activity";
+    NSString *sql = @"SELECT feedDescription,feedImageUrl,actorType,actorId,actorName,actorUrl,actorTagline,feedImagePath, targetType, targetId , targetName, targetURL, targetTagline , targetImagePath,feedType FROM Activity";
     
     sqlite3_stmt *statement;
     
     if(sqlite3_prepare_v2(db,[sql UTF8String],-1,&statement,nil) == SQLITE_OK)
     {
-        NSLog(@"INSIDE ACTIVITY NOT REACHABLE");
         while(sqlite3_step(statement) == SQLITE_ROW)
         {
             char *field1 = (char *) sqlite3_column_text(statement,0);
@@ -473,6 +481,42 @@ NSString *_angelUserEmailFromDB;
             NSString *field8Str = [[NSString alloc] initWithUTF8String:field8];
             NSString *str8 = [[NSString alloc] initWithFormat:@"%@", field8Str];
             [feedImagesArrayFromDirectoryFromDB addObject:str8];
+   
+            char *field9 = (char *) sqlite3_column_text(statement,8);
+            NSString *field9Str = [[NSString alloc] initWithUTF8String:field9];
+            NSString *str9 = [[NSString alloc] initWithFormat:@"%@", field9Str];
+            [targetTypeArrayFromDB addObject:str9];
+            
+            char *field10 = (char *) sqlite3_column_text(statement,9);
+            NSString *field10Str = [[NSString alloc] initWithUTF8String:field10];
+            NSString *str10 = [[NSString alloc] initWithFormat:@"%@", field10Str];
+            [targetIdArrayFromDB addObject:str10];
+            
+            char *field11 = (char *) sqlite3_column_text(statement,10);
+            NSString *field11Str = [[NSString alloc] initWithUTF8String:field11];
+            NSString *str11 = [[NSString alloc] initWithFormat:@"%@", field11Str];
+            [targetNameArrayFromDB addObject:str11];
+            
+            char *field12 = (char *) sqlite3_column_text(statement,11);
+            NSString *field12Str = [[NSString alloc] initWithUTF8String:field12];
+            NSString *str12 = [[NSString alloc] initWithFormat:@"%@", field12Str];
+            [targetUrlArrayFromDB addObject:str12];
+            
+            char *field13 = (char *) sqlite3_column_text(statement,12);
+            NSString *field13Str = [[NSString alloc] initWithUTF8String:field13];
+            NSString *str13 = [[NSString alloc] initWithFormat:@"%@", field13Str];
+            [targetTaglineArrayFromDB addObject:str13];
+            
+            char *field14 = (char *) sqlite3_column_text(statement,13);
+            NSString *field14Str = [[NSString alloc] initWithUTF8String:field14];
+            NSString *str14 = [[NSString alloc] initWithFormat:@"%@", field14Str];
+            [targetImageArrayFromDB addObject:str14];
+            
+            char *field15 = (char *) sqlite3_column_text(statement,14);
+            NSString *field15Str = [[NSString alloc] initWithUTF8String:field15];
+            NSString *str15 = [[NSString alloc] initWithFormat:@"%@", field15Str];
+            [feedTypeArrayFromDB addObject:str15];
+            
             
             [field1Str release];
             [field2Str release];
@@ -482,6 +526,14 @@ NSString *_angelUserEmailFromDB;
             [field6Str release];
             [field7Str release];
             [field8Str release];
+            [field9Str release];
+            [field10Str release];
+            [field11Str release];
+            [field12Str release];
+            [field13Str release];
+            [field14Str release];
+            [field15Str release];
+            
             [str1 release];
             [str2 release];
             [str3 release];
@@ -490,13 +542,20 @@ NSString *_angelUserEmailFromDB;
             [str6 release];
             [str7 release];
             [str8 release];
+            [str9 release];
+            [str10 release];
+            [str11 release];
+            [str12 release];
+            [str13 release];
+            [str14 release];
+            [str15 release];
         }
         sqlite3_finalize(statement);
     }
 }
 
 
-// retrieve startp details 
+// retrieve startup details 
 -(void) retrieveStartUpsDetails
 {
     NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM StartUps";
@@ -654,6 +713,7 @@ NSString *_angelUserEmailFromDB;
             [field8Str release];
             [field9Str release];
             [field10Str release];
+            
             [str1 release];
             [str2 release];
             [str3 release];
@@ -757,7 +817,7 @@ NSString *_angelUserEmailFromDB;
 }
 
 
-// retrieve startups following details
+// retrieve startups trending details
 -(void) retrieveStartUpstrendingDetails
 {
     NSString *sql = @"SELECT startUpId,startUpName,startUpAngelUrl,startUpLogoUrl,startUpProdDesc,startUpHighConcept,startUpFollowerCount,startUpLocations,startUpMarkets,startUpImagePath FROM Trending";
@@ -849,6 +909,7 @@ NSString *_angelUserEmailFromDB;
 {
     sqlite3_close(db);
 }
+
 
 
 @end

@@ -23,6 +23,13 @@
     NSMutableArray *feedDescDisplayArrayFromDB; // feed description display array
     NSMutableArray *feedImageArrayFromDB; // feed image array from Database
     
+    NSMutableArray *targetTypeArrayFromDB; // type of actor either startup or user
+    NSMutableArray *targetIdArrayFromDB; // actor id
+    NSMutableArray *targetNameArrayFromDB;  // actor name
+    NSMutableArray *targetUrlArrayFromDB; // actor URL array
+    NSMutableArray *targetTaglineArrayFromDB; // actor tagline
+    NSMutableArray *targetImageArrayFromDB; // feed image array from Database
+    
     // for startups
     NSMutableArray *startUpIdsArrayFromDB; // startup ids from database
     NSMutableArray *startUpNameArrayFromDB; // startup names from database
@@ -41,6 +48,8 @@
     NSMutableArray *inboxViewedFromDB; // status of a inbox messages
     
     NSMutableArray *userDetailsArray; // userDetails array
+    
+    NSMutableArray *feedTypeArrayFromDB;
     
     NSString *_angelUserIdFromDB;
     NSString *_angelUserNameFromDB;
@@ -63,6 +72,14 @@
 @property(nonatomic, retain) NSString *_angelUserImageFromDB;
 @property(nonatomic, retain) NSString *_angelUserEmailFromDB;
 
+
+@property(nonatomic, retain) NSMutableArray *targetTypeArrayFromDB; // type of actor either startup or user
+@property(nonatomic, retain) NSMutableArray *targetIdArrayFromDB; // actor id
+@property(nonatomic, retain) NSMutableArray *targetNameArrayFromDB;  // actor name
+@property(nonatomic, retain) NSMutableArray *targetUrlArrayFromDB; // actor URL array
+@property(nonatomic, retain) NSMutableArray *targetTaglineArrayFromDB; // actor tagline
+@property(nonatomic, retain) NSMutableArray *targetImageArrayFromDB; // feed image array from Database
+
 @property (retain) NSMutableArray *feedImagesArrayFromDirectoryFromDB;
 @property (retain) NSMutableArray *actorTypeArrayFromDB;
 @property (retain) NSMutableArray *actorIdArrayFromDB;
@@ -83,6 +100,8 @@
 @property (retain) NSMutableArray *startUpMarketArrayFromDB;
 @property (retain) NSMutableArray *startUpLogoImageInDirectoryFromDB;
 
+@property (retain) NSMutableArray *feedTypeArrayFromDB;
+
 //To check filePath
 -(NSString *)filePath;
 
@@ -93,7 +112,8 @@
 -(void) createTableUser:(NSString *) tableName withField1:(NSString *) field1 withField2:(NSString *) field2 withField3:(NSString *) field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7;
 
 // Table for Activity
--(void) createTableActivity:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9;
+// create table for feeds
+-(void) createTableActivity:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11 withField12:(NSString *)field12 withField13:(NSString *)field13 withField14:(NSString *)field14 withField15:(NSString *)field15 withField16:(NSString *)field16;
 
 // Table for StartUps
 -(void) createTableStartUps:(NSString *)tableName withField1:(NSString *)field1 withField2:(NSString *)field2 withField3:(NSString *)field3 withField4:(NSString *)field4 withField5:(NSString *)field5 withField6:(NSString *)field6 withField7:(NSString *)field7 withField8:(NSString *)field8 withField9:(NSString *)field9 withField10:(NSString *)field10 withField11:(NSString *)field11;
@@ -114,8 +134,8 @@
 -(void) insertRecordIntoUserTable: (NSString *) tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *)field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value;
 
 
-// Insert Values to Activity Table
--(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value;
+// Insert record into activity table 
+-(void) insertRecordIntoActivityTable:(NSString *)tableName withField1: (NSString *) field1 field1Value: (NSString *) field1Value andField2: (NSString *) field2 field2Value: (NSString *) field2Value andField3: (NSString *) field3 field3Value: (NSString *) field3Value andField4: (NSString *) field4 field4Value: (NSString *) field4Value andField5: (NSString *) field5 field5Value: (NSString *) field5Value andField6: (NSString *) field6 field6Value: (NSString *) field6Value andField7: (NSString *) field7 field7Value: (NSString *) field7Value andField8: (NSString *) field8 field8Value: (NSString *) field8Value andField9: (NSString *) field9 field9Value: (NSString *) field9Value andField10: (NSString *) field10 field10Value: (NSString *) field10Value andField11: (NSString *) field11 field11Value: (NSString *) field11Value andField12: (NSString *) field12 field12Value: (NSString *) field12Value andField13: (NSString *) field13 field13Value: (NSString *) field13Value andField14: (NSString *) field14 field14Value: (NSString *) field14Value andField15: (NSString *) field15 field15Value: (NSString *) field15Value andField16: (NSString *) field16 field16Value: (NSString *) field16Value;
 
 // Insert into startup table
 -(void) insertRecordIntoStartUpsTable:(NSString *)tableName field1Value:(NSString *)field1Value field2Value:(NSString *)field2Value field3Value:(NSString *)field3Value field4Value:(NSString *)field4Value field5Value:(NSString *)field5Value field6Value:(NSString *)field6Value field7Value:(NSString *)field7Value field8Value:(NSString *)field8Value field9Value:(NSString *)field9Value field10Value:(NSString *)field10Value field11Value:(NSString *)field11Value;
@@ -165,6 +185,9 @@
 
 //Delete User from database
 -(void) deleteUserFromDB;
+
+//Delete Inbox from database
+-(void) deleteFromInbox;
 
 // Close database
 -(void) closeDB;

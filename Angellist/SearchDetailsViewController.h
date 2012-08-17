@@ -14,6 +14,7 @@
     IBOutlet UIWebView *webView;
     IBOutlet UIView *loading;
     UILabel *labelSearchDetails;
+    UILabel *labelSearch;
 }
 
 @end
