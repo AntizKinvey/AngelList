@@ -1,23 +1,25 @@
 //
 //  LoginViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/26/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import <KinveyKit/KinveyKit.h>
+#import "DBManager.h"
 
-@interface LoginViewController : UIViewController <UIWebViewDelegate, KCSPersistableDelegate>
+@interface LoginViewController : UIViewController <UIWebViewDelegate>
 {
     IBOutlet UIView *loading;
     IBOutlet UIWebView *webView;
     IBOutlet UIActivityIndicatorView *ac;
+    
+    DBManager *_dbmanager;
 }
 
+-(void) saveImageOfUserAndDetailsToDb;
 -(IBAction)dismissView:(id)sender;
-
 -(void) closeAction;
 
 @end

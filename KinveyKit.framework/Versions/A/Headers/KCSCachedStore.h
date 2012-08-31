@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "KCSStore.h"
 #import "KCSAppdataStore.h"
+#import "KCSOfflineSaveStore.h"
 
 /** Cache Policies. These constants determine the caching behavior when used with KCSChacedStore query. */
 typedef enum KCSCachePolicy {
@@ -29,12 +30,18 @@ typedef enum KCSCachePolicy {
  - `KCSCachePolicyNone` - No caching, all queries are sent to the server.
  - `KCSCachePolicyLocalOnly` - Only the cache is queried, the server is never called. If a result is not in the cache, an error is returned.
  - `KCSCachePolicyLocalFirst` - The cache is queried and if the result is stored, the `completionBlock` is called with that value. The cache is then updated in the background. If the cache does not contain a result for the query, then the server is queried first.
- - `KCSCahcePolicyNetworkFirst` - The network is queried and the cache is updated with each result. The cached value is only returned when the network is unavailable. 
- - `KCSCahcePolicyBoth` - If available, the cached value is returned to `completionBlock`. The network is then queried and cache updated, afterwards. The `completionBlock` will be called again with the updated result from the server.
+ - `KCSCachePolicyNetworkFirst` - The network is queried and the cache is updated with each result. The cached value is only returned when the network is unavailable. 
+ - `KCSCachePolicyBoth` - If available, the cached value is returned to `completionBlock`. The network is then queried and cache updated, afterwards. The `completionBlock` will be called again with the updated result from the server.
  
  For an individual store, the chace policy can inherit from the defaultCachePolicy, be set using storeWithOptions: factory constructor, supplying the enum for the key `KCSStoreKeyCahcePolicy`.
+ 
+ This store also provides offline save semantics. To enable offline save, supply a unique string for this store for the `KCSStoreKeyUniqueOfflineSaveIdentifier` key in the options dictionary passed in class factory method ([KCSAppdataStore storeWithCollection:options:]. You can also supply an optional `KCSStoreKeyOfflineSaveDelegate` to intercept or be notified when those saves happen when the application becomes online. 
+ 
+ If offline save is enabled, and the application is offline when the `saveObject:withCompletionBlock:withProgressBlock` method processes the saves, the completionBlock will be called with a networking error, but the saves will be queued to be saved when the application becomes online. This completion block will _not_ be called when those queued saves are processed. Instead, the the offline save delegate will be called. The completion block `errorOrNil` object will have in addition to the error information, an array in its `userInfo` for the `KCS_ERROR_UNSAVED_OBJECT_IDS_KEY` containing the `_id`s of the unsaved objects. If the objects haven't been assigned an `_id` yet, the value will be a `NSNull`, in order to keep the array count reliable. 
+ 
+ For more information about offline saving, see KCSOfflineSaveStore and our iOS developer's user guide at docs.kinvey.com. 
  */
-@interface KCSCachedStore : KCSAppdataStore <KCSStore> {
+@interface KCSCachedStore : KCSAppdataStore <KCSOfflineSaveStore> {
     NSCache* _cache;
 }
 
@@ -93,7 +100,4 @@ typedef enum KCSCachePolicy {
  */
 - (void)group:(id)fieldOrFields reduce:(KCSReduceFunction *)function condition:(KCSQuery *)condition completionBlock:(KCSGroupCompletionBlock)completionBlock progressBlock:(KCSProgressBlock)progressBlock cachePolicy:(KCSCachePolicy)cachePolicy;
 
-#if BUILD_FOR_UNIT_TEST
-- (void) setReachable:(BOOL)reachOverwrite;
-#endif
 @end

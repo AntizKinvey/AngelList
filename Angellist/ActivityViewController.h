@@ -1,62 +1,36 @@
 //
 //  ActivityViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/24/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
-#import "StartUpViewController.h"
-#import "SearchViewController.h"
 
-
-@interface ActivityViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface ActivityViewController : UIViewController <UITableViewDataSource>
 {
     IBOutlet UITableView *table;
-    IBOutlet UIView *loadingView;
-    UIView *loadOlderFeeds;
-    UIView *_view1;
-    UILabel *label;
-    UIButton *buttonSearch;
     
-    UIView *viewPullToRefresh;
-    UIImageView *imageAngelLogo;
-    UIImageView *imageRefresh;
-    UILabel *labelrefresh;
-    
-    UIView *viewPullUpOlder;
-    UIImageView *imageKinveyLogo;
-    UIImageView *imagePullUp;
-    UILabel *labelPullUp;
-    
-    UIImageView *kinvey;
-    UIImageView *angelLogo;
     DBManager *_dbmanager;
-    UIView *filterView;
-    UIActivityIndicatorView *labelLoading;
-    StartUpViewController *startUpView;
-    SearchViewController *_searchViewController;
+    
+    IBOutlet UIView *filterView;
+    IBOutlet UIView *filtersButtonsView;
+    IBOutlet UIView *emptyAlertView;
+    IBOutlet UIView *loadingView;
 }
 
-@property(nonatomic, retain)UIView *filterView;
+-(void) loadImages;
+-(void) loadFeeds:(int)pageNo;
+-(void) saveImagesToDocumentsDirectory;
 
-// to save images to the documents directory
--(void) saveImagesOfFeeds;
-
-// to save the details of all feeds to the database
--(void) saveFeedsDataToDB;
-
-
--(void)getFeeds:(int)pageNo;
-
--(void) newFeedLoad;
-
--(void)startLoadingImagesConcurrently;
-
--(void) startLoadingAtBottom;
+-(void)latestfeeds;
+-(void)morefeeds;
 
 -(void) startLoadingAtTop;
+-(void) startLoadingAtBottom;
+
+-(IBAction)getFilteredList:(id)sender;
 
 @end

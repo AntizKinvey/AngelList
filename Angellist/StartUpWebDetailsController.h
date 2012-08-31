@@ -1,8 +1,8 @@
 //
 //  StartUpWebDetailsController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 6/4/12.
+//  Created by Ram Charan on 8/27/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 

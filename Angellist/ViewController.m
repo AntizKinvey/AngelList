@@ -1,8 +1,8 @@
 //
 //  ViewController.m
-//  SampleRest
+//  TableProj
 //
-//  Created by Ram Charan on 5/9/12.
+//  Created by Ram Charan on 8/21/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -13,16 +13,11 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation ViewController
-extern BOOL _allImagesDowloaded;
-extern BOOL _allImagesDownloadDone;
+
 BOOL loginFromAL = FALSE;
-BOOL loginWithTW = FALSE;
 BOOL _loggedIn = FALSE;
 
-extern BOOL _loggedOut;
-
-@synthesize loginView = _loginView;
-
+LoginViewController *_loginViewController;
 ContainerViewController *_containerViewController;
 
 - (void)didReceiveMemoryWarning
@@ -36,7 +31,29 @@ ContainerViewController *_containerViewController;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+}
+
+//Button action to open login screen
+-(IBAction) loginFromAngellist:(id) sender
+{
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        [myAlert show];
+    }
+    else
+    {
+        loginFromAL = TRUE;
+        //Open Login screen
+        _loginViewController = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
+        [_loginViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+        [self presentModalViewController:_loginViewController animated:YES];
+    }
+    
 }
 
 - (void)viewDidUnload
@@ -48,27 +65,17 @@ ContainerViewController *_containerViewController;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     
-    if(_loggedIn== TRUE)
+    if(_loggedIn == TRUE)
     {
-        _allImagesDowloaded = FALSE;
-        _allImagesDownloadDone = FALSE;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-        {
-            _containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPhone" bundle:nil] autorelease];
-        }
-        else
-        {
-            _containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPad" bundle:nil] autorelease];
-        }
+        _containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPhone" bundle:nil] autorelease];
+        
+        _loggedIn = FALSE;
         
         [self.view removeFromSuperview];
         [self.view addSubview:_containerViewController.view];
     }
-    else {
-        [self loginFromAngel];
-    }
-    [super viewWillAppear:animated];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -86,86 +93,6 @@ ContainerViewController *_containerViewController;
 	[super viewDidDisappear:animated];
 }
 
--(void)loginFromAngel
-{
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-        [myAlert show];
-    }
-    else
-    {
-        loginFromAL = TRUE;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-        {
-            //Open Login screen
-            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
-            [_loginView setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-            [self presentModalViewController:_loginView animated:YES];
-            
-        }
-        else
-        {
-            //Open Login screen
-            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
-            [self presentModalViewController:_loginView animated:YES];
-            
-        }
-    }
-
-}
-
-//Button action to open login screen
--(IBAction) loginFromAngellist:(id) sender
-{
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-        [myAlert show];
-    }
-    else
-    {
-        loginFromAL = TRUE;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-        {
-            //Open Login screen
-            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPhone" bundle:nil];
-            [_loginView setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-            [self presentModalViewController:_loginView animated:YES];
-            
-        }
-        else
-        {
-            //Open Login screen
-            _loginView = [[LoginViewController alloc] initWithNibName:@"LoginViewController_iPad" bundle:nil];
-            [self presentModalViewController:_loginView animated:YES];
-            
-        }
-    }
-    
-}
-
--(IBAction) loginWithTwitter:(id) sender
-{
-    loginWithTW = TRUE;
-    _loginView = [[LoginViewController alloc] init];
-    [self presentModalViewController:_loginView animated:YES];
-}
-
--(void) dealloc
-{
-    [_loginView release];
-    [super dealloc];
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -177,7 +104,6 @@ ContainerViewController *_containerViewController;
     {
         return NO;
     }
-    
 }
 
 @end

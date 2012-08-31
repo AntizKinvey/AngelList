@@ -76,7 +76,7 @@ bool _tabBarSelected = false;
     btnImage = [UIImage imageNamed:@"mei.png"];
     btnImageSelected = [UIImage imageNamed:@"mea.png"];
     btn5 = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn5.frame = CGRectMake(240, 406.5f, 80, 52);
+    btn5.frame = CGRectMake(240, 406, 80, 52);
     [btn5 setBackgroundImage:btnImage forState:UIControlStateNormal];
     [btn5 setBackgroundImage:btnImageSelected forState:UIControlStateSelected];
     [btn5 setTag:3];
@@ -98,7 +98,6 @@ bool _tabBarSelected = false;
 - (void)selectTab:(int)tabID
 {
     //kiran
-    
     _tabBarSelected = TRUE;
     
     switch(tabID)

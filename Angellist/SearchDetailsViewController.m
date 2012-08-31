@@ -119,11 +119,17 @@ UIButton *backButton;
     loading.hidden = YES;
 }
 
-
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    // Return YES for supported orientations
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 

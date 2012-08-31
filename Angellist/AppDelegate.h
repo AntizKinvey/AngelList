@@ -1,8 +1,8 @@
 //
 //  AppDelegate.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/21/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -23,15 +23,13 @@
 
 @property (strong, nonatomic) ViewController *viewController;
 
-//Container that holds all views
 @property (strong, nonatomic) ContainerViewController *containerViewController;
+
 //Collection on Kinvey that contains Login details of user
 @property (nonatomic, retain) KCSCollection *loginCollection;
 //Collection on Kinvey that contains Logout details of user
 @property (nonatomic, retain) KCSCollection *logoutCollection;
 
-
-
--(void)loginToAngelList;
+-(void) showLoginScreen;
 
 @end

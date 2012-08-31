@@ -14,7 +14,7 @@
     UIButton *backButton;
     UILabel *labelSearch;
     IBOutlet UISearchBar *searchBar;
-    IBOutlet UITableView *tableSearch;
+    IBOutlet UITableView *table;
     SearchDetailsViewController *searchDetails;
     UIView *_view1;
     UIView *filterView;
@@ -22,7 +22,7 @@
 
 @property(nonatomic , retain)IBOutlet UISearchBar *searchBar;
 
-
-
+-(void)searchOption:(NSString*)query;
+-(void) loadImages;
 
 @end

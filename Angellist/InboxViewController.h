@@ -1,39 +1,29 @@
 //
 //  InboxViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/28/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
-#import "SearchViewController.h"
 
-@interface InboxViewController : UIViewController<UITableViewDataSource, UITableViewDelegate>
+@interface InboxViewController : UIViewController <UITableViewDataSource>
 {
-    IBOutlet UITableView *tableview;
-    UILabel *label;
-    IBOutlet UIView *loading;
-    UIButton *buttonSearch;
-    DBManager *_dbmanager;
-    SearchViewController *_searchViewController;
+    IBOutlet UITableView *table;
     
+    DBManager *_dbmanager;
+    
+    IBOutlet UIView *loadingView;
 }
 
-@property(nonatomic, retain)IBOutlet UITableView *tableview;
-@property(nonatomic, retain)IBOutlet UIView *loading;
+-(void) loadInboxMessages;
 
-// To display time on screen 
--(void)getTime;
+-(void) loadImages;
 
-// To load images concurrently 
--(void)startLoadingImagesConcurrently;
-
-// send request to fetch the data 
--(void)sendRequestToFetch;
-
-// To display viewed status
 -(void)readUnread:(int)msgCount;
+
+-(void)getTime;
 
 @end

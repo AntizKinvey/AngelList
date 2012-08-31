@@ -87,6 +87,14 @@ implementing these methods.
 ///---------------------------------------------------------------------------------------
 /// @name Map from Local to Kinvey property names
 ///---------------------------------------------------------------------------------------
+
+/** Kinvey backend key for an entity's unique id */
+#define KCSEntityKeyId @"_id"
+/** Kinvey backend key for metadata information */
+#define KCSEntityKeyMetadata @"_kinveymeta"
+/** Kinvey backend key for geolocation information. This is a free field for doing geo-queries */
+#define KCSEntityKeyGeolocation @"_geoloc"
+
 /*! Provide the mapping from an Entity's representation to the Native Objective-C representation.
  
  

@@ -1,18 +1,16 @@
 //
 //  ContainerViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/26/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
 
-@interface ContainerViewController : UIViewController <UITabBarControllerDelegate>
-{
-    DBManager *_dbmanager;
-}
+@interface ContainerViewController : UIViewController
+
 
 @property (strong, nonatomic) UITabBarController *tabBarController;
 

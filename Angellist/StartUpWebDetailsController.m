@@ -1,8 +1,8 @@
 //
 //  StartUpWebDetailsController.m
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 6/4/12.
+//  Created by Ram Charan on 8/27/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -11,8 +11,8 @@
 
 @implementation StartUpWebDetailsController
 
-extern NSMutableArray *displayStartUpNameArray;
-extern NSMutableArray *displayStartUpAngelUrlArray;
+extern NSMutableArray *startUpNameArray;
+extern NSMutableArray *startUpLinkArray;
 extern int _rowNumberInStartUps;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -20,7 +20,6 @@ extern int _rowNumberInStartUps;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = [displayStartUpNameArray objectAtIndex:_rowNumberInStartUps];
     }
     return self;
 }
@@ -43,6 +42,8 @@ extern int _rowNumberInStartUps;
     
     [loading.layer setCornerRadius:18.0f];
     
+    self.navigationItem.title = [NSString stringWithFormat:@"%@",[startUpNameArray objectAtIndex:_rowNumberInStartUps]];
+    
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
     UIButton* backButton = [[UIButton alloc] initWithFrame:frame];
@@ -54,11 +55,12 @@ extern int _rowNumberInStartUps;
     [backButtonItem release];
     [backButton release];
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:_rowNumberInStartUps]]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[startUpLinkArray objectAtIndex:_rowNumberInStartUps]]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
     webView.scalesPageToFit=YES;
     [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
 }
 
 -(void) backAction:(id)sender

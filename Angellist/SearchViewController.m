@@ -272,12 +272,24 @@ UITapGestureRecognizer *tap;
     [searchImageStartup removeAllObjects];
     [searchtypeStartup removeAllObjects];
     [searchUrlStartup removeAllObjects];
+    
     [searchNamesUser removeAllObjects];
     [searchIdUser removeAllObjects];
     [searchImageUser removeAllObjects];
     [searchtypeUser removeAllObjects];
     [searchUrlUser removeAllObjects];
+    
+    [searchNamesDisplay removeAllObjects];
+    [searchIdDisplay removeAllObjects];
+    [searchImageDisplay removeAllObjects];
+    [searchtypeDisplay removeAllObjects];
+    [searchUrlDisplay removeAllObjects];    
+    [searchDisplayInTableImage removeAllObjects];
+    
     searchString = searchBar.text;
+    
+     
+    
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
@@ -297,7 +309,7 @@ UITapGestureRecognizer *tap;
 
 // search the string typed
 -(void)searchOption:(NSString*)query
-{
+{ 
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/search?query=%@",query]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod: @"GET"];
@@ -356,60 +368,46 @@ UITapGestureRecognizer *tap;
         [searchDisplayInTableImage addObject:image];
                     
     }
-    
-    [tableSearch reloadData];
-    [self startLoadingImagesConcurrently];
+
+    [table reloadData];
+    [self loadImages];
     
 }
 
 // load images concurrently after the data is loaded in the table
--(void)startLoadingImagesConcurrently 
+-(void) loadImages 
 {
+    /* Operation Queue init (autorelease) */
+    NSOperationQueue *queue = [NSOperationQueue new];
     
-    NSOperationQueue *tShopQueue = [NSOperationQueue new];
-    NSInvocationOperation *tPerformOperation = [[NSInvocationOperation alloc] 
-                                                initWithTarget:self
-                                                selector:@selector(loadImage) 
-                                                object:nil];
-    [tShopQueue addOperation:tPerformOperation]; 
-    [tPerformOperation release];
-    [tShopQueue release];
+    /* Create our NSInvocationOperation to call loadDataWithOperation, passing in nil */
+    NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                            selector:@selector(loadDataWithOperation)
+                                                                              object:nil];
     
+    /* Add the operation to the queue */
+    [queue addOperation:operation];
+    [operation release];
+    [queue release];
 }
 
-- (void)loadImage 
+-(void) loadDataWithOperation
 {
-    for (int asyncCount = 0; asyncCount < [searchImageDisplay count] ; asyncCount++) {
-        
-        NSString *picLoad = [NSString stringWithFormat:@"%@",[searchImageDisplay objectAtIndex:asyncCount]];
-        NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-        UIImage* image = [UIImage imageWithData:imageData];
-        if (image != nil) {
-            
-            [searchDisplayInTableImage replaceObjectAtIndex:asyncCount withObject:image];
-            [self performSelectorOnMainThread:@selector(displayImage:) withObject:[NSNumber numberWithInt:asyncCount] waitUntilDone:NO]; 
+    for(int z=0; z < [searchImageDisplay count]; z++)
+    {
+        if([[searchDisplayInTableImage objectAtIndex:z] isEqual:[UIImage imageNamed:@"placeholder.png"]])
+        {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[searchImageDisplay objectAtIndex:z]]]];
+            [searchDisplayInTableImage replaceObjectAtIndex:z withObject:image];
+            //[table reloadData];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:z inSection: 0];
+            UITableViewCell *cell = [table cellForRowAtIndexPath:indexPath];
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = [searchDisplayInTableImage objectAtIndex:indexPath.row];
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
         }
-        [imageData release];
-        
     }
-    
-}
-
--(void)displayImage:(NSNumber*)presentCount
-{
-    if([[tableSearch indexPathsForVisibleRows]count] > 0)
-    {
-        NSIndexPath *firstRowShown = [[tableSearch indexPathsForVisibleRows]objectAtIndex:0];
-        NSIndexPath *lastRowShown = [[tableSearch indexPathsForVisibleRows]objectAtIndex:[[tableSearch indexPathsForVisibleRows]count]-1];
-        NSInteger count = [presentCount integerValue];
-        if((count > firstRowShown.row)&&(count < lastRowShown.row))
-            [tableSearch reloadData];
-    }
-    else
-    {
-        [tableSearch reloadData]; 
-    }
-    
 }
 
 //Method called when back button is tapped
@@ -422,16 +420,6 @@ UITapGestureRecognizer *tap;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-        [alert show];
-        [alert release];        
-        
-    }
     
     [super viewWillAppear:YES];
 }
@@ -515,7 +503,8 @@ UITapGestureRecognizer *tap;
     [searchImageDisplay removeAllObjects];
     [searchtypeDisplay removeAllObjects];
     [searchUrlDisplay removeAllObjects];
- 
+    [searchDisplayInTableImage removeAllObjects];
+    
     int _tagID = [sender tag];
     
     switch(_tagID)
@@ -534,8 +523,8 @@ UITapGestureRecognizer *tap;
                 [searchDisplayInTableImage addObject:image];
                
             }
-            [tableSearch reloadData];
-            [self startLoadingImagesConcurrently];
+            [table reloadData];
+            [self loadImages];
             
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
             break;
@@ -552,8 +541,8 @@ UITapGestureRecognizer *tap;
                 UIImage *image = [UIImage imageNamed:@"placeholder.png"];
                 [searchDisplayInTableImage addObject:image];
             }
-            [tableSearch reloadData];
-            [self startLoadingImagesConcurrently];
+            [table reloadData];
+            [self loadImages];
             
             [self performSelector:@selector(animateFilter) withObject:nil afterDelay:0.05];
             break;
@@ -593,7 +582,15 @@ UITapGestureRecognizer *tap;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    // Return YES for supported orientations
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 @end

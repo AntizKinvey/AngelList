@@ -1,14 +1,15 @@
- //
-//  InboxDetailsViewController.m
-//  Angellist
 //
-//  Created by Ram Charan on 15/06/12.
+//  InboxDetailsViewController.m
+//  TableProj
+//
+//  Created by Ram Charan on 8/28/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import "InboxDetailsViewController.h"
-#import "InboxViewController.h"
+
 #import <QuartzCore/QuartzCore.h>
+#import "Reachability.h"
 
 #define kOFFSET_FOR_KEYBOARD 160.0
 #define CELL_CONTENT_WIDTH 320.0f
@@ -16,38 +17,42 @@
 
 @implementation InboxDetailsViewController
 
-extern int threadValue; // thread id from inbox screen
-extern NSString *_currAccessToken; // access token
-BOOL stayup1, fromInboxDetails;
+extern NSMutableArray *userDetailsArray;
+extern int threadValue;
 
-NSMutableArray *_msgUser; // array for message user
-NSMutableArray *_otherUser; // array for the other user in the conversation
-
-NSMutableArray *_messBody; // array for message body
-NSMutableArray *_sen_id; // sender Id array
-NSMutableArray *_rec_id; // recipient Id array
-NSMutableArray *_time; // time array
-NSMutableArray *_displayTimeDetails; //array for displaying time in table view
-
+NSMutableArray *_messageBody;
+NSMutableArray *_senderId;
+NSMutableArray *_recipientId;
+NSMutableArray *_time;
+NSMutableArray *_firstUser;
+NSMutableArray *_secondUser;
 NSMutableArray *displayImage;
+NSMutableArray *_displayTimeDetails;
 
-@synthesize tableMsgDetails, textViewReply;
+BOOL stayUp = NO;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.navigationItem.title = @"Conversation";
     }
     return self;
 }
 
-// TableView delegate method to display informations in a tableview
--(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Release any cached data, images, etc that aren't in use.
+}
+
+//---insert individual row into the table view---
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
     static NSString *CellIdentifier = @"Cell";
-    textViewReply.delegate = self;
+    
     //---try to get a reusable cell--- 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
@@ -61,106 +66,85 @@ NSMutableArray *displayImage;
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-        
-       
     }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
+    // image view to display images
+    UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+    cellImageView.image = [displayImage objectAtIndex:indexPath.row];
+    [cell.contentView addSubview:cellImageView];
+    [cellImageView release];
     
     // label to display names
-    UILabel *name = [[UILabel alloc] initWithFrame:CGRectMake(75, 0, 210, 50)];
-    name.text = [_msgUser objectAtIndex:indexPath.row]; 
-    name.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
-    name.lineBreakMode = UILineBreakModeWordWrap;
-    name.numberOfLines = 0;
-    [cell.contentView addSubview:name];
-    name.backgroundColor = [UIColor clearColor];
-   
+    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(75, 0, 210, 40)];
+    nameLabel.text = [_firstUser objectAtIndex:indexPath.row]; 
+    nameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+    nameLabel.lineBreakMode = UILineBreakModeWordWrap;
+    nameLabel.numberOfLines = 0;
+    [cell.contentView addSubview:nameLabel];
+    nameLabel.backgroundColor = [UIColor clearColor];
+    [nameLabel release];
+    
     // label to display messages
-    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(75, 40, 210, 50)];
-    msgLabel.text = [_messBody objectAtIndex:indexPath.row]; 
+    NSString *text = [_messageBody objectAtIndex:[indexPath row]];
+    CGSize constrainedSize = CGSizeMake(310, 20000.0f);
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+    
+    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(75, 40, 210, size.height)];
+    msgLabel.text = text; 
     msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
     msgLabel.lineBreakMode = UILineBreakModeWordWrap;
     msgLabel.numberOfLines = 0;
     [cell.contentView addSubview:msgLabel];
     msgLabel.backgroundColor = [UIColor clearColor];
-  
-    // label to display time
-    UILabel *msgLabel1 = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
-    msgLabel1.text = [_displayTimeDetails objectAtIndex:indexPath.row]; 
-    msgLabel1.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
-    msgLabel1.lineBreakMode = UILineBreakModeWordWrap;
-    msgLabel1.numberOfLines = 0;
-    [cell.contentView addSubview:msgLabel1];
-    msgLabel1.backgroundColor = [UIColor clearColor];
-  
-    // image view to display images
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
-    imageView.image = [displayImage objectAtIndex:indexPath.row];
-    [cell.contentView addSubview:imageView];
- 
-    // labels to conform to the dynamic cell height with respect to text
-    NSString *strContent1 = [_messBody objectAtIndex:[indexPath row]];
-    NSString *strContent2 = [_msgUser objectAtIndex:indexPath.row]; 
-    NSString *strContent3 = [_displayTimeDetails objectAtIndex:[indexPath row]];
-    CGSize constrainedSize = CGSizeMake(310, 20000);
-    CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
-    if (!msgLabel)
-        msgLabel = (UILabel*)[cell viewWithTag:1];
-    [msgLabel setText:strContent1];
-    [msgLabel setFrame:CGRectMake(75, 30, 210, MAX(exactSize.height, 20.0f))];
-    
-    if (!msgLabel1)
-        msgLabel1 = (UILabel*)[cell viewWithTag:1];
-    [msgLabel1 setText:strContent3];
-    [msgLabel1 setFrame:CGRectMake(220, msgLabel.frame.size.height+30, 210, 35)];
-    
-    if (!name)
-        name = (UILabel*)[cell viewWithTag:1];
-    [name setText:strContent2];
-    [name setFrame:CGRectMake(75, 0, 210, 40)];
-    
-    [name release];
     [msgLabel release];
-    [msgLabel1 release];
-    [imageView release];
-
-    return cell;   
     
+    // label to display time
+    UILabel *msgTime = [[UILabel alloc] initWithFrame:CGRectMake(220, msgLabel.frame.size.height+30, 210, 35)];
+    msgTime.text = [_displayTimeDetails objectAtIndex:indexPath.row]; 
+    msgTime.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
+    msgTime.lineBreakMode = UILineBreakModeWordWrap;
+    msgTime.numberOfLines = 0;
+    [cell.contentView addSubview:msgTime];
+    msgTime.backgroundColor = [UIColor clearColor];
+    [msgTime release];
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    return cell;
 }
 
-// return keyboard on 'Done' button
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    
-    if([text isEqualToString:@"\n"]) {
-        [textView resignFirstResponder];
-        return NO;
-    }
-    
-    return YES;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
+{ 
+    return [_firstUser count];
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *text = [_messageBody objectAtIndex:[indexPath row]];
+    CGSize constraint = CGSizeMake(310, 20000.0f);
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    CGFloat height = size.height;
+    
+    return height + (40 * 2);
+}
+
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
-    textViewReply.layer.cornerRadius = 10.0f;
-    textViewReply.layer.borderColor = [UIColor grayColor].CGColor;
-    textViewReply.layer.borderWidth = 1.0f;
-    [self getrequestDetails];
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-}
-
-//get details of the conversation
--(void)getrequestDetails
-{
-    
-    _messBody = [[NSMutableArray alloc] init];
-    _sen_id = [[NSMutableArray alloc] init];
-    _rec_id = [[NSMutableArray alloc] init];
+    _messageBody = [[NSMutableArray alloc] init];
+    _senderId = [[NSMutableArray alloc] init];
+    _recipientId = [[NSMutableArray alloc] init];
     _time = [[NSMutableArray alloc] init];
-    _msgUser = [[NSMutableArray alloc] init];
-    _otherUser = [[NSMutableArray alloc] init];
+    _firstUser = [[NSMutableArray alloc] init];
+    _secondUser = [[NSMutableArray alloc] init];
     displayImage = [[NSMutableArray alloc] init];
     _displayTimeDetails = [[NSMutableArray alloc] init];
+    
+    [super viewDidLoad];
+    
+    // Do any additional setup after loading the view from its nib.
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
@@ -172,226 +156,137 @@ NSMutableArray *displayImage;
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
-    _dbmanager = [[DBManager alloc] init];
-    [_dbmanager openDB];
     
-    [_dbmanager retrieveUserDetails];
+    self.navigationItem.title = [NSString stringWithFormat:@"Conversation"];
     
-    // URL request
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,_dbmanager.access_tokenFromDB]];
+    textViewReply.layer.cornerRadius = 10.0f;
+    textViewReply.layer.borderColor = [UIColor grayColor].CGColor;
+    textViewReply.layer.borderWidth = 1.0f;
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod:@"GET"];
-    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    NSError* error;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
-    NSArray *arrayMessages = [json valueForKey:@"messages"];
-    NSArray *arrayUser = [json valueForKey:@"users"];
-    int user = 0;
+    loadingView.hidden = NO;
+    [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(invokeGetConversations) userInfo:nil repeats:NO];
+}
+
+-(void) invokeGetConversations
+{
+    [self getConversations];
+    [table reloadData];
+}
+
+-(void) getConversations
+{
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    for (int msg = [arrayMessages count] ; msg >= 1 ; msg--) 
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        
-        
-        NSDictionary *diction = [arrayMessages objectAtIndex:msg-1];
-        NSDictionary *user1Diction = [arrayUser objectAtIndex:0];
-        NSDictionary *user2Diction = [arrayUser objectAtIndex:1];
-        
-        [_messBody addObject:[diction valueForKey:@"body"]];
-        [_sen_id addObject:[diction valueForKey:@"sender_id"]];
-        [_rec_id addObject:[diction valueForKey:@"recipient_id"]];
-        [_time addObject:[diction valueForKey:@"created_at"]];
-        
-        NSString *string1 = [NSString stringWithFormat:@"%@",[_sen_id objectAtIndex:user]];
-        
-        NSString *string2 = [NSString stringWithFormat:@"%@",[user1Diction valueForKey:@"id"]];
-        
-        if ([string1 isEqualToString:string2]) {
-            [_msgUser addObject:[user1Diction valueForKey:@"name"]];
-            [_otherUser addObject:[user1Diction valueForKey:@"image"]];
-            
-        }
-        else {
-            
-            [_msgUser addObject:[user2Diction valueForKey:@"name"]];
-            [_otherUser addObject:[user2Diction valueForKey:@"image"]];
-        }
-        
-        [displayImage addObject:[UIImage imageNamed:@"placeholder.png"]];
-       
-        user++;
-        
-    }
-    [self getTime];
-    [self startLoadingImagesConcurrently];
-    
-
-}
-
-// navigate back to inbox
--(void) backAction:(id)sender
-{
-    fromInboxDetails = TRUE;
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-// functions load images Concurrently
--(void)startLoadingImagesConcurrently
-{
-    
-    NSOperationQueue *tShopQueue = [NSOperationQueue new];
-    NSInvocationOperation *tPerformOperation = [[NSInvocationOperation alloc] 
-                                                initWithTarget:self
-                                                selector:@selector(loadImage) 
-                                                object:nil];
-    [tShopQueue addOperation:tPerformOperation]; 
-    [tPerformOperation release];
-    [tShopQueue release];
-}
-
-- (void)loadImage 
-{
-    for (int asyncCount = 0; asyncCount < [_otherUser count] ; asyncCount++) {
-        
-        NSString *picLoad = [NSString stringWithFormat:@"%@",[_otherUser objectAtIndex:asyncCount]];
-        NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-               
-        UIImage* image = [UIImage imageWithData:imageData];
-        
-        if (image != nil) {
-            
-            [displayImage replaceObjectAtIndex:asyncCount withObject:image];
-            [self performSelectorOnMainThread:@selector(displayImage:) withObject:[NSNumber numberWithInt:asyncCount] waitUntilDone:NO]; 
-        }
-        [imageData release];
-    }
-}
-
--(void)displayImage:(NSNumber*)presentCount
-{
-    if([[tableMsgDetails indexPathsForVisibleRows]count] > 0)
-    {
-        NSIndexPath *firstRowShown = [[tableMsgDetails indexPathsForVisibleRows]objectAtIndex:0];
-        NSIndexPath *lastRowShown = [[tableMsgDetails indexPathsForVisibleRows]objectAtIndex:[[tableMsgDetails indexPathsForVisibleRows]count]-1];
-        NSInteger count = [presentCount integerValue];
-        if((count > firstRowShown.row)&&(count < lastRowShown.row))
-            [tableMsgDetails reloadData];
-    }
-    else
-        [tableMsgDetails reloadData]; 
-    
-}
-
- 
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
-{ 
-
-    // retun numver of messages in the conversation to set the number of rows in the tableview
-    return [_msgUser count];
-}
-
-
-// To display the height of each cell conforming to the text length
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-        NSString *text = [_messBody objectAtIndex:[indexPath row]];
-        CGSize constraint = CGSizeMake(310, 20000.0f);
-        CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
-        CGFloat height = MAX(size.height, 0.0f);
-        
-        return height + (30 * 2);
-}
-
-
-// return keyboard
--(IBAction)returnkeyboard:(id)sender
-{ 
-    [textViewReply resignFirstResponder];
-}
-
-// post a reply from the user
--(IBAction)postReply:(id)sender
-{
-    [_dbmanager retrieveUserDetails];
-    
-    NSString *postMsg = [NSString stringWithFormat:@"%@",textViewReply.text];
-    NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=%@",threadValue,postMsg,_dbmanager.access_tokenFromDB]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod:@"POST"];
-    [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    [self getrequestDetails];
-    
-  // reload table
-    [tableMsgDetails reloadData];
-    textViewReply.text =@"";
-
-    
-}
-
-
-
-//  methods move the view up while replying through the text view // 
-- (void)keyboardWillShow:(NSNotification *)notif{
-    [self setViewMoveUp:YES];
-}
-
-- (void)textViewDidBeginEditing:(UITextField *)sender {
-    stayup1 = YES;
-    
-    if ([sender isEqual:textViewReply])
-    {
-        [self setViewMoveUp:YES];
-        
-    }
-
-}
-
-- (void)textViewDidEndEditing:(UITextField *)sender {
-    stayup1 = NO;
-    if ([sender isEqual:textViewReply])
-    {
-        [self setViewMoveUp:NO];
-        
-    }
-    
-}
-
-
--(void)setViewMoveUp:(BOOL)moveUp
-{
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.3]; // if you want to slide up the view
-    [UIView setAnimationBeginsFromCurrentState:YES];
-    
-    CGRect rect = self.view.frame;
-    if (moveUp)
-    {
-
-        if (rect.origin.y == 0 ) {
-            rect.origin.y -= kOFFSET_FOR_KEYBOARD;
-            
-        }
-        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];
     }
     else
     {
-        if (stayup1 == NO) {
-            rect.origin.y += kOFFSET_FOR_KEYBOARD;
-           
+        [_messageBody removeAllObjects];
+        [_senderId removeAllObjects];
+        [_recipientId removeAllObjects];
+        [_time removeAllObjects];
+        [_firstUser removeAllObjects];
+        [_secondUser removeAllObjects];
+        [displayImage removeAllObjects];
+        [_displayTimeDetails removeAllObjects];
+        
+        // URL request
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages/%d?access_token=%@",threadValue,[userDetailsArray objectAtIndex:2]]];
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod:@"GET"];
+        NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+        NSError* error;
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
+        NSArray *arrayMessages = [json valueForKey:@"messages"];
+        NSArray *arrayUser = [json valueForKey:@"users"];
+        int user = 0;
+        
+        for (int msg = [arrayMessages count] ; msg >= 1 ; msg--) 
+        {
+            NSDictionary *diction = [arrayMessages objectAtIndex:msg-1];
+            NSDictionary *user1Diction = [arrayUser objectAtIndex:0];
+            NSDictionary *user2Diction = [arrayUser objectAtIndex:1];
+            
+            [_messageBody addObject:[diction valueForKey:@"body"]];
+            [_senderId addObject:[diction valueForKey:@"sender_id"]];
+            [_recipientId addObject:[diction valueForKey:@"recipient_id"]];
+            [_time addObject:[diction valueForKey:@"created_at"]];
+            
+            NSString *string1 = [NSString stringWithFormat:@"%@",[_senderId objectAtIndex:user]];
+            
+            NSString *string2 = [NSString stringWithFormat:@"%@",[user1Diction valueForKey:@"id"]];
+            
+            if ([string1 isEqualToString:string2]) {
+                [_firstUser addObject:[user1Diction valueForKey:@"name"]];
+                [_secondUser addObject:[user1Diction valueForKey:@"image"]];
+                
+            }
+            else {
+                
+                [_firstUser addObject:[user2Diction valueForKey:@"name"]];
+                [_secondUser addObject:[user2Diction valueForKey:@"image"]];
+            }
+            
+            [displayImage addObject:[UIImage imageNamed:@"placeholder.png"]];
+            
+            user++;
+            
         }
+        [self loadImages];
+        [self getTime];
     }
-    self.view.frame = rect; 
-    [UIView commitAnimations];
+    loadingView.hidden = YES;
 }
 
+//Image caching
+-(void) loadImages
+{
+    /* Operation Queue init (autorelease) */
+    NSOperationQueue *queue = [NSOperationQueue new];
+    
+    /* Create our NSInvocationOperation to call loadDataWithOperation, passing in nil */
+    NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                            selector:@selector(loadDataWithOperation)
+                                                                              object:nil];
+    
+    /* Add the operation to the queue */
+    [queue addOperation:operation];
+    [operation release];
+    [queue release];
+}
 
-
+-(void) loadDataWithOperation
+{
+    for(int z=0; z < [_secondUser count]; z++)
+    {
+        if([[displayImage objectAtIndex:z] isEqual:[UIImage imageNamed:@"placeholder.png"]])
+        {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_secondUser objectAtIndex:z]]]];
+            [displayImage replaceObjectAtIndex:z withObject:image];
+            
+//            NSArray *array = [[NSArray alloc] initWithObjects:indexPath, nil];
+//            [table reloadRowsAtIndexPaths: array withRowAnimation: UITableViewRowAnimationNone];
+//            [array release];
+            
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:z inSection: 0];
+            UITableViewCell *cell = [table cellForRowAtIndexPath:indexPath];
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = [displayImage objectAtIndex:indexPath.row];
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+        }
+    }
+}
 
 // display time
 -(void)getTime
 {
-    
     for (int time=0; time < [_time count]; time++) { 
         
         NSString *timeStamp = [NSString stringWithFormat:@"%@",[_time objectAtIndex:time]];
@@ -446,28 +341,44 @@ NSMutableArray *displayImage;
         else {
             displayTime = [NSString stringWithFormat:@"about %d months ago",year];
         }
-        
         [_displayTimeDetails addObject:displayTime];
         [cal release];
         [dateForm release];
-        
     }
+}
+
+
+// post a reply from the user
+-(IBAction)postReply:(id)sender
+{
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];
+    }
+    else
+    {
+        NSString *postMsg = [NSString stringWithFormat:@"%@",textViewReply.text];
+        NSURL *url = [NSURL URLWithString:[[NSString stringWithFormat:@"https://api.angel.co/1/messages?thread_id=%d&body=%@&access_token=%@",threadValue,postMsg,[userDetailsArray objectAtIndex:2]]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod:@"POST"];
+        [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+        [self getConversations];
+        
+        // reload table
+        [table reloadData];
+        textViewReply.text =@"";
+    }
 }
 
-- (void)didReceiveMemoryWarning
+-(void) backAction:(id)sender
 {
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
+    [self.navigationController popViewControllerAnimated:YES];
 }
-
-
--(void)dealloc
-{
-    [super dealloc];
-}
-
 
 - (void)viewDidUnload
 {
@@ -476,10 +387,75 @@ NSMutableArray *displayImage;
     // e.g. self.myOutlet = nil;
 }
 
-//To support orientations
+
+////////////////////
+//  methods move the view up while replying through the text view // 
+- (void)keyboardWillShow:(NSNotification *)notif{
+    [self setViewMoveUp:YES];
+}
+// return keyboard on 'Done' button
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    
+    if([text isEqualToString:@"\n"]) {
+        [textView resignFirstResponder];
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (void)textViewDidBeginEditing:(UITextField *)sender {
+    stayUp = YES;
+    
+    if ([sender isEqual:textViewReply])
+    {
+        [self setViewMoveUp:YES];
+    }
+}
+
+- (void)textViewDidEndEditing:(UITextField *)sender {
+    stayUp = NO;
+    if ([sender isEqual:textViewReply])
+    {
+        [self setViewMoveUp:NO];
+    }
+}
+
+
+-(void)setViewMoveUp:(BOOL)moveUp
+{
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.3]; // if you want to slide up the view
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    
+    CGRect rect = self.view.frame;
+    if (moveUp)
+    {
+        if (rect.origin.y == 0 ) {
+            rect.origin.y -= kOFFSET_FOR_KEYBOARD;
+        }
+    }
+    else
+    {
+        if (stayUp == NO) {
+            rect.origin.y += kOFFSET_FOR_KEYBOARD;
+        }
+    }
+    self.view.frame = rect; 
+    [UIView commitAnimations];
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    // Return YES for supported orientations
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 @end

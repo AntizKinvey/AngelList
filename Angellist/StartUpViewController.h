@@ -1,67 +1,43 @@
 //
 //  StartUpViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/24/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
-#import "SearchViewController.h"
 
-@interface StartUpViewController : UIViewController <UITableViewDataSource>
+@interface StartUpViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
     IBOutlet UITableView *table;
-    IBOutlet UIView *loadingView;
-    IBOutlet UIButton *moreButton;
-    UIButton *buttonSearch;
+    IBOutlet UIView *filterViewInStartUps;
+    IBOutlet UIView *filtersButtonsViewInStartUps;
+    
+    IBOutlet UIView *emptyAlertView;
+    
     DBManager *_dbmanager;
-    UIView *filterView;
-    UIView *_view2;
-    UILabel *labels;
-    NSOperationQueue *tShopQueueStartups;
-    SearchViewController *_searchViewController;
     
-    UIView *viewPullToRefreshS;
-    UIImageView *imageAngelLogoS;
-    UIImageView *imageRefreshS;
-    UILabel *labelrefreshS;
-    
-    UIView *viewPullUpOlderS;
-    UIImageView *imageKinveyLogoS;
-    UIImageView *imagePullUpS;
-    UILabel *labelPullUpS;
-    
+    IBOutlet UIView *loadingView;
 }
+-(void) getStartUpsFollowedByUser;
+-(void) loadFollowingStartUps:(NSString *)urlString;
+-(void) loadPortfolioStartUps:(NSString *)urlString;
 
-@property(nonatomic,retain) UIView *filterView;
+-(void) loadImages;
 
-//Method to get details of user following
--(void) getDetailsOfFollowing;
-//Method to get details of user portfolio
--(void) getDetailsOfPortfolio;
--(void) getDetailsOfAll;
+-(void) getTrendingStartUps;
+-(void) getFollowingStartUps;
+-(void) getPortfolioStartUps;
 
-//Save images and startUp details to database
--(void) saveImagesOfStartUps;
--(void) saveStartUpsDetailsToDB;
+-(IBAction)getFilteredList:(id)sender;
 
--(void) saveImagesOfStartUpsFollowing;
--(void) saveStartUpsFollowingDetailsToDB;
+-(void) saveTrendingStartUps;
+-(void) saveFollowingStartUps;
+-(void) savePortfolioStartUps;
 
--(void) saveImagesOfStartUpsPortfolio;
--(void) saveStartUpsPortfolioDetailsToDB;
-
-//Save images of trending startUps
--(void) saveImagesOfStartUpsTrending;
-//Save details of following startUps by user to database
--(void) saveStartUpsTrendingDetailsToDB;
-
-// to load the request
--(void)sendRequestForLoad;
-
-//Load more startUps
--(IBAction)moreButtonAction:(id)sender;
+-(void)refreshTrendingStartUps;
+-(void) startLoadingAtTop;
 
 @end

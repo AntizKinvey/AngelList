@@ -2,7 +2,7 @@
 //  KinveyUser.h
 //  KinveyKit
 //
-//  Copyright (c) 2008-2011, Kinvey, Inc. All rights reserved.
+//  Copyright (c) 2008-2012, Kinvey, Inc. All rights reserved.
 //
 //  This software contains valuable confidential and proprietary information of
 //  KINVEY, INC and is subject to applicable licensing agreements.
@@ -15,6 +15,7 @@
 
 @class KCSCollection;
 @class KCSRESTRequest;
+@class KCSMetadata;
 
 // Need to predefine our classes here
 @class KCSUser;
@@ -69,6 +70,15 @@ typedef void (^KCSUserCompletionBlock)(KCSUser* user, NSError* errorOrNil, KCSUs
 
 @end
 
+/** Constant for use in querying the username field */
+#define KCSUserAttributeUsername @"username"
+/** Constant for use in querying the surname field */
+#define KCSUserAttributeSurname @"last_name"
+/** Constant for use in querying the given name field */
+#define KCSUserAttributeGivenname @"first_name"
+/** Constant for use in querying the email field */
+#define KCSUserAttributeEmail @"email"
+
 
 /*! User in the Kinvey System
  
@@ -79,18 +89,42 @@ typedef void (^KCSUserCompletionBlock)(KCSUser* user, NSError* errorOrNil, KCSUs
  Since all requests *must* be made through a user, the library maintains the concept of a current user, which is the
  user used to make all requests.  Convienience routines are available to manage the state of this Current User.
  
+ Like other entities, KCSUsers can have different levels of access control. The `user` collection can be made private in the Kinvey console; if it is private, users will still have four fields that can be queried publicly: username, surname, given name, and email. These can be discovered with ... 
+ 
+ Like other entities, the `metadata` property can be modified to control access on a user-by-user basis, beyond the `user` collection-wide settings. 
+ 
+ @see KCSMetadata
+ @see KCSPersistable
  */
 @interface KCSUser : NSObject <KCSPersistable>
 
 ///---------------------------------------------------------------------------------------
 /// @name User Information
 ///---------------------------------------------------------------------------------------
-/*! Username of this Kinvey User */
+/*! Username of this Kinvey User. Publicly queryable be default. */
 @property (nonatomic, copy) NSString *username;
 /*! Password of this Kinvey User */
 @property (nonatomic, copy) NSString *password;
 /*! Device Tokens of this User */
 @property (nonatomic, copy) NSArray *deviceTokens;
+/*! Session Auth Token, if available */
+@property (nonatomic, copy) NSString *sessionAuth;
+/*! Access Control Metadata of this User 
+ @see KCSPersistable
+ */
+@property (nonatomic, retain) KCSMetadata *metadata;
+/** Optional surname for the user. Publicly queryable be default. */
+@property (nonatomic, copy) NSString *surname;
+/** Optional given (first) name for the user. Publicly queryable be default. */
+@property (nonatomic, copy) NSString *givenName;
+/** Optional email address for the user. Publicly queryable be default. */
+@property (nonatomic, copy) NSString *email;
+
++ (BOOL) hasSavedCredentials;
+
+/** Clears and saved credentials from the keychain.
+ */
++ (void) clearSavedCredentials;
 
 ///---------------------------------------------------------------------------------------
 /// @name KinveyKit Internal Services
@@ -135,6 +169,15 @@ typedef void (^KCSUserCompletionBlock)(KCSUser* user, NSError* errorOrNil, KCSUs
 */
 + (void)userWithUsername: (NSString *)username password: (NSString *)password withDelegate: (id<KCSUserActionDelegate>)delegate;
 
+
+/** Create a new Kinvey user and register them with the backend.
+ * @param username The username to create, if it already exists on the back-end an error will be returned.
+ * @param password The user's password
+ * @param completionBlock The callback to perform when the creation completes (or errors).
+ */
++ (void) userWithUsername:(NSString *)username password:(NSString *)password withCompletionBlock:(KCSUserCompletionBlock)completionBlock;
+
+
 ///---------------------------------------------------------------------------------------
 /// @name Managing the Current User
 ///---------------------------------------------------------------------------------------
@@ -153,6 +196,16 @@ typedef void (^KCSUserCompletionBlock)(KCSUser* user, NSError* errorOrNil, KCSUs
 + (void)loginWithUsername: (NSString *)username
                  password: (NSString *)password 
       withCompletionBlock:(KCSUserCompletionBlock)completionBlock;
+
+/*! Login a user with a Facebook Access Token.
+ 
+ This creates a new Kinvey user or logs in with an existing one associated with the supplied Facebook access token. Kinvey will verify the token with Facebook on the server and return an authorized Kinvey user if the process is sucessful.
+ 
+ To obtain the access token, download the Facebook SDK (https://developers.facebook.com/ios/) and follow the instructions for session log-in. 
+ @param accessToken the `access_token` provided by Facebook.
+ @param completionBlock the callback when the login completes or errors out.
+ */
++ (void)loginWithFacebookAccessToken:(NSString*)accessToken withCompletionBlock:(KCSUserCompletionBlock)completionBlock;
 
 /*! Removes a user and their data from Kinvey
  * @param delegate The delegate to inform once the action is complete.
@@ -192,9 +245,6 @@ typedef void (^KCSUserCompletionBlock)(KCSUser* user, NSError* errorOrNil, KCSUs
  * @return The KCSCollection to access users.
  */
 - (KCSCollection *)userCollection;
-
-
-
 
 
 @end

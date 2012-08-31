@@ -1,52 +1,50 @@
 //
 //  StartUpDetailsViewController.m
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 6/4/12.
+//  Created by Ram Charan on 8/27/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import "StartUpDetailsViewController.h"
-#import "StartUpWebDetailsController.h"
 #import "Reachability.h"
+
 #import <QuartzCore/QuartzCore.h>
+#import "StartUpWebDetailsController.h"
 #import "KCSUserActivity.h"
 
 @implementation StartUpDetailsViewController
 
-extern NSMutableArray *displayStartUpIdsArray;
-extern NSMutableArray *displayStartUpNameArray;
-extern NSMutableArray *displayStartUpAngelUrlArray;
-extern NSMutableArray *displayStartUpLogoUrlArray;
-extern NSMutableArray *displayStartUpProductDescArray;
-extern NSMutableArray *displayStartUpHighConceptArray;
-extern NSMutableArray *displayStartUpFollowerCountArray;
-extern NSMutableArray *displayStartUpLocationArray;
-extern NSMutableArray *displayStartUpMarketArray;
-extern NSMutableArray *displayStartUpLogoImageInDirectory;
+extern NSMutableArray *startUpImageDisplayArray;
+extern NSMutableArray *startUpNameArray;
+extern NSMutableArray *startUpLinkArray;
+extern NSMutableArray *startUpProdDescArray;
+extern NSMutableArray *startUpFollowCountArray;
+extern NSMutableArray *startUpLocationsArray;
+extern NSMutableArray *startUpMarketsArray;
 
 extern int _rowNumberInStartUps;
-extern BOOL _filterFollow;
-extern BOOL _filterPortfolio;
-extern NSString *_currAccessToken;
-extern NSString *_globalSessionId;
 
+//for follow and unfollow
+extern NSMutableArray *startUpIdArray;
 extern NSMutableArray *userFollowingIds;
+extern NSMutableArray *userDetailsArray;
+/////////////////////////
+NSMutableArray *displayDetailsOfStartUpsArray;
 
-NSMutableArray *displayInCells;
 
+extern NSString *_globalSessionId;
 KCSCollection *_detailsCollection;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-       // self.title = @"StartUp";
     }
     return self;
 }
-
 
 //---insert individual row into the table view---
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -68,148 +66,116 @@ KCSCollection *_detailsCollection;
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
+    UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
+    cellImageView.image = [displayDetailsOfStartUpsArray objectAtIndex:0];
+    cellImageView.layer.cornerRadius = 3.5f;
+    cellImageView.layer.masksToBounds = YES;
+    [cell.contentView addSubview:cellImageView];
+    [cellImageView release];
+    
+    //startup name to be displayed
+    UILabel *startUpNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
+    startUpNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+    startUpNamelabel.lineBreakMode = UILineBreakModeWordWrap;
+    startUpNamelabel.backgroundColor = [UIColor clearColor];
+    startUpNamelabel.text = [displayDetailsOfStartUpsArray objectAtIndex:1];
+    startUpNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
+    [cell.contentView addSubview:startUpNamelabel];
+    [startUpNamelabel release];
+    
+    //startUp follower count to be displayed
+    UILabel *startUpFollowerslabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 20, 270, 30)];
+    startUpFollowerslabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+    startUpFollowerslabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+    startUpFollowerslabel.backgroundColor = [UIColor clearColor];
+    startUpFollowerslabel.lineBreakMode = UILineBreakModeWordWrap;
+    startUpFollowerslabel.text = [NSString stringWithFormat:@"%@ follows",[displayDetailsOfStartUpsArray objectAtIndex:2]];
+    [cell.contentView addSubview:startUpFollowerslabel];
+    [startUpFollowerslabel release];
+    
+    
+    //startup locations to be displayed
+    UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+120, 270, 30)];
+    startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
+    startUpLocationlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+    
+    startUpLocationlabel.numberOfLines = 0;
+    startUpLocationlabel.backgroundColor = [UIColor clearColor];
+    startUpLocationlabel.lineBreakMode = UILineBreakModeWordWrap;
+    startUpLocationlabel.text = [NSString stringWithFormat:@"Locations - %@",[displayDetailsOfStartUpsArray objectAtIndex:3]];
+    [cell.contentView addSubview:startUpLocationlabel];
+    [startUpLocationlabel release];
+    
+    // startup market label  
+    UILabel *startUpMarketlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+160, 270, 30)];
+    startUpMarketlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
+    startUpMarketlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
+    startUpMarketlabel.numberOfLines = 0;
+    startUpMarketlabel.backgroundColor = [UIColor clearColor];
+    startUpMarketlabel.lineBreakMode = UILineBreakModeWordWrap;
+    
+    startUpMarketlabel.text = [NSString stringWithFormat:@"Markets - %@",[displayDetailsOfStartUpsArray objectAtIndex:4]];
+    [cell.contentView addSubview:startUpMarketlabel];
+    [startUpMarketlabel release];
+    
+    NSString *text = [displayDetailsOfStartUpsArray objectAtIndex:5];
+    CGSize constraint = CGSizeMake(270, 20000.0f);
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    
+    
+    //startup description to be displayed
+    UILabel *startUpDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpMarketlabel.frame.size.height+200, 270, size.height)];
+    startUpDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+    int numLines = (int)(startUpDesclabel.frame.size.height/startUpDesclabel.font.leading);
+    startUpDesclabel.numberOfLines = numLines;
+    startUpDesclabel.backgroundColor = [UIColor clearColor];
+    startUpDesclabel.lineBreakMode = UILineBreakModeWordWrap;
+    startUpDesclabel.text = text;
+    [cell.contentView addSubview:startUpDesclabel];
+    [startUpDesclabel release];
+    
+    
+    if([userFollowingIds containsObject:[startUpIdArray objectAtIndex:_rowNumberInStartUps]])
     {
-        if(indexPath.row == 0)
-        {
-            //Image to be displayed
-            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 20, 100, 100)];
-            
-            
-            
-            //Check for the availability of Internet
-            Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-            
-            NetworkStatus internetStatus = [r currentReachabilityStatus];
-            if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-            {
-                cellImageView.image = [UIImage imageWithContentsOfFile:[displayInCells objectAtIndex:0]];
-            }
-            else 
-            {
-                cellImageView.image = [displayInCells objectAtIndex:0];
-            }
-            
-            
-            
-            cellImageView.layer.cornerRadius = 3.5f;
-            cellImageView.layer.masksToBounds = YES;
-            [cell.contentView addSubview:cellImageView];
-            [cellImageView release];
-            
-            //startup name to be displayed
-            UILabel *startUpNamelabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 300, 30)];
-            startUpNamelabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
-            startUpNamelabel.lineBreakMode = UILineBreakModeWordWrap;
-            startUpNamelabel.backgroundColor = [UIColor clearColor];
-            startUpNamelabel.text = [displayInCells objectAtIndex:1];
-            startUpNamelabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
-            [cell.contentView addSubview:startUpNamelabel];
-            [startUpNamelabel release];
-            
-            NSString *text1 = [displayInCells objectAtIndex:2];
-            CGSize constraint1 = CGSizeMake(270, 20000.0f);
-            CGSize size1 = [text1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint1 lineBreakMode:UILineBreakModeWordWrap];
-            
-
-            //startup locations to be displayed
-            UILabel *startUpLocationlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+120, 270, 30)];
-            startUpLocationlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
-            startUpLocationlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
-            
-            startUpLocationlabel.numberOfLines = 0;
-            startUpLocationlabel.backgroundColor = [UIColor clearColor];
-            startUpLocationlabel.lineBreakMode = UILineBreakModeWordWrap;
-            NSString *strLoc = [displayInCells objectAtIndex:3];
-            NSString *displayLoc = [NSString stringWithFormat:@"Locations - %@",strLoc];
-            displayLoc = [[displayLoc componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsJoinedByString:@" "];
-            startUpLocationlabel.text = displayLoc;
-            [cell.contentView addSubview:startUpLocationlabel];
-            [startUpLocationlabel release];
-            
-            // startup market label  
-            UILabel *startUpMarketlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpNamelabel.frame.size.height+160, 270, 30)];
-            startUpMarketlabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
-            startUpMarketlabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
-            startUpMarketlabel.numberOfLines = 0;
-            startUpMarketlabel.backgroundColor = [UIColor clearColor];
-            startUpMarketlabel.lineBreakMode = UILineBreakModeWordWrap;
-            NSString *str = [displayInCells objectAtIndex:4];
-            NSString *displayMarkets = [NSString stringWithFormat:@"Markets - %@",str];
-            displayMarkets = [[displayMarkets componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsJoinedByString:@" "];
-            startUpMarketlabel.text = displayMarkets;
-            [cell.contentView addSubview:startUpMarketlabel];
-            [startUpMarketlabel release];
-            
-            
-            //startup description to be displayed
-            UILabel *startUpDesclabel = [[UILabel alloc] initWithFrame:CGRectMake(20, startUpMarketlabel.frame.size.height+200, 270, size1.height)];
-            startUpDesclabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
-            int numLines = (int)(startUpDesclabel.frame.size.height/startUpDesclabel.font.leading);
-            startUpDesclabel.numberOfLines = numLines;
-            startUpDesclabel.backgroundColor = [UIColor clearColor];
-            startUpDesclabel.lineBreakMode = UILineBreakModeWordWrap;
-            startUpDesclabel.text = text1;
-            [cell.contentView addSubview:startUpDesclabel];
-            [startUpDesclabel release];
-            
-            //startUp follower count to be displayed
-            UILabel *startUpFollowerslabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 20, 270, 30)];
-            startUpFollowerslabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
-            startUpFollowerslabel.textColor = [UIColor colorWithRed:77.0/255.0 green:77.0/255.0 blue:76.0/255.0 alpha:1.0f];
-            startUpFollowerslabel.backgroundColor = [UIColor clearColor];
-            startUpFollowerslabel.lineBreakMode = UILineBreakModeWordWrap;
-            startUpFollowerslabel.text = [NSString stringWithFormat:@"%@ follows",[displayInCells objectAtIndex:5]];
-            [cell.contentView addSubview:startUpFollowerslabel];
-            [startUpFollowerslabel release];
-            
-            if([userFollowingIds containsObject:[displayStartUpIdsArray objectAtIndex:_rowNumberInStartUps]])
-            {
-                unfollowButton.hidden = NO;
-                followButton.hidden = YES;
-                
-                unfollowButton.frame = CGRectMake(170, 260+size1.height, 52, 36);
-                [cell.contentView addSubview:unfollowButton];
-            }
-            else
-            {
-                followButton.hidden = NO;
-                unfollowButton.hidden = YES;
-                
-                followButton.frame = CGRectMake(170, 260+size1.height, 52, 36);
-                [cell.contentView addSubview:followButton];
-            }
-            
-            moreButton.frame = CGRectMake(230, 260+size1.height, 52, 36);
-            [[cell contentView] addSubview:moreButton];
-        }
+        unfollowButton.hidden = NO;
+        followButton.hidden = YES;
+        
+        unfollowButton.frame = CGRectMake(170, size.height + 259, 52, 36);
+        [cell.contentView addSubview:unfollowButton];
     }
     else
     {
-        //For IPad
+        followButton.hidden = NO;
+        unfollowButton.hidden = YES;
+        
+        followButton.frame = CGRectMake(170, size.height + 259, 52, 36);
+        [cell.contentView addSubview:followButton];
     }
     
+    moreButton.frame = CGRectMake(230, size.height + 259, 52, 36);
+    [[cell contentView] addSubview:moreButton];
+
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
     return cell; 
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
+{ 
+    return 1;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    NSString *text = [displayInCells objectAtIndex:2];
+    NSString *text = [displayDetailsOfStartUpsArray objectAtIndex:5];
     
     CGSize constraint = CGSizeMake(270, 20000.0f);
     
-    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     
     return size.height + 315;
     
-}
-
-
-//---set the number of rows in the table view---
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
-{ 
-    return 1;
 }
 
 - (void)didReceiveMemoryWarning
@@ -224,21 +190,52 @@ KCSCollection *_detailsCollection;
 
 - (void)viewDidLoad
 {
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
     UIButton* backButton = [[UIButton alloc] initWithFrame:frame];
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
-    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
-    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-    
     UIBarButtonItem* backButtonItem = [[UIBarButtonItem alloc] initWithCustomView:backButton];
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
     
-    self.navigationItem.title = [NSString stringWithFormat:@"%@",[displayStartUpNameArray objectAtIndex:_rowNumberInStartUps]];
+    self.navigationItem.title = [NSString stringWithFormat:@"%@",[startUpNameArray objectAtIndex:_rowNumberInStartUps]];
+    
+    //Follow button
+    followButton = [[UIButton alloc] init];
+    [followButton setBackgroundImage:[UIImage imageNamed:@"follow.png"] forState:UIControlStateNormal];
+    [followButton addTarget:self action:@selector(followStartUp) forControlEvents:UIControlStateHighlighted];
+    followButton.hidden = YES;
+//    [followButton release];
+    
+    //Unfollow button
+    unfollowButton = [[UIButton alloc] init];
+    [unfollowButton setBackgroundImage:[UIImage imageNamed:@"unfollow.png"] forState:UIControlStateNormal];
+    [unfollowButton addTarget:self action:@selector(unfollowStartUp) forControlEvents:UIControlStateHighlighted];
+    unfollowButton.hidden = YES;
+//    [unfollowButton release];
+    
+    //More button
+    moreButton = [[UIButton alloc] init];
+    [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
+    [moreButton addTarget:self action:@selector(startUpWebDetails) forControlEvents:UIControlStateHighlighted];
+//    [moreButton release];
+    
+    displayDetailsOfStartUpsArray = [NSMutableArray new];
+    [displayDetailsOfStartUpsArray addObject:[startUpImageDisplayArray objectAtIndex:_rowNumberInStartUps]];
+    [displayDetailsOfStartUpsArray addObject:[startUpNameArray objectAtIndex:_rowNumberInStartUps]];
+    [displayDetailsOfStartUpsArray addObject:[startUpFollowCountArray objectAtIndex:_rowNumberInStartUps]];
+    [displayDetailsOfStartUpsArray addObject:[startUpLocationsArray objectAtIndex:_rowNumberInStartUps]];
+    [displayDetailsOfStartUpsArray addObject:[startUpMarketsArray objectAtIndex:_rowNumberInStartUps]];
+    [displayDetailsOfStartUpsArray addObject:[startUpProdDescArray objectAtIndex:_rowNumberInStartUps]];
+    
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
     
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
@@ -258,76 +255,15 @@ KCSCollection *_detailsCollection;
         //Set details of user activity
         KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
         userActivity.sessionId = _globalSessionId;
-        userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[displayStartUpAngelUrlArray objectAtIndex:_rowNumberInStartUps]];
+        userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[startUpLinkArray objectAtIndex:_rowNumberInStartUps]];
         [userActivity saveToCollection:_detailsCollection withDelegate:self];
         [userActivity release];
     }
-    
-    //Follow button
-    followButton = [[UIButton alloc] init];
-    [followButton setBackgroundImage:[UIImage imageNamed:@"follow.png"] forState:UIControlStateNormal];
-    [followButton addTarget:self action:@selector(followStartUp) forControlEvents:UIControlStateHighlighted];
-    followButton.hidden = YES;
-    
-    //Unfollow button
-    unfollowButton = [[UIButton alloc] init];
-    [unfollowButton setBackgroundImage:[UIImage imageNamed:@"unfollow.png"] forState:UIControlStateNormal];
-    [unfollowButton addTarget:self action:@selector(unfollowStartUp) forControlEvents:UIControlStateHighlighted];
-    unfollowButton.hidden = YES;
-    
-    //More button
-    moreButton = [[UIButton alloc] init];
-    [moreButton setBackgroundImage:[UIImage imageNamed:@"more.png"] forState:UIControlStateNormal];
-    [moreButton addTarget:self action:@selector(startUpDetails) forControlEvents:UIControlStateHighlighted];
-    
-    
-    //Array that displays startUp details
-    displayInCells = [[NSMutableArray alloc] init];
-    
-    [displayInCells addObject:[displayStartUpLogoImageInDirectory objectAtIndex:_rowNumberInStartUps]];
-    [displayInCells addObject:[displayStartUpNameArray objectAtIndex:_rowNumberInStartUps]];
-    [displayInCells addObject:[displayStartUpProductDescArray objectAtIndex:_rowNumberInStartUps]];
-    
-    [displayInCells addObject:[displayStartUpLocationArray objectAtIndex:_rowNumberInStartUps]];
-    
-    [displayInCells addObject:[displayStartUpMarketArray objectAtIndex:_rowNumberInStartUps]];
-    [displayInCells addObject:[displayStartUpFollowerCountArray objectAtIndex:_rowNumberInStartUps]];
-    
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
 }
 
 -(void) backAction:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
-}
-
-//Method invoked when selecting more button
--(void)startUpDetails
-{
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
-        [myAlert show];
-    }
-    else
-    {
-        StartUpWebDetailsController *webDetailsController;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-        {
-            webDetailsController = [[[StartUpWebDetailsController alloc] initWithNibName:@"StartUpWebDetailsController_iPhone" bundle:nil] autorelease]; 
-        }
-        else
-        {
-            webDetailsController = [[[StartUpWebDetailsController alloc] initWithNibName:@"StartUpWebDetailsController_iPad" bundle:nil] autorelease]; 
-        }
-        
-        [self.navigationController pushViewController:webDetailsController animated:YES];
-    }
 }
 
 //Method to follow startUp
@@ -339,17 +275,18 @@ KCSCollection *_detailsCollection;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        UIAlertView *myAlert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [myAlert show];
+        [myAlert release];
     }
     else
     {
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/follows?id=%@&type=startup&access_token=%@",[displayStartUpIdsArray objectAtIndex:_rowNumberInStartUps],_currAccessToken]];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/follows?id=%@&type=startup&access_token=%@",[startUpIdArray objectAtIndex:_rowNumberInStartUps],[userDetailsArray objectAtIndex:2]]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"POST"];
         
         [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-        [userFollowingIds addObject:[displayStartUpIdsArray objectAtIndex:_rowNumberInStartUps]];
+        [userFollowingIds addObject:[startUpIdArray objectAtIndex:_rowNumberInStartUps]];
         followButton.hidden = YES;
         unfollowButton.hidden = NO;
         [table reloadData];
@@ -365,30 +302,43 @@ KCSCollection *_detailsCollection;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:@"No Internet Connection" message:@"Please turn on wi-fi." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        UIAlertView *myAlert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [myAlert show];
+        [myAlert release];
     }
     else
     {
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/follows?id=%@&type=startup&access_token=%@",[displayStartUpIdsArray objectAtIndex:_rowNumberInStartUps],_currAccessToken]];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/follows?id=%@&type=startup&access_token=%@",[startUpIdArray objectAtIndex:_rowNumberInStartUps],[userDetailsArray objectAtIndex:2]]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPMethod: @"DELETE"];
         
         [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-        [userFollowingIds removeObject:[displayStartUpIdsArray objectAtIndex:_rowNumberInStartUps]];
+        [userFollowingIds removeObject:[startUpIdArray objectAtIndex:_rowNumberInStartUps]];
         followButton.hidden = NO;
         unfollowButton.hidden = YES;
         [table reloadData];
     }
 }
 
--(void) viewWillAppear:(BOOL)animated
+//Method invoked when selecting more button
+-(void)startUpWebDetails
 {
-    [displayInCells retain];
-    [super viewWillAppear:animated];
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *myAlert = [[[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
+        [myAlert show];
+    }
+    else
+    {
+        StartUpWebDetailsController *webDetailsController = [[[StartUpWebDetailsController alloc] initWithNibName:@"StartUpWebDetailsController_iPhone" bundle:nil] autorelease]; 
+        
+        [self.navigationController pushViewController:webDetailsController animated:YES];
+    }
 }
-
-
 
 - (void)viewDidUnload
 {
@@ -400,16 +350,14 @@ KCSCollection *_detailsCollection;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
--(void) dealloc
-{
-    [displayInCells release];
-    [followButton release];
-    [unfollowButton release];
-    [moreButton release];
-    [super dealloc];
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 /************************************************************************************************************/
@@ -430,9 +378,20 @@ KCSCollection *_detailsCollection;
 // This is called when a save fails
 - (void)entity:(id)entity operationDidFailWithError:(NSError *)error
 {
-    NSLog(@"\n%@",[error localizedDescription]);
-    NSLog(@"\n%@",[error localizedFailureReason]);
-    [entity saveToCollection:_detailsCollection withDelegate:self];
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\n No Internet Connection");
+    }
+    else
+    {
+        NSLog(@"\n%@",[error localizedDescription]);
+        NSLog(@"\n%@",[error localizedFailureReason]);
+        [entity saveToCollection:_detailsCollection withDelegate:self];
+    }
 }
 
 @end

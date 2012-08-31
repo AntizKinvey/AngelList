@@ -1,42 +1,27 @@
 //
 //  InboxDetailsViewController.h
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 15/06/12.
+//  Created by Ram Charan on 8/28/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import "DBManager.h"
 
-@interface InboxDetailsViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, UITextViewDelegate>
+@interface InboxDetailsViewController : UIViewController <UITableViewDataSource, UITextViewDelegate>
 {
-    IBOutlet UITableView *tableMsgDetails;
+    IBOutlet UITableView *table;
     IBOutlet UITextView *textViewReply;
-    DBManager *_dbmanager; 
+    IBOutlet UIView *loadingView;
 }
 
-// table view
-@property(nonatomic, retain)IBOutlet UITableView *tableMsgDetails;
+-(void) getConversations;
 
-// text view to send a reply
-@property(nonatomic, retain)IBOutlet UITextView *textViewReply;
+-(void) loadImages;
 
-
-
-// return keyboard
--(IBAction)returnkeyboard:(id)sender;
-
-// move the view up while replying through the text view
--(void)setViewMoveUp:(BOOL)moveUp;
-
-// load images Concurrently
--(void)startLoadingImagesConcurrently;
-
-// display time
 -(void)getTime;
 
-//get details of the conversation
--(void)getrequestDetails;
+-(void)setViewMoveUp:(BOOL)moveUp;
+
 
 @end

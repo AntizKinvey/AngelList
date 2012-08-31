@@ -1,22 +1,23 @@
 //
 //  InboxViewController.m
-//  Angellist
+//  TableProj
 //
-//  Created by Ram Charan on 5/25/12.
+//  Created by Ram Charan on 8/28/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
 #import "InboxViewController.h"
-#import "InboxDetailsViewController.h"
-#import "Reachability.h"
+
 #import <QuartzCore/QuartzCore.h>
+#import "Reachability.h"
+#import "SearchViewController.h"
+#import "InboxDetailsViewController.h"
 
 @implementation InboxViewController
 
-@synthesize tableview, loading;
+extern NSMutableArray *userDetailsArray;
 
-extern NSString *_currAccessToken;
-
+//////////////////////////////////
 NSMutableArray *_senderName; // sender name
 NSMutableArray *_recepientName; // recepient name
 NSMutableArray *_imageOfRecepient; // image of recepient 
@@ -31,38 +32,23 @@ NSMutableArray *_placeHolder; // place holder images
 NSMutableArray *_time; // time got from response
 NSMutableArray *_displayTime; // display time
 NSMutableArray *_totalMsgCount; // total message count
+//////////////////////////////////
 
-
-extern BOOL fromInboxDetails;
-
-NSString *threadIdString; // thread id string for database
-int threadValue = 0; // thread id for inbox details
-int countDownInbox = 0;
-float alphaValueInInbox = 1.0;
-NSTimer *timerInbox;
-UIView *noInternetView;
+UILabel *navigationBarLabelInInbox;
+int threadValue = 0;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.title = @"Inbox";
     }
     return self;
 }
 
-- (void)didReceiveMemoryWarning
+//---insert individual row into the table view---
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
-}
-
-
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
-{
-    
     static NSString *CellIdentifier = @"Cell";
     
     //---try to get a reusable cell--- 
@@ -73,45 +59,39 @@ UIView *noInternetView;
             [view removeFromSuperview];
         }
     }
+    
     //---create new cell if no reusable cell is available---
     if (cell == nil) 
     {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
+    // image view to display image of the sender
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+    imageView.image = [_placeHolder objectAtIndex:indexPath.row];
+    imageView.layer.cornerRadius = 3.5f;
+    imageView.layer.masksToBounds = YES;
+    [cell.contentView addSubview:imageView];
+    [imageView release];
     
     // label to display sender name
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 50)];
-    label.text = [_senderName objectAtIndex:indexPath.row];
-    label.backgroundColor = [UIColor clearColor];
+    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 0, 210, 40)];
+    nameLabel.text = [_senderName objectAtIndex:indexPath.row];
+    nameLabel.backgroundColor = [UIColor clearColor];
+    NSString *strStatus = [NSString stringWithFormat:@"%@",[_dbmanager.inboxViewedArrayFromDB objectAtIndex:indexPath.row]];
     
-    NSString *strStatus = [NSString stringWithFormat:@"%@",[_dbmanager.inboxViewedFromDB objectAtIndex:indexPath.row]];
-     
     if ([strStatus isEqual:@"0"]) 
     {
-    label.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
-        
+        nameLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
     }
     else 
     {
-        
-        label.textColor = [UIColor grayColor];
-        
+        nameLabel.textColor = [UIColor grayColor];
     }
+    nameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
+    [cell.contentView addSubview:nameLabel];
+    [nameLabel release];
     
-    label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14];
-    [cell.contentView addSubview:label];
-    [label release];
-    
-    // label to display message
-    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(220, 70, 70, 30)];
-    msgLabel.text = [_displayTime objectAtIndex:indexPath.row];
-    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
-    [cell.contentView addSubview:msgLabel];
-    msgLabel.backgroundColor = [UIColor clearColor];
-    [msgLabel release];
-    
-       
     UIImageView *imageViewDot = [[UIImageView alloc] initWithFrame:CGRectMake(260, 5, 20, 20)];
     imageViewDot.image = [UIImage imageNamed:@"dot.png"];
     [cell.contentView addSubview:imageViewDot];
@@ -125,114 +105,87 @@ UIView *noInternetView;
     [cell.contentView addSubview:msgCountLabel];
     msgCountLabel.backgroundColor = [UIColor clearColor];
     [msgCountLabel release];
-
     
-    // label to display time  
-    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 40, 210, 30)];
-    timeLabel.text = [_msgbody objectAtIndex:indexPath.row]; 
-    timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
-    timeLabel.lineBreakMode = UILineBreakModeWordWrap;
-    timeLabel.numberOfLines = 0;
-    timeLabel.backgroundColor = [UIColor clearColor];
+    // label to display message  
+    NSString *msgText = [_msgbody objectAtIndex:[indexPath row]];
+    CGSize constrainedSize = CGSizeMake(310, 200);
+    CGSize size = [msgText sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
+    
+    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(70, 40, 210, size.height)];
+    msgLabel.text = msgText; 
+    msgLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+    msgLabel.lineBreakMode = UILineBreakModeWordWrap;
+    msgLabel.numberOfLines = 0;
+    msgLabel.backgroundColor = [UIColor clearColor];
+    [cell.contentView addSubview:msgLabel];
+    [msgLabel release];
+    
+    // label to display time
+    UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, MAX(msgLabel.frame.size.height+35, 80), 90, 30)];
+    timeLabel.text = [_displayTime objectAtIndex:indexPath.row];
+    timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:9];
     [cell.contentView addSubview:timeLabel];
+    timeLabel.backgroundColor = [UIColor clearColor];
     [timeLabel release];
     
-    // image view to display image of the sender
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
-    imageView.image = [_placeHolder objectAtIndex:indexPath.row];
-    imageView.layer.cornerRadius = 3.5f;
-    imageView.layer.masksToBounds = YES;
-    [cell.contentView addSubview:imageView];
-    [imageView release];
-    
-    // To conform to the table dynamic cell height
-    NSString *strContent1 = [_msgbody objectAtIndex:[indexPath row]];
-    NSString *strContent3 = [_displayTime objectAtIndex:[indexPath row]];
-     NSString *strContent4 = [_senderName objectAtIndex:indexPath.row];
-    CGSize constrainedSize = CGSizeMake(310, 200);
-    CGSize exactSize = [strContent1 sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constrainedSize lineBreakMode:UILineBreakModeWordWrap];
-    
-    if (!timeLabel)
-        timeLabel = (UILabel*)[cell viewWithTag:1];
-    [timeLabel setText:strContent1];
-    [timeLabel setFrame:CGRectMake(70, 30, 210, MAX(exactSize.height, 20.0f))];
-    
-    if (!msgLabel)
-        msgLabel = (UILabel*)[cell viewWithTag:1];
-    [msgLabel setText:strContent3];
-    [msgLabel setFrame:CGRectMake(220, MAX(timeLabel.frame.size.height+35, 80), 210, 30)];
-    
-    if (!label)
-        label = (UILabel*)[cell viewWithTag:1];
-    [label setText:strContent4];
-    [label setFrame:CGRectMake(70, 0, 210, 40)];
-    
-    loading.hidden = YES;
     return cell;
-    
 }
-
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-    // return number of message thread count in database
-    return [_dbmanager.inboxThreadIdFromDB count];
+    return [_dbmanager.inboxThreadIdArrayFromDB count];
 }
 
-
- // for dynamic cell height according to the text
+// for dynamic cell height according to the text
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
     NSString *text = [_msgbody objectAtIndex:indexPath.row];
     CGSize constraint = CGSizeMake(310, 200.0f);
-    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Bold" size:15] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
+    CGSize size = [text sizeWithFont:[UIFont fontWithName:@"Helvetica-Light" size:14] constrainedToSize:constraint lineBreakMode:UILineBreakModeWordWrap];
     CGFloat height = MAX(size.height, 44.0f);
     return height + (30 * 2);
-
 }
 
-- (void)viewWillAppear:(BOOL)animated
+// TableView delegate method to navigate to the details of a message and display the conversation in that particular thread
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // image for the navigation bar background
-    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
-    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
-    //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"No Internet Connection" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
         [alert release];
     }
     else
     {
-        NSIndexPath *selection = [tableview indexPathForSelectedRow];
-        if (selection){
-            [tableview deselectRowAtIndexPath:selection animated:YES];
+        //NSString *threadIdString = [[NSString alloc] init];
+        NSString *threadIdString = [NSString stringWithFormat:@"%@",[_threadId objectAtIndex:indexPath.row]];
+        
+        NSString *readState = [NSString stringWithFormat:@"%@", [_dbmanager.inboxViewedArrayFromDB objectAtIndex:indexPath.row]];
+        
+        
+        if ([readState isEqual:@"0"]) {
+            [_dbmanager updateStatusIntoInboxTable:@"Inbox" withField1:@"viewed" field1Value:@"1" andField2:@"threadId" field2Value:threadIdString];
         }
         
-        if (fromInboxDetails == TRUE) {
-            // to load messages again when returned from inbox details
-            fromInboxDetails = FALSE;
-            [self sendRequestToFetch];
-            [_dbmanager retrieveInboxDetails];
-            [tableview reloadData];
-            [self startLoadingImagesConcurrently]; // to load the images concurrently
-        }
+        threadValue = [threadIdString intValue];
+        
+        InboxDetailsViewController *detailsViewController = [[[InboxDetailsViewController alloc] initWithNibName:@"InboxDetailsViewController_iPhone" bundle:nil] autorelease];
+        
+        [self.navigationController pushViewController:detailsViewController animated:YES];
     }
-    
-    [super viewWillAppear:animated];
 }
 
--(void)viewDidAppear:(BOOL)animated
+- (void)didReceiveMemoryWarning
 {
-    [super viewDidAppear:animated];
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+    
+    // Release any cached data, images, etc that aren't in use.
 }
-
 
 #pragma mark - View lifecycle
 
@@ -240,286 +193,223 @@ UIView *noInternetView;
 {
     _dbmanager = [[DBManager alloc] init];
     [_dbmanager openDB];
-    _dbmanager.inboxThreadIdFromDB = [[[NSMutableArray alloc] init] autorelease];
-    _dbmanager.inboxTotalFromDB = [[[NSMutableArray alloc] init] autorelease];
-    _dbmanager.inboxViewedFromDB = [[[NSMutableArray alloc] init] autorelease];
     
-    noInternetView = [[UIView alloc] initWithFrame:CGRectMake(100, 140, 118, 118)];
-    noInternetView.alpha = 0;
-    [noInternetView.layer setCornerRadius:10.0f];
-    noInternetView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:noInternetView];
+//    _dbmanager.inboxThreadIdArrayFromDB = [NSMutableArray new];
+//    _dbmanager.inboxTotalArrayFromDB = [NSMutableArray new];
+//    _dbmanager.inboxViewedArrayFromDB = [NSMutableArray new];
     
-    // Label to display the message no interbnet connection when offline
-    UILabel *msgLabel = [[UILabel alloc] initWithFrame:CGRectMake(7, 53, 106, 46)];
-    msgLabel.text = @"No Internet Connection";
-    msgLabel.textAlignment = UITextAlignmentCenter;
-    msgLabel.numberOfLines = 2;
-    msgLabel.backgroundColor = [UIColor clearColor];
-    msgLabel.textColor = [UIColor whiteColor];
-    msgLabel.font = [UIFont fontWithName:@"System" size:10.0];
-    [noInternetView addSubview:msgLabel];
+    _dbmanager.inboxThreadIdArrayFromDB = [[NSMutableArray new] autorelease];
+    _dbmanager.inboxTotalArrayFromDB = [[NSMutableArray new] autorelease];
+    _dbmanager.inboxViewedArrayFromDB = [[NSMutableArray new] autorelease];
     
-    UIImage *notReachableImage = [UIImage imageNamed:@"closebutton.png"];
-    UIImageView *notReachView = [[UIImageView alloc] initWithFrame:CGRectMake(41, 20, 37, 37)];
-    notReachView.image = notReachableImage;
-    [noInternetView addSubview:notReachView];
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
     
-    [msgLabel release];
-    [notReachView release];
-    [noInternetView release];
+    //Navigation Bar Label
+    navigationBarLabelInInbox = [[UILabel alloc] initWithFrame:CGRectMake(30, 10, 260, 20)];
+    navigationBarLabelInInbox.textAlignment = UITextAlignmentCenter;
+    navigationBarLabelInInbox.textColor = [UIColor whiteColor];
+    navigationBarLabelInInbox.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
+    navigationBarLabelInInbox.backgroundColor = [UIColor clearColor];
+    navigationBarLabelInInbox.text = @"Inbox";
+    [self.navigationController.navigationBar addSubview:navigationBarLabelInInbox];
+    [navigationBarLabelInInbox release];
     
-    // to check whether it is an iphone or not and load the views accordingly
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-    {
-        self.navigationController.navigationBar.frame = CGRectMake(0, 0, 320, 45);
-    }
-    else
-    {
-        self.navigationController.navigationBar.frame = CGRectMake(0, 0, 768, 45);
-    }
-    
-    // for search button
-    buttonSearch = [[UIButton alloc] init];
-    buttonSearch.frame = CGRectMake(0, 0, 49, 42);
+    //Search Button
+    UIButton *buttonSearch = [[UIButton alloc] init];
+    buttonSearch.frame = CGRectMake(0, 0, 52, 45);
     [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
-    [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
-    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted]; // action for search button
+    [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
     buttonSearch.enabled = YES;
     
-    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:buttonSearch]autorelease];
+    UIBarButtonItem *barButtonSearch = [[UIBarButtonItem alloc] initWithCustomView:buttonSearch];
+    self.navigationItem.rightBarButtonItem = barButtonSearch;
+    [barButtonSearch release];
+    [buttonSearch release];
+    
+//    [self loadInboxMessages];
+}
 
-    
-    // image for the navigation bar background
-    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
-    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-    
-    self.tabBarItem.title = @"Inbox";
-
-    loading.hidden = YES;
-    UIImage* image = [UIImage imageNamed:@"back.png"];
-    CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    UIButton* backButton = [[[UIButton alloc] initWithFrame:frame] autorelease];
-    [backButton setBackgroundImage:image forState:UIControlStateNormal];
-    [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
-    
-    //Check for the availability of Internet
+-(void) loadInboxMessages
+{
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-      countDownInbox = 0;
-
-        [super viewDidLoad];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];
     }
     else
     {
-        // to fetch request from AngelList
-        [self sendRequestToFetch];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",[userDetailsArray objectAtIndex:2]]]; //0923767ad7d007d4c519aa45a1129f73 //4e9e60844d74902da90466a9b08a4d1c
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPMethod: @"GET"];
         
-         [super viewDidLoad];
-        // Do any additional setup after loading the view from its nib.
+        NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
         
-        [self startLoadingImagesConcurrently];
-    }
-    
-}
-
--(void)goToSearch
-{
-    _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
-    [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    [self.navigationController pushViewController:_searchViewController animated:YES];
-    
-}
-
-
-// to fetch request from AngelList
--(void)sendRequestToFetch
-{
-    [_dbmanager retrieveUserDetails];
-    
-   // send GET request to AngelList to fetch the messages
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.angel.co/1/messages?access_token=%@",_dbmanager.access_tokenFromDB]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod: @"GET"];
-    
-    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-
-    NSError* error;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
-    NSArray *_messageThreads = [json valueForKey:@"messages"];
-   
-    if ([_messageThreads count] == 0) {
-        UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
-        labelError.text = @"No messages to display!";
-        labelError.textColor = [UIColor grayColor];
-        labelError.textAlignment = UITextAlignmentCenter;
-        [labelError setBackgroundColor:[UIColor clearColor]];
-        [self.view addSubview:labelError];
-        [labelError release];
-    }
-    else {
-        _senderName = [[NSMutableArray alloc] init];
-        _imageOfSender = [[NSMutableArray alloc] init];
-        _imageOfRecepient = [[NSMutableArray alloc] init];
-        _userids = [[NSMutableArray alloc] init];
-        _sender = [[NSMutableArray alloc] init];
-        _recepient = [[NSMutableArray alloc] init];
-        _recepientName = [[NSMutableArray alloc] init];
-        _read = [[NSMutableArray alloc] init];
-        _threadId = [[NSMutableArray alloc] init];
-        _msgbody = [[NSMutableArray alloc] init];
-        _placeHolder = [[NSMutableArray alloc] init];
-        _time = [[NSMutableArray alloc] init];
-        _displayTime = [[NSMutableArray alloc] init];
-        _totalMsgCount = [[NSMutableArray alloc] init];
+        NSError* error;
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:&error];
+        NSArray *_messageThreads = [json valueForKey:@"messages"];
         
-        for (int _userCount=0; _userCount<[_messageThreads count] ; _userCount++) 
+        if ([_messageThreads count] == 0) {
+            UILabel *labelError = [[UILabel alloc] initWithFrame:CGRectMake(60, 150, 200, 30)];
+            labelError.text = @"No messages to display!";
+            labelError.textColor = [UIColor grayColor];
+            labelError.textAlignment = UITextAlignmentCenter;
+            [labelError setBackgroundColor:[UIColor clearColor]];
+            [self.view addSubview:labelError];
+            [labelError release];
+        }
+        else 
         {
-            NSDictionary *diction = [_messageThreads objectAtIndex:_userCount];
             
-            [_userids addObject:[[diction valueForKey:@"users"] valueForKey:@"id"]];
-            [_sender addObject:[[diction valueForKey:@"last_message"] valueForKey:@"sender_id"]];
-            [_recepient addObject:[[diction valueForKey:@"last_message"] valueForKey:@"recipient_id"]];
-            [_read addObject:[NSNumber numberWithBool:[[diction valueForKey:@"viewed"]boolValue]]];
-            [_totalMsgCount addObject:[diction valueForKey:@"total"]];
-            for (int _userCount1=0; _userCount1<[_messageThreads count] ; _userCount1++) 
+            _senderName = [[NSMutableArray alloc] init];
+            _imageOfSender = [[NSMutableArray alloc] init];
+            _imageOfRecepient = [[NSMutableArray alloc] init];
+            _userids = [[NSMutableArray alloc] init];
+            _sender = [[NSMutableArray alloc] init];
+            _recepient = [[NSMutableArray alloc] init];
+            _recepientName = [[NSMutableArray alloc] init];
+            _read = [[NSMutableArray alloc] init];
+            _threadId = [[NSMutableArray alloc] init];
+            _msgbody = [[NSMutableArray alloc] init];
+            _placeHolder = [[NSMutableArray alloc] init];
+            _time = [[NSMutableArray alloc] init];
+            _displayTime = [[NSMutableArray alloc] init];
+            _totalMsgCount = [[NSMutableArray alloc] init];
+            
+            for (int _userCount=0; _userCount<[_messageThreads count] ; _userCount++) 
             {
-                NSDictionary *diction = [_messageThreads objectAtIndex:_userCount1];
-                [_threadId addObject:[diction valueForKey:@"thread_id"]];
-            }
-            [_msgbody addObject:[[diction valueForKey:@"last_message"] valueForKey:@"body"]];
-            [_time addObject:[[diction valueForKey:@"last_message"] valueForKey:@"created_at"]];
-            
+                NSDictionary *diction = [_messageThreads objectAtIndex:_userCount];
+                
+                [_userids addObject:[[diction valueForKey:@"users"] valueForKey:@"id"]];
+                [_sender addObject:[[diction valueForKey:@"last_message"] valueForKey:@"sender_id"]];
+                [_recepient addObject:[[diction valueForKey:@"last_message"] valueForKey:@"recipient_id"]];
+                [_read addObject:[NSNumber numberWithBool:[[diction valueForKey:@"viewed"]boolValue]]];
+                [_totalMsgCount addObject:[diction valueForKey:@"total"]];
+                for (int _userCount1=0; _userCount1<[_messageThreads count] ; _userCount1++) 
+                {
+                    NSDictionary *diction = [_messageThreads objectAtIndex:_userCount1];
+                    [_threadId addObject:[diction valueForKey:@"thread_id"]];
+                }
+                [_msgbody addObject:[[diction valueForKey:@"last_message"] valueForKey:@"body"]];
+                [_time addObject:[[diction valueForKey:@"last_message"] valueForKey:@"created_at"]];
+                
                 [self readUnread:_userCount];
                 if(_userCount == [_messageThreads count]-1)
                 {
                     [self readUnread:_userCount];
                 }
-            
-            
-            NSDictionary *dictionary = [diction valueForKey:@"users"];
-            NSString *string1 = [NSString stringWithFormat:@"%@",[_sender objectAtIndex:_userCount]];
-            
-            NSEnumerator *enumerator = [dictionary objectEnumerator];
-            NSDictionary *key;
-            
-            while (key = [enumerator nextObject]) {
                 
-                NSString *string2 = [NSString stringWithFormat:@"%@",[key valueForKey:@"id"]];
                 
-                if ([string1 isEqual:string2]) 
-                {
+                NSDictionary *dictionary = [diction valueForKey:@"users"];
+                NSString *string1 = [NSString stringWithFormat:@"%@",[_sender objectAtIndex:_userCount]];
+                
+                NSEnumerator *enumerator = [dictionary objectEnumerator];
+                NSDictionary *key;
+                
+                while (key = [enumerator nextObject]) {
                     
-                    [_senderName addObject:[key valueForKey:@"name"]];
-                    [_imageOfSender addObject:[key valueForKey:@"image"]];
-                   
+                    NSString *string2 = [NSString stringWithFormat:@"%@",[key valueForKey:@"id"]];
+                    
+                    if ([string1 isEqual:string2]) 
+                    {
+                        
+                        [_senderName addObject:[key valueForKey:@"name"]];
+                        [_imageOfSender addObject:[key valueForKey:@"image"]];
+                        
+                        
+                    }
+                    else 
+                    {
+                        [_recepientName addObject:[key valueForKey:@"name"]];
+                        [_imageOfRecepient addObject:[key valueForKey:@"image"]];
+                    }
                     
                 }
-                else 
-                {
-                    [_recepientName addObject:[key valueForKey:@"name"]];
-                    [_imageOfRecepient addObject:[key valueForKey:@"image"]];
-                }
                 
+                [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
             }
-            
-            [_placeHolder addObject:[UIImage imageNamed:@"placeholder.png"]];
+            [self loadImages];
+            [self getTime]; 
         }
-        
-        [self getTime]; 
-        
     }
-       
+    loadingView.hidden = YES;
 }
 
-// Functions to display images concurrently 
--(void)startLoadingImagesConcurrently
+//Image caching
+-(void) loadImages
 {
+    /* Operation Queue init (autorelease) */
+    NSOperationQueue *queue = [NSOperationQueue new];
     
-    NSOperationQueue *tShopQueue = [NSOperationQueue new];
-    NSInvocationOperation *tPerformOperation = [[NSInvocationOperation alloc] 
-                                                initWithTarget:self
-                                                selector:@selector(loadImage) 
-                                                object:nil];
-    [tShopQueue addOperation:tPerformOperation]; 
-    [tPerformOperation release];
-    [tShopQueue release];
+    /* Create our NSInvocationOperation to call loadDataWithOperation, passing in nil */
+    NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                            selector:@selector(loadDataWithOperation)
+                                                                              object:nil];
+    
+    /* Add the operation to the queue */
+    [queue addOperation:operation];
+    [operation release];
+    [queue release];
 }
 
-- (void)loadImage 
+-(void) loadDataWithOperation
 {
-    for (int asyncCount = 0; asyncCount < [_imageOfSender count] ; asyncCount++) {
-        
-        NSString *picLoad = [NSString stringWithFormat:@"%@",[_imageOfSender objectAtIndex:asyncCount]];
-        NSData* imageData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:picLoad]];
-        UIImage* image = [UIImage imageWithData:imageData];
-        if (image != nil) {
-            
-            [_placeHolder replaceObjectAtIndex:asyncCount withObject:image];
-            [self performSelectorOnMainThread:@selector(displayImage:) withObject:[NSNumber numberWithInt:asyncCount] waitUntilDone:NO]; 
-        }
-        [imageData release];
-    }
-}
-
--(void)displayImage:(NSNumber*)presentCount
-{
-    if([[tableview indexPathsForVisibleRows]count] > 0)
+    for(int z=0; z < [_imageOfSender count]; z++)
     {
-        NSIndexPath *firstRowShown = [[tableview indexPathsForVisibleRows]objectAtIndex:0];
-        NSIndexPath *lastRowShown = [[tableview indexPathsForVisibleRows]objectAtIndex:[[tableview indexPathsForVisibleRows]count]-1];
-        NSInteger count = [presentCount integerValue];
-        if((count > firstRowShown.row)&&(count < lastRowShown.row))
-             [_dbmanager retrieveInboxDetails];
-             [tableview reloadData];
+        if([[_placeHolder objectAtIndex:z] isEqual:[UIImage imageNamed:@"placeholder.png"]])
+        {
+            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_imageOfSender objectAtIndex:z]]]];
+            [_placeHolder replaceObjectAtIndex:z withObject:image];
+            //[table reloadData];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:z inSection: 0];
+            UITableViewCell *cell = [table cellForRowAtIndexPath:indexPath];
+            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+            cellImageView.image = [_placeHolder objectAtIndex:indexPath.row];
+            [cell.contentView addSubview:cellImageView];
+            [cellImageView release];
+        }
     }
-    else
-         [_dbmanager retrieveInboxDetails];
-        [tableview reloadData]; 
-    
 }
-
 
 // Function to display the status of the message.
 -(void)readUnread:(int)msgCount
 {
-   
     [_dbmanager retrieveInboxDetails];
     
-        if ([_dbmanager.inboxThreadIdFromDB count] != 0) {
-
-            if ([_dbmanager.inboxThreadIdFromDB count] !=[_threadId count]) {  
-                // checks whether the thread ids are same in both db and the retrieved data
-                
-                
-                NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
-                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
-                NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
-                
-                [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
-                
-                
-            }
-            else if (![[NSString stringWithFormat:@"%@",[_totalMsgCount objectAtIndex:msgCount]] isEqual:[NSString stringWithFormat:@"%@",[_dbmanager.inboxTotalFromDB objectAtIndex:msgCount]]]) {
-                
-                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
-                NSString *str3 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
-                NSString *str4 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
-                [_dbmanager updateRecordIntoInboxTable:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str3 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str4];
-            }
-
-        }
-        else {
+    if ([_dbmanager.inboxThreadIdArrayFromDB count] != 0) {
+        
+        if ([_dbmanager.inboxThreadIdArrayFromDB count] !=[_threadId count]) {  // checks whether the thread ids are same in both db and the retrieved data
             
-                NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
-                NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
-                NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
-                
-                [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
+            
+            NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+            NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+            NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+            
+            [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
+            
+            
         }
+        else if (![[NSString stringWithFormat:@"%@",[_totalMsgCount objectAtIndex:msgCount]] isEqual:[NSString stringWithFormat:@"%@",[_dbmanager.inboxTotalArrayFromDB objectAtIndex:msgCount]]]) {
+            
+            NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+            NSString *str3 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+            NSString *str4 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+            [_dbmanager updateRecordIntoInboxTable:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str3 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str4];
+        }
+        
+    }
+    else {
+        
+        NSString *str1 = [NSString stringWithFormat:@"%@", [_threadId objectAtIndex:msgCount]];
+        NSString *str2 = [NSString stringWithFormat:@"%@", [_totalMsgCount objectAtIndex:msgCount]];
+        NSString *str3 = [NSString stringWithFormat:@"%@", [_read objectAtIndex:msgCount]];
+        
+        [_dbmanager insertRecordIntoInbox:[NSString stringWithFormat:@"Inbox"] withField1:[NSString stringWithFormat:@"threadId"] field1Value:str1 andField2:[NSString stringWithFormat:@"total"] field2Value:str2 andField3:[NSString stringWithFormat:@"viewed"] field3Value:str3];
+    }
 }
 
 // To display time on screen
@@ -530,20 +420,20 @@ UIView *noInternetView;
         
         NSString *timeStamp = [NSString stringWithFormat:@"%@",[_time objectAtIndex:time]];
         
-    NSDateFormatter *dateForm = [[NSDateFormatter alloc] init];
-    [dateForm setDateFormat:@"YYYY-MM-dd'T'HH:mm:ss'Z'"];
-    [dateForm setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
-    [dateForm setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-    
-    NSCalendar *cal = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    [cal setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
-    [cal setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-    NSDate *date1 = [dateForm dateFromString:timeStamp];
-    NSDate *date2 = [NSDate date];
-    unsigned int unitFlags = NSDayCalendarUnit|NSYearCalendarUnit|NSMonthCalendarUnit|NSHourCalendarUnit|NSMinuteCalendarUnit|NSSecondCalendarUnit; 
+        NSDateFormatter *dateForm = [[NSDateFormatter alloc] init];
+        [dateForm setDateFormat:@"YYYY-MM-dd'T'HH:mm:ss'Z'"];
+        [dateForm setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
+        [dateForm setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
         
-    // gets the difference between the current date and also the date and time in the timestamp of the data
-    NSDateComponents *diffComps = [cal components:unitFlags fromDate:date2 toDate:date1 options:0];
+        NSCalendar *cal = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        [cal setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]];
+        [cal setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+        NSDate *date1 = [dateForm dateFromString:timeStamp];
+        NSDate *date2 = [NSDate date];
+        unsigned int unitFlags = NSDayCalendarUnit|NSYearCalendarUnit|NSMonthCalendarUnit|NSHourCalendarUnit|NSMinuteCalendarUnit|NSSecondCalendarUnit; 
+        
+        // gets the difference between the current date and also the date and time in the timestamp of the data
+        NSDateComponents *diffComps = [cal components:unitFlags fromDate:date2 toDate:date1 options:0];
         
         int year = ABS([diffComps year]);
         int month = ABS([diffComps month]);
@@ -560,7 +450,7 @@ UIView *noInternetView;
                 if (day == 0) {
                     
                     if (hour == 0){
-
+                        
                         if (minute == 0) {
                             
                             displayTime = [NSString stringWithFormat:@"about %d secs ago",seconds];     
@@ -576,8 +466,8 @@ UIView *noInternetView;
                     }
                 }
                 else {
-                        displayTime = [NSString stringWithFormat:@"about %d days ago",day]; 
-                    }
+                    displayTime = [NSString stringWithFormat:@"about %d days ago",day]; 
+                }
             }
             else {
                 
@@ -586,21 +476,67 @@ UIView *noInternetView;
         }
         else {
             
-             displayTime = [NSString stringWithFormat:@"about %d months ago",year];
+            displayTime = [NSString stringWithFormat:@"about %d months ago",year];
         }
-
+        
         [_displayTime addObject:displayTime];
         [cal release];
         [dateForm release];
-
     }
-
 }
 
-// to come back from inbox details
--(void) backAction:(id)sender
+-(void)goToSearch
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];        
+    }
+    else
+    {
+        SearchViewController *_searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
+        [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+        [self.navigationController pushViewController:_searchViewController animated:YES];
+        [_searchViewController release];
+    }
+}
+
+-(void) viewWillAppear:(BOOL)animated
+{
+    UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
+    [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+    
+    NSIndexPath *selection = [table indexPathForSelectedRow];
+    if (selection)
+    {
+        [table deselectRowAtIndexPath:selection animated:YES];
+    }
+    [super viewWillAppear:YES];
+    
+    loadingView.hidden = NO;
+    [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(invokeLoadInboxMessages) userInfo:nil repeats:NO];
+}
+
+-(void) invokeLoadInboxMessages
+{
+    [self loadInboxMessages];
+    [table reloadData];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+	[super viewWillDisappear:animated];
+    navigationBarLabelInInbox.hidden = YES;
+}
+
+-(void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:YES];
+    navigationBarLabelInInbox.hidden = NO;
 }
 
 - (void)viewDidUnload
@@ -610,36 +546,6 @@ UIView *noInternetView;
     // e.g. self.myOutlet = nil;
 }
 
-// TableView delegate method to navigate to the details of a message and display the conversation in that particular thread
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    
-    threadIdString = [[NSString alloc] init];
-    
-    InboxDetailsViewController *detailsViewController;
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) 
-    {
-        detailsViewController = [[[InboxDetailsViewController alloc] initWithNibName:@"InboxDetailsViewController_IPhone" bundle:nil] autorelease];
-    }
-    else
-    {
-        detailsViewController = [[[InboxDetailsViewController alloc] initWithNibName:@"InboxDetailsViewController_IPad" bundle:nil] autorelease];
-    }
-    threadIdString = [NSString stringWithFormat:@"%@",[_threadId objectAtIndex:indexPath.row]];
-    
-    NSString *readState = [NSString stringWithFormat:@"%@", [_dbmanager.inboxViewedFromDB objectAtIndex:indexPath.row]];
-    
-    
-    if ([readState isEqual:@"0"]) {
-        [_dbmanager updateStatusIntoInboxTable:@"Inbox" withField1:@"viewed" field1Value:@"1" andField2:@"threadId" field2Value:threadIdString];
-    }
-    
-    threadValue = [threadIdString intValue];
-    [self.navigationController pushViewController:detailsViewController animated:YES];
-}
-
-// To support orientations
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -651,12 +557,6 @@ UIView *noInternetView;
     {
         return NO;
     }
-}
-
-
--(void) dealloc
-{
-    [super dealloc];
 }
 
 @end

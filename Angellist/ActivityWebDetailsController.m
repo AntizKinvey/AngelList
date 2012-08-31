@@ -1,8 +1,8 @@
 //
-//  ActivityWebDetailsVontroller.m
-//  Angellist
+//  ActivityWebDetailsController.m
+//  TableProj
 //
-//  Created by Ram Charan on 6/4/12.
+//  Created by Ram Charan on 8/25/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -11,32 +11,18 @@
 
 @implementation ActivityWebDetailsController
 
-// array from feed details
-extern NSMutableArray *actorNameArray;
-extern NSMutableArray *actorUrlArray;
-
-extern NSMutableArray *targetNameArray;
-extern NSMutableArray *targetUrlArray;
+extern int _rowNumberInDetails;
 extern int _rowNumberInActivity;
-
-extern int _rowIndexPathNumber;
-
-UIButton* backButton;
+extern NSMutableArray *actorNameArray;
+extern NSMutableArray *actorLinkArray;
+extern NSMutableArray *targetNameArray;
+extern NSMutableArray *targetLinkArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-       
-        if (_rowIndexPathNumber == 0) {
-            self.title = [actorNameArray objectAtIndex:_rowNumberInActivity];
-            
-        }
-        else if(_rowIndexPathNumber == 2){
-             self.title = [targetNameArray objectAtIndex:_rowNumberInActivity];
-            
-        }
     }
     return self;
 }
@@ -53,16 +39,17 @@ UIButton* backButton;
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
     
     webView.delegate = self;
     webView.scrollView.bounces = NO;
-    
     [loading.layer setCornerRadius:18.0f];
     
     // back button
     UIImage* image = [UIImage imageNamed:@"back.png"];
     CGRect frame = CGRectMake(0, 0, image.size.width, image.size.height);
-    backButton = [[UIButton alloc] initWithFrame:frame];
+    UIButton *backButton = [[UIButton alloc] initWithFrame:frame];
     [backButton setBackgroundImage:image forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlStateHighlighted];
     
@@ -70,23 +57,20 @@ UIButton* backButton;
     self.navigationItem.leftBarButtonItem = backButtonItem;
     [backButtonItem release];
     [backButton release];
-     self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
-    // load angellist URL
+    
     NSURL *url;
-    if (_rowIndexPathNumber == 0) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorUrlArray objectAtIndex:_rowNumberInActivity]]];
-       
+    if(_rowNumberInDetails == 0)
+    {
+        self.navigationItem.title = [NSString stringWithFormat:@"%@",[actorNameArray objectAtIndex:_rowNumberInActivity]];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[actorLinkArray objectAtIndex:_rowNumberInActivity]]];
     }
-    else if(_rowIndexPathNumber == 2){
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[targetUrlArray objectAtIndex:_rowNumberInActivity]]];
-        
+    else
+    {
+        self.navigationItem.title = [NSString stringWithFormat:@"%@",[targetNameArray objectAtIndex:_rowNumberInActivity]];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@",[targetLinkArray objectAtIndex:_rowNumberInActivity]]];
     }
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [webView loadRequest:request];
-    
-   
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
 }
 
 -(void) backAction:(id)sender
@@ -97,7 +81,7 @@ UIButton* backButton;
 -(void)viewWillDisappear:(BOOL)animated
 {
     [webView setDelegate:nil];
-    
+    [super viewWillDisappear:YES];
 }
 
 - (void)viewDidUnload
@@ -125,8 +109,6 @@ UIButton* backButton;
     loading.hidden = YES;
 }
 
-
-// To support orientations 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations

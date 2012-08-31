@@ -9,15 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
 #import "ViewController.h"
-#import "SearchViewController.h"
 
 @interface UserProfileViewController : UIViewController<UITableViewDelegate,UITableViewDataSource, UIAlertViewDelegate>
 {
-    SearchViewController *_searchViewController;
     IBOutlet UITableView *tableViewUser;
     DBManager *_dbmanager;
     UIButton *_logoutButton;
     UIButton *buttonSearch;
+   
 }
 
 

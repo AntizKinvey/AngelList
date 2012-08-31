@@ -1,8 +1,8 @@
 //
-//  ActivityWebDetailsVontroller.h
-//  Angellist
+//  ActivityWebDetailsController.h
+//  TableProj
 //
-//  Created by Ram Charan on 6/4/12.
+//  Created by Ram Charan on 8/25/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -10,8 +10,8 @@
 
 @interface ActivityWebDetailsController : UIViewController <UIWebViewDelegate>
 {
-    // webview
     IBOutlet UIWebView *webView;
     IBOutlet UIView *loading;
 }
+
 @end

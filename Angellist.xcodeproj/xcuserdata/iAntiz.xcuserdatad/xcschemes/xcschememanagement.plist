@@ -4,11 +4,6 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Ad hoc.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
-		</dict>
 		<key>Angellist.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -17,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>7884DBE9156F8C3000679076</key>
+		<key>07030D8615F0F76800AA5242</key>
 		<dict>
 			<key>primary</key>
 			<true/>

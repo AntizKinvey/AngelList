@@ -1,8 +1,8 @@
 //
-//  WebViewController.m
-//  SampleRest
+//  LoginViewController.m
+//  TableProj
 //
-//  Created by Ram Charan on 5/9/12.
+//  Created by Ram Charan on 8/26/12.
 //  Copyright (c) 2012 Antiz Technologies Pvt Ltd. All rights reserved.
 //
 
@@ -17,14 +17,15 @@ NSString *access_token;//Access token of Angellist user
 BOOL access_token_received = FALSE;//Flag to be set when access token is received
 
 extern BOOL loginFromAL;
-extern BOOL loginWithTW;
 extern BOOL _loggedIn;
+
 
 NSString *_angelUserId;//Angellist User Id
 NSString *_angelUserName;//Angellist User name
 NSString *_angelUserImage;//Angellist User Image
 NSString *_angelUserEmailId;//Angellist User email id
 NSString *_angelUserFollows;//Angellist User followers
+
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -49,16 +50,20 @@ NSString *_angelUserFollows;//Angellist User followers
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
     
-    _angelUserId = [[NSString alloc] init];
-    _angelUserName = [[NSString alloc] init];
-    _angelUserFollows = [[NSString alloc] init];
-    _angelUserEmailId = [[NSString alloc] init];
-    _angelUserImage = [[NSString alloc] init];
+    _angelUserId = [NSString new];
+    _angelUserName = [NSString new];
+    _angelUserFollows = [NSString new];
+    _angelUserEmailId = [NSString new];
+    _angelUserImage = [NSString new];
+    
+    _dbmanager = [[DBManager alloc] init];
+    [_dbmanager openDB];
     
     webView.delegate = self;
     webView.scrollView.bounces = NO;
-
+    
     [loading.layer setCornerRadius:18.0f];
     
     
@@ -69,12 +74,13 @@ NSString *_angelUserFollows;//Angellist User followers
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
         [webView loadRequest:request];
     }
-    else if(loginWithTW)
-    {
-        NSURL *url = [NSURL URLWithString:@"http://angel.co/auth/twitter/with_callback?callback=%2Fsessions%2Fcontinue_after_social_login%3Fprovider%3Dtwitter&sr=login"];
-        NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        [webView loadRequest:request];
-    }
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType 
@@ -146,7 +152,7 @@ NSString *_angelUserFollows;//Angellist User followers
                                   JSONObjectWithData:response
                                   options:kNilOptions 
                                   error:&error];
-           
+            
             
             _angelUserId = [json objectForKey:@"id"];
             _angelUserName = [json objectForKey:@"name"];
@@ -157,11 +163,11 @@ NSString *_angelUserFollows;//Angellist User followers
             NSString *fbUrl = [json objectForKey:@"facebook_url"];
             NSString *twUrl = [json objectForKey:@"twitter_url"];
             
-             NSLog(@"\n \n id = %@ \n \n", _angelUserId);
-             NSLog(@"\n \n id = %@ \n \n", _angelUserName);
-             NSLog(@"\n \n id = %@ \n \n", _angelUserFollows);
-             NSLog(@"\n \n id = %@ \n \n", _angelUserEmailId);
-             NSLog(@"\n \n id = %@ \n \n", _angelUserImage);
+            NSLog(@"\n \n id = %@ \n \n", _angelUserId);
+            NSLog(@"\n \n id = %@ \n \n", _angelUserName);
+            NSLog(@"\n \n id = %@ \n \n", _angelUserFollows);
+            NSLog(@"\n \n id = %@ \n \n", _angelUserEmailId);
+            NSLog(@"\n \n id = %@ \n \n", _angelUserImage);
             
             if((fbUrl == (NSString *)[NSNull null]) || [fbUrl isEqualToString:@""] )
             {
@@ -171,51 +177,48 @@ NSString *_angelUserFollows;//Angellist User followers
             {
                 twUrl = @"NA";
             }
+            NSLog(@"\nfacebook url = %@\ntwitter url = %@",fbUrl,twUrl);
             //Set the User collection attributes in Kinvey with user's access token, facebook url(if any), twitter url(if any)
-            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",fbUrl] forAttribute:@"facebookUrl"];
-            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",twUrl] forAttribute:@"twitterUrl"];
-            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",access_token] forAttribute:@"access_token"];
-            [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
+//            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",fbUrl] forAttribute:@"facebookUrl"];
+//            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",twUrl] forAttribute:@"twitterUrl"];
+//            [[[KCSClient sharedClient] currentUser] setValue:[NSString stringWithFormat:@"%@",access_token] forAttribute:@"access_token"];
+//            [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
             
             access_token_received = FALSE;
             _loggedIn = TRUE;
-            [self closeAction];
+            [self saveImageOfUserAndDetailsToDb];
         }
-    }
-    
-    if(loginWithTW)
-    {
-        
     }
 }
 
--(void) viewDidAppear:(BOOL)animated
+-(void) saveImageOfUserAndDetailsToDb
 {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+
+    NSString *savedImagePathForUser = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"me.jpg"]];
+    UIImage *imageForUser = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@",_angelUserImage]]]];
+    NSData *imageDataForUser = UIImagePNGRepresentation(imageForUser);
+    [imageDataForUser writeToFile:savedImagePathForUser atomically:NO];
     
+    int _userId = 1;
+    [_dbmanager insertRecordIntoUserTable:@"User" withField1:@"UID" field1Value:[NSString stringWithFormat:@"%d",_userId] andField2:@"username" field2Value:[NSString stringWithFormat:@"%@",_angelUserName] andField3:@"angelUserId" field3Value:[NSString stringWithFormat:@"%@",_angelUserId] andField4:@"access_token" field4Value:[NSString stringWithFormat:@"%@",access_token] andField5:@"email" field5Value:[NSString stringWithFormat:@"%@",_angelUserEmailId] andField6:@"image" field6Value:savedImagePathForUser andField7:@"follows" field7Value:[NSString stringWithFormat:@"%@",_angelUserFollows]];
     
-    
+    [self closeAction];
 }
+
+
 
 -(IBAction)dismissView:(id)sender
 {
-    
-    
     [self closeAction];
 }
 //Close login Page
 -(void) closeAction
 {
     loginFromAL = FALSE;
-    loginWithTW = FALSE;
     [webView stopLoading];
     [self dismissModalViewControllerAnimated:YES];
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -229,40 +232,6 @@ NSString *_angelUserFollows;//Angellist User followers
     {
         return NO;
     }
-}
-
-/************************************************************************************************************/
-/*                                          Kinvey Delegate Methods                                         */
-/************************************************************************************************************/
-
-//Persistable Delegate Methods
-// Right now just pop-up an alert about what we got back from Kinvey during
-// the save. Normally you would want to implement more code here
-// This is called when the save completes successfully
-- (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
-{
-    NSLog(@"\n\n%@",[result description]);
-}
-
-// Right now just pop-up an alert about the error we got back from Kinvey during
-// the save attempt. Normally you would want to implement more code here
-// This is called when a save fails
-- (void)entity:(id)entity operationDidFailWithError:(NSError *)error
-{
-    NSLog(@"\n\n%@",[error localizedDescription]);
-    NSLog(@"\n\n%@",[error localizedFailureReason]);
-    [[[KCSClient sharedClient] currentUser] saveWithDelegate:self];
-}
-
--(void)dealloc
-{
-    [_angelUserId release];
-    [_angelUserName release];
-    [_angelUserFollows release];
-    [_angelUserEmailId release];
-    [_angelUserImage release];
-    
-    [super dealloc];
 }
 
 @end

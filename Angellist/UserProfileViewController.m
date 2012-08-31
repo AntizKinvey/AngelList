@@ -8,33 +8,16 @@
 
 #import "UserProfileViewController.h"
 #import "LoginViewController.h"
+#import "SearchViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import <Foundation/NSHTTPCookie.h>
 #import "AppDelegate.h"
 #import "Reachability.h"
+#import "ContainerViewController.h"
 
 @implementation UserProfileViewController
 
-extern BOOL _loggedIn;
-extern NSString *_angelUserNameFromDB;
-
-////////////////////////////////////////////
-extern NSMutableArray *_msgbody;
-extern NSMutableArray *_senderName; // sender name
-extern NSMutableArray *_recepientName; // recepient name
-extern NSMutableArray *_imageOfRecepient; // image of recepient 
-extern NSMutableArray *_imageOfSender; // image of sender
-extern NSMutableArray *_userids; // user ids
-extern NSMutableArray *_sender; // sender ids
-extern NSMutableArray *_recepient; // recepient ids
-extern NSMutableArray *_read; // viewed status
-extern NSMutableArray *_threadId; // thread id
-extern NSMutableArray *_msgbody; // message body
-extern NSMutableArray *_placeHolder; // place holder images
-extern NSMutableArray *_time; // time got from response
-extern NSMutableArray *_displayTime; // display time
-extern NSMutableArray *_totalMsgCount; // total message count
-
+extern NSMutableArray *userDetailsArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -66,7 +49,7 @@ extern NSMutableArray *_totalMsgCount; // total message count
     }
     
     // load the image of the user from db
-    UIImage *image = [UIImage imageWithContentsOfFile:_dbmanager._angelUserImageFromDB];
+    UIImage *image = [UIImage imageWithContentsOfFile:[userDetailsArray objectAtIndex:4]];
     UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(80, 20, 150, 150)];
     cellImageView.image = image;
     cellImageView.layer.cornerRadius = 3.5f;
@@ -79,7 +62,7 @@ extern NSMutableArray *_totalMsgCount; // total message count
     UILabel *cellNameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 180, 290, 20)] autorelease];//CGRectMake(90, 180, 290, 20)] autorelease];
     
     cellNameLabel.lineBreakMode = UILineBreakModeWordWrap;
-    cellNameLabel.text = _dbmanager._angelUserNameFromDB;
+    cellNameLabel.text = [userDetailsArray objectAtIndex:0];
     cellNameLabel.backgroundColor = [UIColor clearColor];
     cellNameLabel.textColor = [UIColor colorWithRed:63.0/255.0 green:103.0/255.0 blue:160.0/255.0 alpha:1.0f];
     cellNameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:18];
@@ -87,27 +70,19 @@ extern NSMutableArray *_totalMsgCount; // total message count
     [cell.contentView addSubview:cellNameLabel];
     
     // load the email id of the user
-    UILabel *cellHighConceptLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 200, 290, 20)] autorelease];//26
-    cellHighConceptLabel.lineBreakMode = UILineBreakModeWordWrap;
-    cellHighConceptLabel.numberOfLines = 2;
-    cellHighConceptLabel.text = _dbmanager._angelUserEmailFromDB;
-    cellHighConceptLabel.backgroundColor = [UIColor clearColor];
-    cellHighConceptLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:16];
-    cellHighConceptLabel.textAlignment = UITextAlignmentCenter;
-    [cell.contentView addSubview:cellHighConceptLabel];
+    UILabel *cellEmailLabel = [[[UILabel alloc] initWithFrame:CGRectMake(5, 200, 290, 20)] autorelease];//26
+    cellEmailLabel.lineBreakMode = UILineBreakModeWordWrap;
+    cellEmailLabel.numberOfLines = 2;
+    cellEmailLabel.text = [userDetailsArray objectAtIndex:3];
+    cellEmailLabel.backgroundColor = [UIColor clearColor];
+    cellEmailLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:16];
+    cellEmailLabel.textAlignment = UITextAlignmentCenter;
+    [cell.contentView addSubview:cellEmailLabel];
     
     [cell.contentView addSubview:_logoutButton];
     
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        _logoutButton.enabled = NO;
-    }
-    else {
-        _logoutButton.enabled = YES;
-    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     return cell; 
 }
@@ -115,14 +90,13 @@ extern NSMutableArray *_totalMsgCount; // total message count
     
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 360;    
+    return 360; //160    
 }
 
 
 //---set the number of rows in the table view---
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 { 
-    
     return 1;
 }
 
@@ -130,6 +104,8 @@ extern NSMutableArray *_totalMsgCount; // total message count
 {
     UIImage *backgroundImage = [UIImage imageNamed:@"navigationbarNf.png"];
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+   
+    
 }
 
 -(void)viewDidLoad
@@ -140,7 +116,7 @@ extern NSMutableArray *_totalMsgCount; // total message count
     [_dbmanager openDB];
     
     _logoutButton = [[UIButton alloc] init];
-    _logoutButton.frame = CGRectMake(110, 260, 80, 50);
+    _logoutButton.frame = CGRectMake(110, 260, 80, 42);
   
     [_logoutButton setImage:[UIImage imageNamed:@"logout.png"] forState:UIControlStateNormal];
     [_logoutButton addTarget:self action:@selector(logoutFromApp) forControlEvents:UIControlStateHighlighted];
@@ -148,7 +124,7 @@ extern NSMutableArray *_totalMsgCount; // total message count
     // for search options
     
      buttonSearch = [[UIButton alloc] init];
-     buttonSearch.frame = CGRectMake(0, 0, 49, 42);
+     buttonSearch.frame = CGRectMake(0, 0, 52, 45);
     [buttonSearch setImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
     [buttonSearch setImage:[UIImage imageNamed:@"searcha.png"] forState:UIControlStateSelected];
     [buttonSearch addTarget:self action:@selector(goToSearch) forControlEvents:UIControlStateHighlighted];
@@ -162,7 +138,8 @@ extern NSMutableArray *_totalMsgCount; // total message count
     [self.navigationController.navigationBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
     
      [_dbmanager retrieveUserDetails];
-    self.navigationItem.title = _dbmanager._angelUserNameFromDB;
+     // NSLog(@"\n \n \n name = %@ \n \n \n ",_dbmanager._angelUserNameFromDB);
+    self.navigationItem.title = [userDetailsArray objectAtIndex:0];
     
 }
 
@@ -171,26 +148,34 @@ extern NSMutableArray *_totalMsgCount; // total message count
 {    // alert before the logout
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Are you sure to logout?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Yes",@"No", nil];
     [alert show];
-    [alert release];
-    
-    
-    
+    [alert release]; 
 }
 
 -(void)goToSearch
 {
-    _searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
-    [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    //[self presentModalViewController:_searchViewController animated:YES];
-    [self.navigationController pushViewController:_searchViewController animated:YES];
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:@"Internet appears offline!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [alert release];        
+    }
+    else
+    {
+        SearchViewController *_searchViewController = [[SearchViewController alloc] initWithNibName:@"SearchViewController" bundle:nil];
+        [_searchViewController setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+        [self.navigationController pushViewController:_searchViewController animated:YES];
+        [_searchViewController release];
+    }
 }
 
 
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 0) {
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
         
         // to delete all the cookies of the webview
         NSHTTPCookie *aCookie;
@@ -198,22 +183,23 @@ extern NSMutableArray *_totalMsgCount; // total message count
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:aCookie];
         }
         
-        _loggedIn = FALSE;
-        
         [_dbmanager deleteUserFromDB]; // delete user details from the the db
-        [_dbmanager deleteFromInbox];
+        [_dbmanager deleteRowsFromActivity];
+        [_dbmanager deleteRowsFromTrending];
+        [_dbmanager deleteRowsFromFollowing];
+        [_dbmanager deleteRowsFromPortfolio];
+        [_dbmanager deleteInboxFromDB];
         
 
         
         // navigate to the login screen
+        
         AppDelegate *mainDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-        [mainDelegate loginToAngelList];
+        [mainDelegate showLoginScreen];
     }
     
    
 }
-
-
 
 - (void)viewDidUnload
 {
@@ -224,7 +210,15 @@ extern NSMutableArray *_totalMsgCount; // total message count
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    // Return YES for supported orientations
+    if((interfaceOrientation == UIInterfaceOrientationPortrait) || (interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
+    {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 @end
