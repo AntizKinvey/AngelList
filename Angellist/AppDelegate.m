@@ -28,6 +28,7 @@ BOOL _kinveyPingSuccess = FALSE;//Ping to Kinvey flag
 NSString *_globalSessionId;//Contains unique session Id
 NSString *_kinveyUserId;//Id of user of current device assigned by Kinvey 
 
+KCSLogout *logout;
 
 - (void)dealloc
 {
@@ -61,94 +62,13 @@ NSString *_kinveyUserId;//Id of user of current device assigned by Kinvey
     [self showLoginScreen];
     //    [self.window makeKeyAndVisible];
     
-    return YES;
-}
-
--(void) showLoginScreen
-{
-    _totalNoOfRowsInUserTable = [_dbmanager retrieveNoOfRowsOfUser];
-    
-    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-    // Override point for customization after application launch.
-    if(_totalNoOfRowsInUserTable == 0)
-    {
-        self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil] autorelease];
-        self.window.rootViewController = self.viewController;
-        [self.window makeKeyAndVisible];
-    }
-    else
-    {
-        self.containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPhone" bundle:nil] autorelease];
-        self.window.rootViewController = self.containerViewController;
-        [self.window makeKeyAndVisible];
-    }
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-    /*
-     Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-     Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-     */
-    
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
     
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
-        NSLog(@"\n\nNo Internet Connection in Resign active");
-    }
-    else
-    {
-        if(_kinveyPingSuccess)
-        {
-            NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
-            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
-            NSDate *currDate = [NSDate date];
-            NSString *todayDate = [date_formater stringFromDate:currDate];
-            [date_formater release];
-            //Set logout details of user
-            KCSLogout *logout = [[KCSLogout alloc] init];
-            logout.logouttime = todayDate;
-            logout.sessionId = _globalSessionId;
-            [_globalSessionId release];
-            
-            [logout saveToCollection:_logoutCollection withDelegate:self];
-            
-            [logout release];
-        }
-    }
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    /*
-     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-     If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-     */
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-    /*
-     Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-     */
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    /*
-     Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-     */
-    
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\nNo Internet Connection in become Active");
+        NSLog(@"\n\nNo Internet Connection in Launching");
     }
     else
     {
@@ -183,6 +103,140 @@ NSString *_kinveyUserId;//Id of user of current device assigned by Kinvey
             }
         }];
         
+    }
+    
+    return YES;
+}
+
+-(void) showLoginScreen
+{
+    _totalNoOfRowsInUserTable = [_dbmanager retrieveNoOfRowsOfUser];
+    
+    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+    // Override point for customization after application launch.
+    if(_totalNoOfRowsInUserTable == 0)
+    {
+        self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController_iPhone" bundle:nil] autorelease];
+        self.window.rootViewController = self.viewController;
+        [self.window makeKeyAndVisible];
+    }
+    else
+    {
+        self.containerViewController = [[[ContainerViewController alloc] initWithNibName:@"ContainerViewController_iPhone" bundle:nil] autorelease];
+        self.window.rootViewController = self.containerViewController;
+        [self.window makeKeyAndVisible];
+    }
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    /*
+     Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+     Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+     */
+    
+//    //Check for the availability of Internet
+//    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+//    
+//    NetworkStatus internetStatus = [r currentReachabilityStatus];
+//    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+//    {
+//        NSLog(@"\n\nNo Internet Connection in Resign active");
+//    }
+//    else
+//    {
+//        if(_kinveyPingSuccess == TRUE)
+//        {
+//            NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
+//            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+//            NSDate *currDate = [NSDate date];
+//            NSString *todayDate = [date_formater stringFromDate:currDate];
+//            [date_formater release];
+//            //Set logout details of user
+//            logout = [[KCSLogout alloc] init];
+//            logout.logouttime = todayDate;
+//            logout.sessionId = _globalSessionId;
+//            [_globalSessionId release];
+//            
+////            [logout saveToCollection:_logoutCollection withDelegate:self];
+////            
+////            [logout release];
+//        }
+//    }
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    /*
+     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+     If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+     */
+    
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\nNo Internet Connection in Resign active");
+    }
+    else
+    {
+        if(_kinveyPingSuccess == TRUE)
+        {
+            NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
+            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+            NSDate *currDate = [NSDate date];
+            NSString *todayDate = [date_formater stringFromDate:currDate];
+            [date_formater release];
+            //Set logout details of user
+            logout = [[KCSLogout alloc] init];
+            logout.logouttime = todayDate;
+            logout.sessionId = _globalSessionId;
+            [_globalSessionId release];
+            
+            //            [logout saveToCollection:_logoutCollection withDelegate:self];
+            //            
+            //            [logout release];
+        }
+    }
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    /*
+     Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+     */
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    /*
+     Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+     */
+    //Check for the availability of Internet
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+    
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+    {
+        NSLog(@"\n\nNo Internet Connection in become Active");
+    }
+    else
+    {
+        if(_kinveyPingSuccess == TRUE)
+        {
+            NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 1");
+            [[[KCSClient sharedClient] currentUser] loadWithDelegate:self]; 
+            NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 2");
+            if(logout.sessionId!=nil)
+            {
+                NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 3");
+                [logout saveToCollection:_logoutCollection withDelegate:self];
+                //[logout release];
+                NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 4");
+            }
+        }
     }
 }
 
