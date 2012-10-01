@@ -86,8 +86,8 @@
 		07030E5815F0FA7600AA5242 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E4E15F0FA7600AA5242 /* Security.framework */; };
 		07030E5915F0FA7600AA5242 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E4F15F0FA7600AA5242 /* StoreKit.framework */; };
 		07030E5A15F0FA7600AA5242 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E5015F0FA7600AA5242 /* SystemConfiguration.framework */; };
-		07030E5C15F0FAA300AA5242 /* KinveyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E5B15F0FAA300AA5242 /* KinveyKit.framework */; };
-		07030E5E15F0FABF00AA5242 /* libUAirship-1.2.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E5D15F0FABF00AA5242 /* libUAirship-1.2.2.a */; };
+		07F7A4E81608771D00314193 /* KinveyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07F7A4E71608771D00314193 /* KinveyKit.framework */; };
+		07F7A4EA1608774700314193 /* libUAirship-1.2.2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07F7A4E91608774700314193 /* libUAirship-1.2.2.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -194,8 +194,8 @@
 		07030E4E15F0FA7600AA5242 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		07030E4F15F0FA7600AA5242 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		07030E5015F0FA7600AA5242 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		07030E5B15F0FAA300AA5242 /* KinveyKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KinveyKit.framework; sourceTree = "<group>"; };
-		07030E5D15F0FABF00AA5242 /* libUAirship-1.2.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libUAirship-1.2.2.a"; path = "Airship/libUAirship-1.2.2.a"; sourceTree = "<group>"; };
+		07F7A4E71608771D00314193 /* KinveyKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KinveyKit.framework; sourceTree = "<group>"; };
+		07F7A4E91608774700314193 /* libUAirship-1.2.2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libUAirship-1.2.2.a"; path = "Airship/libUAirship-1.2.2.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,7 +203,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07030E5E15F0FABF00AA5242 /* libUAirship-1.2.2.a in Frameworks */,
+				07F7A4EA1608774700314193 /* libUAirship-1.2.2.a in Frameworks */,
 				07030E5115F0FA7600AA5242 /* CFNetwork.framework in Frameworks */,
 				07030E5215F0FA7600AA5242 /* CoreLocation.framework in Frameworks */,
 				07030E5315F0FA7600AA5242 /* CoreTelephony.framework in Frameworks */,
@@ -217,7 +217,7 @@
 				07030D8C15F0F76800AA5242 /* UIKit.framework in Frameworks */,
 				07030D8E15F0F76800AA5242 /* Foundation.framework in Frameworks */,
 				07030D9015F0F76800AA5242 /* CoreGraphics.framework in Frameworks */,
-				07030E5C15F0FAA300AA5242 /* KinveyKit.framework in Frameworks */,
+				07F7A4E81608771D00314193 /* KinveyKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,7 +227,8 @@
 		07030D7C15F0F76800AA5242 = {
 			isa = PBXGroup;
 			children = (
-				07030E5D15F0FABF00AA5242 /* libUAirship-1.2.2.a */,
+				07F7A4E91608774700314193 /* libUAirship-1.2.2.a */,
+				07F7A4E71608771D00314193 /* KinveyKit.framework */,
 				07030E4A15F0FA7600AA5242 /* libsqlite3.dylib */,
 				07030E4B15F0FA7600AA5242 /* libz.dylib */,
 				07030D9115F0F76800AA5242 /* Angellist */,
@@ -247,7 +248,6 @@
 		07030D8A15F0F76800AA5242 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				07030E5B15F0FAA300AA5242 /* KinveyKit.framework */,
 				07030E4715F0FA7600AA5242 /* CFNetwork.framework */,
 				07030E4815F0FA7600AA5242 /* CoreLocation.framework */,
 				07030E4915F0FA7600AA5242 /* CoreTelephony.framework */,
@@ -539,8 +539,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -554,11 +554,12 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "AD45F93D-2BDA-42D5-A586-9B0AED77393C";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AD45F93D-2BDA-42D5-A586-9B0AED77393C";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -567,20 +568,21 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "AD45F93D-2BDA-42D5-A586-9B0AED77393C";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AD45F93D-2BDA-42D5-A586-9B0AED77393C";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -588,6 +590,8 @@
 		07030DA615F0F76800AA5242 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -595,11 +599,15 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Angellist/Angellist-Prefix.pch";
 				INFOPLIST_FILE = "Angellist/Angellist-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -607,6 +615,8 @@
 		07030DA715F0F76800AA5242 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -614,11 +624,15 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Angellist/Angellist-Prefix.pch";
 				INFOPLIST_FILE = "Angellist/Angellist-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

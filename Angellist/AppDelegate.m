@@ -104,7 +104,6 @@ KCSLogout *logout;
         }];
         
     }
-    
     return YES;
 }
 
@@ -134,35 +133,6 @@ KCSLogout *logout;
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
      Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
      */
-    
-//    //Check for the availability of Internet
-//    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-//    
-//    NetworkStatus internetStatus = [r currentReachabilityStatus];
-//    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-//    {
-//        NSLog(@"\n\nNo Internet Connection in Resign active");
-//    }
-//    else
-//    {
-//        if(_kinveyPingSuccess == TRUE)
-//        {
-//            NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
-//            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
-//            NSDate *currDate = [NSDate date];
-//            NSString *todayDate = [date_formater stringFromDate:currDate];
-//            [date_formater release];
-//            //Set logout details of user
-//            logout = [[KCSLogout alloc] init];
-//            logout.logouttime = todayDate;
-//            logout.sessionId = _globalSessionId;
-//            [_globalSessionId release];
-//            
-////            [logout saveToCollection:_logoutCollection withDelegate:self];
-////            
-////            [logout release];
-//        }
-//    }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -193,7 +163,7 @@ KCSLogout *logout;
             logout = [[KCSLogout alloc] init];
             logout.logouttime = todayDate;
             logout.sessionId = _globalSessionId;
-            [_globalSessionId release];
+           // [_globalSessionId release];
             
             //            [logout saveToCollection:_logoutCollection withDelegate:self];
             //            
@@ -226,15 +196,11 @@ KCSLogout *logout;
     {
         if(_kinveyPingSuccess == TRUE)
         {
-            NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 1");
             [[[KCSClient sharedClient] currentUser] loadWithDelegate:self]; 
-            NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 2");
             if(logout.sessionId!=nil)
             {
-                NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 3");
                 [logout saveToCollection:_logoutCollection withDelegate:self];
                 //[logout release];
-                NSLog(@"\n\nINSIDE KINVEY PING SUCCESS IN ACTIVE 4");
             }
         }
     }
@@ -309,7 +275,9 @@ KCSLogout *logout;
         NSString *todayDate = [date_formater stringFromDate:currDate];
         [date_formater release];
         
-        _globalSessionId = [[NSString alloc] initWithFormat:@"%d",[result count]+1];
+        NSString *temp_str = [[NSString alloc] initWithFormat:@"%d",[result count]+1];
+        _globalSessionId = [[NSString alloc] initWithFormat:@"%d",[result count]+1];//[NSString stringWithFormat:@"%@",temp_str];
+        [temp_str release]; 
         //Set login details of user
         KCSLogin *loginDetails = [[KCSLogin alloc] init];
         
@@ -330,7 +298,7 @@ KCSLogout *logout;
 
 - (void)collection:(KCSCollection *)collection didFailWithError:(NSError *)error{
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
+
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
@@ -341,7 +309,6 @@ KCSLogout *logout;
         NSLog(@"\n%@",[error localizedDescription]);
         NSLog(@"\n%@",[error localizedFailureReason]);
     }
-    
 }
 
 //Entity Delegate Methods
@@ -371,7 +338,7 @@ KCSLogout *logout;
 - (void)entity:(id<KCSPersistable>)entity fetchDidFailWithError:(NSError *)error
 {
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
+
     NetworkStatus internetStatus = [r currentReachabilityStatus];
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
     {
@@ -379,9 +346,9 @@ KCSLogout *logout;
     }
     else
     {
-        NSLog(@"\n%@",[error localizedDescription]);
-        NSLog(@"\n%@",[error localizedFailureReason]);
+        NSLog(@"Error Description: %@, Code: %d, Supplemental: %@", [error localizedDescription], [error code], [error localizedFailureReason]);
         [[[KCSClient sharedClient] currentUser] loadWithDelegate:self];
+        
     }
 }
 
