@@ -1,0 +1,1 @@
+/Users/iAntiz/Desktop/deepak/AngelKD/Angellist/DerivedData/Build/Intermediates/ArchiveIntermediates/Ad hoc/InstallationBuildProductsLocation/Applications/Angellist.app

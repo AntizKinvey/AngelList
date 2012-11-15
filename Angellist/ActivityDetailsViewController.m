@@ -11,6 +11,7 @@
 #import "ActivityWebDetailsController.h"
 #import "Reachability.h"
 #import "KCSUserActivity.h"
+#import "KCSLogin.h"
 
 @implementation ActivityDetailsViewController
 
@@ -249,6 +250,8 @@ extern NSString *_globalSessionId;
 
 - (void)viewDidLoad
 {
+    
+    NSLog(@"KK _globalSessionId = %@",_globalSessionId);
     displayDetailsOfFeedsArray = [NSMutableArray new];
     
     [displayDetailsOfFeedsArray addObject:[feedActorImageDisplayArray objectAtIndex:_rowNumberInActivity]];
