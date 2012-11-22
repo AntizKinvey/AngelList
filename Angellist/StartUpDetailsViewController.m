@@ -35,7 +35,7 @@ NSMutableArray *displayDetailsOfStartUpsArray;
 
 extern NSString *_globalSessionId;
 KCSCollection *_detailsCollection;
-
+int _number_of_times_SD = 10;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -254,7 +254,15 @@ KCSCollection *_detailsCollection;
         
         //Set details of user activity
         KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
-        userActivity.sessionId = _globalSessionId;
+        
+        SessionStates *sharedManager = [SessionStates sharedManager];
+        if(sharedManager._sessionId == nil)
+        {
+            [sharedManager setSessionId];
+        }
+        userActivity.sessionId = sharedManager._sessionId;//_globalSessionId;
+        
+        //userActivity.sessionId = _globalSessionId;
         userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[startUpLinkArray objectAtIndex:_rowNumberInStartUps]];
         [userActivity saveToCollection:_detailsCollection withDelegate:self];
         [userActivity release];
@@ -371,6 +379,7 @@ KCSCollection *_detailsCollection;
 - (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
 {
     NSLog(@"\n\n%@",[result description]);
+    _number_of_times_SD = 10;
 }
 
 // Right now just pop-up an alert about the error we got back from Kinvey during
@@ -378,20 +387,26 @@ KCSCollection *_detailsCollection;
 // This is called when a save fails
 - (void)entity:(id)entity operationDidFailWithError:(NSError *)error
 {
-    //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\n No Internet Connection");
-    }
-    else
-    {
+       
         NSLog(@"\n%@",[error localizedDescription]);
         NSLog(@"\n%@",[error localizedFailureReason]);
-        [entity saveToCollection:_detailsCollection withDelegate:self];
-    }
+        
+        if(error.code != 401 && _number_of_times_SD >= 0){
+           
+                        
+            [self performSelector:@selector(TrysaveToCollection:) withObject:entity afterDelay:10.0];
+                        
+            
+        }
+        else if (error.code == 401)
+        {
+            [KCSUser clearSavedCredentials];
+        }
 }
 
+-(void)TrysaveToCollection:(id) entity{
+    
+    _number_of_times_SD--;
+    [entity saveToCollection:_detailsCollection withDelegate:self];
+}
 @end

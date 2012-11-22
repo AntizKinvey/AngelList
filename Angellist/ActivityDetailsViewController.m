@@ -12,6 +12,8 @@
 #import "Reachability.h"
 #import "KCSUserActivity.h"
 #import "KCSLogin.h"
+#import "AppDelegate.h"
+
 
 @implementation ActivityDetailsViewController
 
@@ -35,6 +37,8 @@ extern int _rowNumberInActivity;
 
 KCSCollection *_detailsCollection;
 extern NSString *_globalSessionId;
+
+int _number_of_times_AD = 10;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -289,25 +293,33 @@ extern NSString *_globalSessionId;
     
     ////////////////////////////////////// To be saved to Kinvey /////////////////////////////////
     //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\n No Internet Connection");
-    }
-    else
-    {
+//    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+//    
+//    NetworkStatus internetStatus = [r currentReachabilityStatus];
+//    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+//    {
+//        NSLog(@"\n\n No Internet Connection");
+//    }
+//    else
+//    {
         _detailsCollection = [[[KCSClient sharedClient]
                                collectionFromString:@"UserActivity"
                                withClass:[KCSUserActivity class]] retain];
         
         KCSUserActivity *userActivity = [[KCSUserActivity alloc] init];
-        userActivity.sessionId = _globalSessionId;
+        
+        SessionStates *sharedManager = [SessionStates sharedManager];
+        if(sharedManager._sessionId == nil)
+        {
+            [sharedManager setSessionId];
+        }
+        userActivity.sessionId = sharedManager._sessionId;//_globalSessionId;
+        
+       NSLog(@"in ActivityDetailsViewController session id is %@\n",sharedManager._sessionId);
         userActivity.urlLinkVisited = [NSString stringWithFormat:@"%@",[actorLinkArray objectAtIndex:_rowNumberInActivity]];
         [userActivity saveToCollection:_detailsCollection withDelegate:self];
         [userActivity release];
-    }
+   // }
 }
 
 -(void) backAction:(id)sender
@@ -357,6 +369,7 @@ extern NSString *_globalSessionId;
 - (void)entity:(id)entity operationDidCompleteWithResult:(NSObject *)result
 {
     NSLog(@"\n\n%@",[result description]);
+    _number_of_times_AD = 10;
 }
 
 // Right now just pop-up an alert about the error we got back from Kinvey during
@@ -365,19 +378,44 @@ extern NSString *_globalSessionId;
 - (void)entity:(id)entity operationDidFailWithError:(NSError *)error
 {
     //Check for the availability of Internet
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\n No Internet Connection");
-    }
-    else
-    {
+//    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
+//    
+//    NetworkStatus internetStatus = [r currentReachabilityStatus];
+//    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
+//    {
+//        NSLog(@"\n\n No Internet Connection");
+//    }
+//    else
+//    {
+    NSLog(@"inside operationDidFailWithError - ActivityDetailsViewController\n ");
         NSLog(@"\n%@",[error localizedDescription]);
         NSLog(@"\n%@",[error localizedFailureReason]);
-        [entity saveToCollection:_detailsCollection withDelegate:self];
-    }
+        
+        if(error.code != 401 && _number_of_times_AD >= 0){
+           // _number_of_times_AD--;
+            NSLog(@"fetchDidFailWithError , _number_of_times_AD:%d\n",_number_of_times_AD);
+            
+            
+            [self performSelector:@selector(TrysaveToCollection:) withObject:entity afterDelay:10.0];
+            
+            
+            
+        }
+        else if (error.code == 401)
+        {
+            [KCSUser clearSavedCredentials];
+        }
+
+        
+    //}
+    
+    
+}
+
+-(void)TrysaveToCollection:(id) entity{
+    NSLog(@"inside TrysaveToCollection- activitydetailsviewcontroller\n");
+    _number_of_times_AD--;
+    [entity saveToCollection:_detailsCollection withDelegate:self];
 }
 
 @end

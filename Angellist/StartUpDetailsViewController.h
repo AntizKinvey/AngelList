@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <KinveyKit/KinveyKit.h>
+#import "SessionStates.h"
 
 @interface StartUpDetailsViewController : UIViewController <UITableViewDataSource, KCSPersistableDelegate>
 {

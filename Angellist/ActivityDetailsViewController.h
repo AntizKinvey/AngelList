@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <KinveyKit/KinveyKit.h>
+#import "SessionStates.h"
 
 @interface ActivityDetailsViewController : UIViewController <UITableViewDataSource, KCSPersistableDelegate>
 {
     IBOutlet UITableView *table;
+   
 }
 
 -(void) navigateToWebDetails;

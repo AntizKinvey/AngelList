@@ -88,6 +88,7 @@
 		07030E5A15F0FA7600AA5242 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07030E5015F0FA7600AA5242 /* SystemConfiguration.framework */; };
 		077B3CC9161D548200D84CA0 /* libUAirship-1.3.3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 077B3CC8161D548200D84CA0 /* libUAirship-1.3.3.a */; };
 		077B3CCF161D556000D84CA0 /* KinveyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077B3CCE161D556000D84CA0 /* KinveyKit.framework */; };
+		078501B2165BA7A200F3CF9F /* SessionStates.m in Sources */ = {isa = PBXBuildFile; fileRef = 078501B1165BA7A200F3CF9F /* SessionStates.m */; };
 		07870BAA1622AD4B0075BBEA /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07870BA91622AD4B0075BBEA /* Twitter.framework */; };
 		07870BAD1622AD630075BBEA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07870BAC1622AD630075BBEA /* Accounts.framework */; };
 /* End PBXBuildFile section */
@@ -198,6 +199,8 @@
 		07030E5015F0FA7600AA5242 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		077B3CC8161D548200D84CA0 /* libUAirship-1.3.3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libUAirship-1.3.3.a"; path = "Airship/libUAirship-1.3.3.a"; sourceTree = "<group>"; };
 		077B3CCE161D556000D84CA0 /* KinveyKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KinveyKit.framework; sourceTree = "<group>"; };
+		078501B0165BA7A200F3CF9F /* SessionStates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionStates.h; sourceTree = "<group>"; };
+		078501B1165BA7A200F3CF9F /* SessionStates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionStates.m; sourceTree = "<group>"; };
 		07870BA91622AD4B0075BBEA /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
 		07870BAC1622AD630075BBEA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -233,6 +236,8 @@
 		07030D7C15F0F76800AA5242 = {
 			isa = PBXGroup;
 			children = (
+				078501B0165BA7A200F3CF9F /* SessionStates.h */,
+				078501B1165BA7A200F3CF9F /* SessionStates.m */,
 				07870BAC1622AD630075BBEA /* Accounts.framework */,
 				07870BA91622AD4B0075BBEA /* Twitter.framework */,
 				077B3CCE161D556000D84CA0 /* KinveyKit.framework */,
@@ -517,6 +522,7 @@
 				07030E4115F0F9C200AA5242 /* UserProfileViewController.m in Sources */,
 				07030E4315F0F9C200AA5242 /* SearchViewController.m in Sources */,
 				07030E4515F0F9C200AA5242 /* SearchDetailsViewController.m in Sources */,
+				078501B2165BA7A200F3CF9F /* SessionStates.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,8 +553,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -564,8 +570,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -576,8 +582,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -587,8 +593,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-ObjC";
-				PROVISIONING_PROFILE = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
@@ -598,8 +604,8 @@
 		07030DA615F0F76800AA5242 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -613,8 +619,8 @@
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
@@ -624,8 +630,8 @@
 		07030DA715F0F76800AA5242 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Srikanth Srinivasaiah (VM343XL6HJ)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Rega Interactive";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Rega Interactive";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -639,8 +645,8 @@
 					"\"$(SRCROOT)/Airship\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "FA0F082F-E39E-41F9-A378-A86B51E7301B";
+				PROVISIONING_PROFILE = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "15A68B6A-04B6-4EE9-A416-2686510EC39E";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;

@@ -444,7 +444,8 @@ UIActivityIndicatorView *refreshSpinnerTopTrending;
 //            [table reloadData];
             break;
     }
-}
+} 
+
 
 -(void) invokeStartUpsFromFilter
 {
@@ -512,6 +513,8 @@ UIActivityIndicatorView *refreshSpinnerTopTrending;
         NSArray *startUpTrendingFollowCount = [json valueForKey:@"follower_count"];
         NSArray *startUpTrendingLocations = [[json valueForKey:@"locations"] valueForKey:@"display_name"];
         NSArray *startUpTrendingMarkets = [[json valueForKey:@"markets"] valueForKey:@"display_name"];
+        
+        
         
         for (int z=0; z < [startUpTrendingHidden count]; z++) 
         {
@@ -581,6 +584,8 @@ UIActivityIndicatorView *refreshSpinnerTopTrending;
                 
             }//End IF
         }//End For
+        
+        
         
         for (int k=0; k < [startUpNameArray count]; k++) 
         {
@@ -1074,21 +1079,24 @@ UIActivityIndicatorView *refreshSpinnerTopTrending;
 
 -(void) loadDataWithOperation
 {
-    for(int z=0; z < [startUpImageUrlArray count]; z++)
-    {
-        if([[startUpImageDisplayArray objectAtIndex:z] isEqual:[UIImage imageNamed:@"placeholder.png"]])
+        //if((startUpImageDisplayArray != nil) && ([startUpImageDisplayArray count] == [startUpImageUrlArray count]) )
+    //{       
+        for(int z=0; z < [startUpImageDisplayArray count]; z++)
         {
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[startUpImageUrlArray objectAtIndex:z]]]];
-            [startUpImageDisplayArray replaceObjectAtIndex:z withObject:image];
-            //[table reloadData];
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:z inSection: 0];
-            UITableViewCell *cell = [table cellForRowAtIndexPath:indexPath];
-            UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
-            cellImageView.image = [startUpImageDisplayArray objectAtIndex:indexPath.row];
-            [cell.contentView addSubview:cellImageView];
-            [cellImageView release];
+            if([[startUpImageDisplayArray objectAtIndex:z] isEqual:[UIImage imageNamed:@"placeholder.png"]])
+            {
+                UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[startUpImageUrlArray objectAtIndex:z]]]];
+                [startUpImageDisplayArray replaceObjectAtIndex:z withObject:image];
+                //[table reloadData];
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:z inSection: 0];
+                UITableViewCell *cell = [table cellForRowAtIndexPath:indexPath];
+                UIImageView *cellImageView = [[UIImageView alloc] initWithFrame:CGRectMake(7, 12, 50, 50)];
+                cellImageView.image = [startUpImageDisplayArray objectAtIndex:indexPath.row];
+                [cell.contentView addSubview:cellImageView];
+                [cellImageView release];
+            }
         }
-    }
+   // }
 }
 
 

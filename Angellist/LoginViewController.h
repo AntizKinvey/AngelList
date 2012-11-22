@@ -15,6 +15,7 @@
     IBOutlet UIWebView *webView;
     IBOutlet UIActivityIndicatorView *ac;
     
+    
     DBManager *_dbmanager;
 }
 

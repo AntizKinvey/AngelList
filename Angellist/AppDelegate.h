@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
 #import <KinveyKit/KinveyKit.h>
+#import <KinveyKit/KinveyAnalytics.h>
+#import "SessionStates.h"
 
 @class ViewController,ContainerViewController;
 
@@ -17,6 +19,8 @@
     DBManager *_dbmanager;
     KCSCollection *loginCollection;
     KCSCollection *logoutCollection;
+    SessionStates *_sessionStatesObj;
+    
 }
 
 @property (strong, nonatomic) UIWindow *window;

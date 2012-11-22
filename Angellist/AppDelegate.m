@@ -12,6 +12,7 @@
 #import "KCSLogin.h"
 #import "KCSLogout.h"
 #import "Reachability.h"
+//#import "KinveyAnalytics.h"
 
 @implementation AppDelegate
 
@@ -42,7 +43,8 @@ int _number_of_times = 10;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
+   
+       
     _dbmanager = [DBManager new];
     [_dbmanager openDB];
     
@@ -81,7 +83,7 @@ int _number_of_times = 10;
         [[KCSClient sharedClient] initializeKinveyServiceForAppKey:@"kid1945"
                                                      withAppSecret:@"8f0b10ceba3c4bfa8f4ea03e42093231"
                                                       usingOptions:nil];
-        //NSLog(@"kkkkkkkkkkkkkkk\n");
+       
         [KCSPing pingKinveyWithBlock:^(KCSPingResult *result) {
             // This block gets executed when the ping completes
             
@@ -103,7 +105,8 @@ int _number_of_times = 10;
             } 
             else 
             {
-                NSLog(@"\n\n%@",[result description]);
+                
+                NSLog(@"\nno network while ping\n%@",[result description]);
                 _kinveyPingSuccess = FALSE;
             }
         }];
@@ -160,19 +163,19 @@ int _number_of_times = 10;
         if(_kinveyPingSuccess == TRUE)
         {
             NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
-            [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+            [date_formater setDateFormat:@"dd/MM/YYYY HH:mm"];
             NSDate *currDate = [NSDate date];
             NSString *todayDate = [date_formater stringFromDate:currDate];
             [date_formater release];
             //Set logout details of user
             logout = [[KCSLogout alloc] init];
             logout.logouttime = todayDate;
-            logout.sessionId = _globalSessionId;
-           // [_globalSessionId release];
+            SessionStates *sharedManager = [SessionStates sharedManager];
             
-            //            [logout saveToCollection:_logoutCollection withDelegate:self];
-            //            
-            //            [logout release];
+            NSLog(@"\n\nthe string is at start %@\n\n",sharedManager._sessionId);
+            
+            logout.sessionId = sharedManager._sessionId;//_globalSessionId;
+           
         }
     }
 }
@@ -189,11 +192,19 @@ int _number_of_times = 10;
     /*
      Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
      */
+    
+  
+     //KCSAnalytics *col = [KCSAnalytics new];
+    SessionStates *sharedManager = [SessionStates sharedManager];
+
+  [sharedManager setSessionId];
+    _globalSessionId = sharedManager._sessionId;
+    
     //Check for the availability of Internet
     Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];   
    
     
-    NetworkStatus internetStatus = [r currentReachabilityStatus];    
+   NetworkStatus internetStatus = [r currentReachabilityStatus];    
     
     
     if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
@@ -211,7 +222,7 @@ int _number_of_times = 10;
                 //[logout release];
             }
         }
-    }
+   }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -241,61 +252,39 @@ int _number_of_times = 10;
 // This is called when a save fails
 - (void)entity:(id)entity operationDidFailWithError:(NSError *)error
 {
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];  
-   
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    
 
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\nNo Internet Connection in operationDidFailWithError");
-    }
-    else
-    {
         NSLog(@"\n%@",[error localizedDescription]);
         NSLog(@"\n%@",[error localizedFailureReason]);
-        
-        NSString *classname = NSStringFromClass([entity class]);
-        if([classname isEqualToString:@"KCSLogin"])
+        if(error.code != 401 && _number_of_times >= 0)
         {
-            [entity saveToCollection:_loginCollection withDelegate:self];
+            _number_of_times--;
+            NSString *classname = NSStringFromClass([entity class]);
+            if([classname isEqualToString:@"KCSLogin"])
+            {
+                [entity saveToCollection:_loginCollection withDelegate:self];
+            }
+            if([classname isEqualToString:@"KCSLogout"])
+            {
+                [entity saveToCollection:_logoutCollection withDelegate:self];
+            }  
         }
-        if([classname isEqualToString:@"KCSLogout"])
+        else if (error.code == 401)
         {
-            [entity saveToCollection:_logoutCollection withDelegate:self];
-        }  
-    }
+            [KCSUser clearSavedCredentials];
+        }
+    
 }
 
 //Collection Delegate Methods
 - (void)collection:(KCSCollection *)collection didCompleteWithResult:(NSArray *)result{
     
-    NSLog(@"Inside AppDeligate didCompleteWithResult\n");
-    
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-   
-    
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-   
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\nNo Internet Connection in didCompleteWithResult");
-    }
-    else
-    {
         
         NSDateFormatter *date_formater=[[NSDateFormatter alloc] init];
-        [date_formater setDateFormat:@"dd/MM/YYYY HH:MM"];
+        [date_formater setDateFormat:@"dd/MM/YYYY HH:mm"];
         NSDate *currDate = [NSDate date];
         NSString *todayDate = [date_formater stringFromDate:currDate];
         [date_formater release];
-        
-        NSString *temp_str = [[NSString alloc] initWithFormat:@"%d",[result count]+1];
-        _globalSessionId = [[NSString alloc] initWithFormat:@"%d",[result count]+1];//[NSString stringWithFormat:@"%@",temp_str];
-        [temp_str release]; 
-        
-        
+  
         //Set login details of user
         KCSLogin *loginDetails = [[KCSLogin alloc] init];
         
@@ -303,7 +292,10 @@ int _number_of_times = 10;
         
         loginDetails.logintime = todayDate;
         
-        loginDetails.sessionId = [NSString stringWithFormat:@"%d",[result count]+1];
+        SessionStates *sharedManager = [SessionStates sharedManager];
+       
+        loginDetails.sessionId = sharedManager._sessionId;//[NSString stringWithFormat:@"%d",[result count]+1];
+       
              
         [loginDetails saveToCollection:_loginCollection withDelegate:self];
         
@@ -311,9 +303,9 @@ int _number_of_times = 10;
         
         result = nil;
         [result release];
+        _number_of_times = 10;
         
-         
-    }
+        
 }
 
 - (void)collection:(KCSCollection *)collection didFailWithError:(NSError *)error{
@@ -329,8 +321,8 @@ int _number_of_times = 10;
     }
     else
     {
-        NSLog(@"\nkkdidFailWithErrorkk%@",[error localizedDescription]);
-        NSLog(@"\nkkdidFailWithErrorkk%@",[error localizedFailureReason]);
+        NSLog(@"\n%@",[error localizedDescription]);
+        NSLog(@"\n%@",[error localizedFailureReason]);
     }
 }
 
@@ -338,23 +330,11 @@ int _number_of_times = 10;
 // This is called when the load completes successfully
 - (void)entity:(id<KCSPersistable>)entity fetchDidCompleteWithResult:(NSUserDefaults *)result
 {
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];
-     
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\nNo Internet Connection in fetchDidCompleteWithResult");
-    }
-    else
-    {
         _kinveyUserId = [NSString stringWithString:[result objectForKey:@"username"]];
-        if(_kinveyPingSuccess)
-        {
+        
             [_loginCollection fetchAllWithDelegate:self];
             _number_of_times = 10;
-        }
-    }
+        
 }
 
 // Right now just pop-up an alert about the error we got back from Kinvey during
@@ -363,30 +343,24 @@ int _number_of_times = 10;
 - (void)entity:(id<KCSPersistable>)entity fetchDidFailWithError:(NSError *)error
 {
    
-    Reachability *r = [Reachability reachabilityWithHostName:@"www.google.com"];    
-
-    NetworkStatus internetStatus = [r currentReachabilityStatus];    
-       
-    if ((internetStatus != ReachableViaWiFi) && (internetStatus != ReachableViaWWAN))
-    {
-        NSLog(@"\n\nNo Internet Connection in fetchDidFailWithError");
-    }
-    else
-    {
+    
         NSLog(@"Error Description: %@, Code: %d, Supplemental: %@", [error localizedDescription], [error code], [error localizedFailureReason]); 
         if(error.code != 401 && _number_of_times >= 0){
-           
-            [[[KCSClient sharedClient] currentUser] loadWithDelegate:self];
-            _number_of_times--;
             
+            [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(loadCurrentUser) userInfo:nil repeats:NO];
+        
         }
         else if (error.code == 401)
         {
             [KCSUser clearSavedCredentials];
         }
         
-        
-    }
+}
+
+
+-(void) loadCurrentUser{
+    _number_of_times--;
+    [[[KCSClient sharedClient] currentUser] loadWithDelegate:self];
 }
 
 @end
